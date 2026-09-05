@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@10.28.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=24.x"
   },
   "scripts": {
     "typecheck": "tsc -b && tsc -p tsconfig.test.json",
