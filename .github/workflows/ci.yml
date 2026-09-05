@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-24.04
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      # Integration tests provision their own databases from this handle.
+      TEST_ADMIN_DATABASE_URL: postgres://postgres@127.0.0.1:5432/postgres
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # A clean checkout has no build output. If anything in the pipeline
+      # depends on a generated artifact, it has to generate it — this fails the
+      # job rather than passing on a developer's stale directory.
+      - name: Assert a clean tree
+        run: |
+          test ! -d storybook-static || { echo "storybook-static present in a clean checkout"; exit 1; }
+          test ! -d node_modules     || { echo "node_modules present in a clean checkout"; exit 1; }
+
+      - run: pnpm install --frozen-lockfile
+
+      # `pnpm verify` runs: typecheck -> source-tree check -> lint ->
+      # money-column check -> requirement-copy check -> build-storybook -> test.
+      # The Storybook build is an input to the coverage test, so it precedes it.
+      #
+      # The script is NOT called `ci`: pnpm reserves that name for a built-in
+      # command and refuses to run the script, which made this job fail on a
+      # clean checkout while passing locally.
+      - run: pnpm run verify
+
+      - name: Upload Storybook
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static
+          retention-days: 7

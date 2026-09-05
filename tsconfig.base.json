@@ -1,0 +1,61 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": [
+      "ES2023"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "composite": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@inrsettle/money": [
+        "packages/money/src/index.ts"
+      ],
+      "@inrsettle/ids": [
+        "packages/ids/src/index.ts"
+      ],
+      "@inrsettle/contracts": [
+        "packages/contracts/src/index.ts"
+      ],
+      "@inrsettle/db": [
+        "packages/db/src/index.ts"
+      ],
+      "@inrsettle/domain": [
+        "packages/domain/src/index.ts"
+      ],
+      "@inrsettle/jobs": [
+        "packages/jobs/src/index.ts"
+      ],
+      "@inrsettle/testing": [
+        "packages/testing/src/index.ts"
+      ],
+      "@inrsettle/api": [
+        "apps/api/src/index.ts"
+      ],
+      "@inrsettle/app-services": [
+        "packages/app/src/index.ts"
+      ],
+      "@inrsettle/providers": [
+        "packages/providers/src/index.ts"
+      ],
+      "@inrsettle/ui": [
+        "packages/ui/src/index.ts"
+      ],
+      "@inrsettle/domain/browser": [
+        "packages/domain/src/browser.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": "../.."
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../db"
+    },
+    {
+      "path": "../ids"
+    },
+    {
+      "path": "../domain"
+    },
+    {
+      "path": "../app"
+    }
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/__tests__/**"
+  ]
+}

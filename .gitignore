@@ -1,0 +1,42 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.turbo/
+.env
+.env.*
+!.env.example
+coverage/
+pgdata/
+
+# stray emits next to source (tsc should only write to dist/)
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+
+storybook-static/
+
+# Local-only working directories. `_to_delete/` holds superseded archives on a
+# developer's machine and must never reach the repository; it is listed here
+# rather than deleted because it is the developer's to remove.
+_to_delete/
+
+# Local recordings, databases and scratch output.
+*.sqlite
+*.sqlite3
+*.db
+recordings/
+*.mp4
+*.mov
+
+# Credential and key material. Never tracked, whatever the extension suggests.
+# `scripts/check-secrets.mjs` fails the build if any of it is staged anyway.
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+.npmrc
+.git-credentials
+secrets/

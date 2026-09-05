@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "types": [
+      "node"
+    ],
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2023",
+      "DOM"
+    ]
+  },
+  "include": [
+    "packages/**/*.test.ts",
+    "apps/**/*.test.ts",
+    "apps/**/*.test.tsx",
+    "apps/**/__tests__/**/*.ts",
+    "apps/**/__tests__/**/*.tsx",
+    "packages/**/__tests__/**/*.ts",
+    "scripts/**/*.test.ts",
+    "packages/**/*.stories.tsx",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx"
+  ]
+}

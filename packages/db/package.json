@@ -1,0 +1,7 @@
+{ "name": "@inrsettle/db", "version": "0.0.0", "private": true, "type": "module",
+  "main": "./src/index.ts", "types": "./src/index.ts",
+  "dependencies": {
+    "drizzle-orm": "^0.38.2",
+    "postgres": "^3.4.5",
+    "@inrsettle/contracts": "workspace:*"
+  } }

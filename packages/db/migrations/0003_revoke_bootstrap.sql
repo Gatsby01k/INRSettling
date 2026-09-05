@@ -1,0 +1,21 @@
+-- ============================================================================
+-- 0003 — drop bootstrap privilege from the queue role
+--
+-- ORDERING: runs after 0002, and must be applied by the role that granted the
+-- privileges in the first place — the database owner. `inrsettle_worker` cannot
+-- revoke a grant it did not make, so putting these statements in 0002 (which
+-- runs as the worker) would silently do nothing. That is exactly what an
+-- earlier revision did, and the privilege matrix test caught it.
+--
+-- `inrsettle_worker` needed CREATE on `public` to install the enqueue bridge,
+-- and CREATE on the database to install the queue schema. Runtime executes jobs
+-- against objects that already exist and needs neither. It keeps CONNECT, and
+-- it keeps full access to the objects it owns.
+--
+-- Re-running migrations is a deliberate act that re-grants CREATE first; see
+-- `installJobQueue()` in @inrsettle/testing and the ops runbook.
+-- ============================================================================
+
+REVOKE CREATE ON SCHEMA public FROM inrsettle_worker;
+-- The database-level revoke names the database, so it is issued by the
+-- migration runner rather than written here.

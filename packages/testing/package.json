@@ -1,0 +1,15 @@
+{
+  "name": "@inrsettle/testing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@inrsettle/db": "workspace:*",
+    "@inrsettle/ids": "workspace:*",
+    "postgres": "^3.4.5",
+    "@inrsettle/domain": "workspace:*",
+    "@inrsettle/app-services": "workspace:*"
+  }
+}

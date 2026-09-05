@@ -1,0 +1,21 @@
+{
+  "name": "@inrsettle/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@inrsettle/app-services": "workspace:*",
+    "@inrsettle/contracts": "workspace:*",
+    "@inrsettle/db": "workspace:*",
+    "@inrsettle/domain": "workspace:*",
+    "@inrsettle/ids": "workspace:*",
+    "@inrsettle/money": "workspace:*",
+    "drizzle-orm": "^0.38.2"
+  },
+  "devDependencies": {
+    "graphile-worker": "^0.16.6",
+    "postgres": "^3.4.9"
+  }
+}

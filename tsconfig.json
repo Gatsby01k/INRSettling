@@ -1,0 +1,44 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/money"
+    },
+    {
+      "path": "packages/ids"
+    },
+    {
+      "path": "packages/db"
+    },
+    {
+      "path": "packages/domain"
+    },
+    {
+      "path": "packages/jobs"
+    },
+    {
+      "path": "packages/providers"
+    },
+    {
+      "path": "packages/contracts"
+    },
+    {
+      "path": "packages/testing"
+    },
+    {
+      "path": "packages/ui"
+    },
+    {
+      "path": "packages/app"
+    },
+    {
+      "path": "apps/app"
+    },
+    {
+      "path": "apps/api"
+    },
+    {
+      "path": "apps/ops"
+    }
+  ]
+}

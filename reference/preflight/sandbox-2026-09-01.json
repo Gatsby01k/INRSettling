@@ -1,0 +1,110 @@
+{
+  "version": "sandbox-2026-09-01",
+  "source": "sandbox_fixture",
+  "description": "DETERMINISTIC SANDBOX TEST RULES — NOT REGULATORY TRUTH. These purpose and document rules are invented for the sandbox so the preflight engine can be exercised end to end. They are not RBI, FEMA or AD-bank requirements and must not be presented as such. Decision D-06 (the real purpose-code taxonomy and its document rules) is OPEN and can only be closed with evidence from the first payout partner and AD bank. When that evidence arrives it is loaded as a separate rule set with source 'ad_bank' or 'provider'; this file is then used only in sandbox.",
+  "purpose_codes": [
+    {
+      "code": "SOFTWARE_SERVICES",
+      "label": "Software services",
+      "regulatory_code": null
+    },
+    {
+      "code": "PROFESSIONAL_FEES",
+      "label": "Professional or consultancy fees",
+      "regulatory_code": null
+    },
+    {
+      "code": "GOODS_EXPORT",
+      "label": "Export of goods",
+      "regulatory_code": null
+    },
+    {
+      "code": "FAMILY_MAINTENANCE",
+      "label": "Family maintenance",
+      "regulatory_code": null
+    }
+  ],
+  "rules": [
+    {
+      "id": "sandbox.invoice_over_10_lakh",
+      "when": {
+        "all": [
+          { "fact": "purpose_code", "op": "in", "value": ["SOFTWARE_SERVICES", "PROFESSIONAL_FEES"] },
+          { "fact": "amount_minor_units", "op": "gte", "value": "100000000" },
+          { "fact": "documents", "op": "not_includes", "value": "commercial_invoice" }
+        ]
+      },
+      "code": "invoice_required",
+      "severity": "blocking",
+      "title": "Invoice is required for this settlement",
+      "detail": "Settlements of {{amount}} for {{purpose_label}} need a commercial invoice before we can send them.",
+      "action": { "type": "upload_document", "document_type": "commercial_invoice" }
+    },
+    {
+      "id": "sandbox.shipping_docs_goods",
+      "when": {
+        "all": [
+          { "fact": "purpose_code", "op": "eq", "value": "GOODS_EXPORT" },
+          { "fact": "documents", "op": "not_includes", "value": "shipping_document" }
+        ]
+      },
+      "code": "shipping_document_required",
+      "severity": "blocking",
+      "title": "Shipping document is required for goods",
+      "detail": "Settlements for export of goods need a bill of lading or airway bill attached to the settlement.",
+      "action": { "type": "upload_document", "document_type": "shipping_document" }
+    },
+    {
+      "id": "sandbox.tax_id_business_over_5_lakh",
+      "when": {
+        "all": [
+          { "fact": "beneficiary_type", "op": "eq", "value": "business" },
+          { "fact": "amount_minor_units", "op": "gte", "value": "50000000" },
+          { "fact": "beneficiary_has_tax_id", "op": "eq", "value": false }
+        ]
+      },
+      "code": "beneficiary_tax_id_required",
+      "severity": "blocking",
+      "title": "Beneficiary PAN is required at this amount",
+      "detail": "Business beneficiaries receiving {{amount}} or more need a PAN on file. Add it to {{beneficiary_name}} to continue.",
+      "action": { "type": "edit_beneficiary", "field": "tax_id" }
+    },
+    {
+      "id": "sandbox.family_maintenance_individual_only",
+      "when": {
+        "all": [
+          { "fact": "purpose_code", "op": "eq", "value": "FAMILY_MAINTENANCE" },
+          { "fact": "beneficiary_type", "op": "eq", "value": "business" }
+        ]
+      },
+      "code": "purpose_beneficiary_mismatch",
+      "severity": "blocking",
+      "title": "Family maintenance must go to an individual",
+      "detail": "{{beneficiary_name}} is a business, so choose a purpose that describes a payment to a company instead.",
+      "action": { "type": "select_purpose" }
+    },
+    {
+      "id": "sandbox.upi_amount_ceiling",
+      "when": {
+        "all": [
+          { "fact": "destination_kind", "op": "eq", "value": "upi" },
+          { "fact": "amount_minor_units", "op": "gt", "value": "10000000" }
+        ]
+      },
+      "code": "upi_amount_above_limit",
+      "severity": "blocking",
+      "title": "This amount is above the UPI limit",
+      "detail": "UPI cannot carry {{amount}} in a single transfer. Add a bank account for {{beneficiary_name}} and settle to that instead.",
+      "action": { "type": "add_payout_destination" }
+    },
+    {
+      "id": "sandbox.large_amount_advisory",
+      "when": { "fact": "amount_minor_units", "op": "gte", "value": "500000000" },
+      "code": "large_settlement_review",
+      "severity": "advisory",
+      "title": "Large settlements may take longer to clear",
+      "detail": "Settlements of {{amount}} are reviewed by the partner bank, which can add a few hours to delivery.",
+      "action": { "type": "contact_support", "topic": "large_settlement_timing" }
+    }
+  ]
+}

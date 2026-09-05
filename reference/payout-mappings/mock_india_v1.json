@@ -1,0 +1,90 @@
+{
+  "version": "mock_india_payout.2026-09-03",
+  "provider_id": "mock_india_payout",
+  "source": "sandbox_fixture",
+  "description": "Sandbox fixture mapping the simulator's vocabulary onto the closed INRSettle exception taxonomy. Not a real provider's contract: every code here is one MockIndiaPayoutProvider emits, and a live provider's table replaces this wholesale rather than extending it.",
+  "codes": [
+    {
+      "provider_code": "BENE_ACCOUNT_CLOSED",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_DESTINATION",
+      "note": "The beneficiary's bank refused the credit because the account no longer exists. Customer-actionable: they can supply a different account, which is why this maps to the destination code rather than the provider one."
+    },
+    {
+      "provider_code": "BENE_ACCOUNT_INVALID",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_DESTINATION",
+      "note": "Account number or IFSC did not resolve at the beneficiary bank. Same customer remedy as a closed account."
+    },
+    {
+      "provider_code": "BENE_NAME_MISMATCH",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_DESTINATION",
+      "note": "The rail rejected on name comparison. Customer-actionable because correcting the holder name is something only they can do."
+    },
+    {
+      "provider_code": "COMPLIANCE_HOLD",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_COMPLIANCE",
+      "note": "Screening or documentation refusal at the partner. Not customer-actionable in the sense of a form to fill in; operations engages before anything is asked of the customer."
+    },
+    {
+      "provider_code": "PURPOSE_CODE_INVALID",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_COMPLIANCE",
+      "note": "The declared purpose code was not accepted for this corridor or amount band. Compliance rather than destination, because the account is fine and the paperwork is not."
+    },
+    {
+      "provider_code": "RAIL_UNAVAILABLE",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_PROVIDER",
+      "note": "The chosen rail was closed or the provider could not reach it. Nothing about the customer or the beneficiary is wrong; this is ours to retry on another rail."
+    },
+    {
+      "provider_code": "PROVIDER_INTERNAL_ERROR",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_PROVIDER",
+      "note": "The provider failed for its own reasons and says so definitively. A definite failure, unlike a timeout, so it is a rejection rather than an unknown."
+    },
+    {
+      "provider_code": "INSUFFICIENT_PROVIDER_BALANCE",
+      "outcome": "rejected",
+      "exception_code": "PAYOUT_REJECTED_PROVIDER",
+      "note": "The partner's own funding was short. Invisible to the customer and not their problem; operations owns it."
+    },
+    {
+      "provider_code": "ACCEPTED",
+      "outcome": "accepted",
+      "note": "The instruction was taken but has not reached the beneficiary. Not terminal, and carries no exception code because nothing has gone wrong."
+    },
+    {
+      "provider_code": "CREDITED",
+      "outcome": "credited",
+      "note": "Value reached the beneficiary. Requires a well-formed UTR before it may move the settlement (T16)."
+    },
+    {
+      "provider_code": "RETURNED_BY_BENEFICIARY_BANK",
+      "outcome": "returned",
+      "note": "A credit that the receiving bank later sent back. A fact about the rails-level execution (P08) that opens a SettlementReturn (N01); it does not change the settlement's status, which stays SETTLED because it was.",
+      "return_reason": "RAIL_REVERSAL"
+    },
+    {
+      "provider_code": "STATUS_UNAVAILABLE",
+      "outcome": "unknown",
+      "exception_code": "PAYOUT_STATUS_UNKNOWN",
+      "note": "The provider will not say. The only correct response is an authoritative status pull, never a resubmission (INV-24)."
+    },
+    {
+      "provider_code": "RETURNED_ACCOUNT_CLOSED",
+      "outcome": "returned",
+      "return_reason": "BENEFICIARY_ACCOUNT_CLOSED",
+      "note": "The beneficiary's account was closed between the credit and the return, so the receiving bank sent the money back. Mapped rather than left unmapped because the reason is one the closed taxonomy already names."
+    },
+    {
+      "provider_code": "RETURNED_NAME_MISMATCH",
+      "outcome": "returned",
+      "return_reason": "BENEFICIARY_NAME_MISMATCH",
+      "note": "The receiving bank compared names downstream of the rail and refused the credit after accepting it. Distinct from a rejection at submission, which never delivers."
+    }
+  ]
+}
