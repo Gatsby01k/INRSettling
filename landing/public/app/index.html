@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f0f7fc">
+  <meta name="description" content="The INRSettle workspace. Explore cross-border settlements, liquidity, counterparties and reconciliation in an interactive product demo.">
+  <title>Overview · INRSettle</title>
+  <link rel="icon" href="/assets/brand-favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/regular.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="/assets/bold.otf" as="font" type="font/otf" crossorigin>
+  <link rel="stylesheet" href="/app/workspace.css">
+  <script type="module" src="/app/workspace.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to workspace</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
+      <a class="sidebar-brand" href="/" aria-label="INRSettle website"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a>
+      <button class="icon-button sidebar-close" data-action="menu-close" aria-label="Close navigation"></button>
+      <nav id="main-nav" aria-label="Main navigation"></nav>
+      <div class="sidebar-art" aria-hidden="true"><img class="sidebar-map" src="/assets/flow.webp" alt="" width="2151" height="731"><img class="sidebar-city" src="/assets/city.webp" alt="" width="2001" height="786"><p>India<br>to the world.<br>Faster. Safer.<br>Together.</p></div>
+      <button class="help-card" data-action="support"><span data-icon="headphones"></span><span>Need help?<small>Talk to our team</small></span><span data-icon="chevron-right"></span></button>
+    </aside>
+    <button class="sidebar-scrim" data-action="menu-close" aria-label="Close navigation" hidden></button>
+    <div class="main-column">
+      <div class="header-art" aria-hidden="true"><img class="header-map" src="/assets/flow.webp" width="2151" height="731" alt=""><img class="header-city" src="/assets/city.webp" width="2001" height="786" alt=""><p>Liquidity<br>connects<br>opportunities</p></div>
+      <header class="topbar">
+        <button class="icon-button mobile-menu" data-action="menu" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button>
+        <button class="global-search" data-action="search"><span data-icon="search"></span><span>Search settlements, counterparties, corridors…</span><kbd>⌘ K</kbd></button>
+        <div class="topbar-account"><button class="notification-button icon-button" data-action="notifications" aria-label="Notifications, 3 unread"><span data-icon="bell"></span><i></i></button><span class="account-divider"></span><button class="account-button" data-action="account" aria-haspopup="dialog"><span class="avatar">RM</span><span class="account-copy"><strong>Rohit Mehta</strong><small>Acme Global Pvt Ltd</small></span><span data-icon="chevron-down"></span></button></div>
+      </header>
+      <main id="workspace" tabindex="-1"><div class="initial-load">Opening your workspace…</div></main>
+    </div>
+  </div>
+  <footer class="app-footer"><a href="/" aria-label="INRSettle website"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Footer"><a href="/">Product</a><button data-action="support">Support</button><button data-action="system-status">Status</button><span class="demo-caption">Demo workspace</span></nav><p>People. Payments. Progress.</p></footer>
+  <dialog class="dialog" id="app-dialog" aria-labelledby="dialog-title"><button class="icon-button dialog-close" data-action="dialog-close" aria-label="Close dialog"><span data-icon="x"></span></button><div id="dialog-content"></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">Please enable JavaScript to use the INRSettle workspace.</p></noscript>
+</body>
+</html>

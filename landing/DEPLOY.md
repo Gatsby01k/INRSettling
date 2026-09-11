@@ -1,11 +1,14 @@
 # Deploying the site
 
-Two properties on one domain, two Vercel projects, one repository:
+One Vercel project, one domain, one repository. The site is `landing/public/`
+and the demo workspace is `landing/public/app/` inside it, so `/` and `/app/` come
+from the same deployment.
 
-| | Source | Vercel Root Directory |
-|---|---|---|
-| `example.com` + `www` | `landing/` | `landing` |
-| `app.example.com` | the product workspace | set when it has a home |
+The repository root carries a `vercel.json` pointing `outputDirectory` at
+`landing/public` with the install and build commands blanked, so importing this
+repository with **default settings** serves the site. Setting Root Directory to
+`landing` works too — Vercel then reads `landing/vercel.json` instead — but it is
+no longer the setting everything depends on.
 
 Replace `example.com` with the real domain. DNS is at Njalla.
 
@@ -63,34 +66,32 @@ Njalla has no ALIAS/ANAME, which is why the apex is an A record. Leave existing 
 and TXT records alone — you are changing web records, not moving nameservers.
 Vercel issues the certificate itself once the records resolve.
 
-## 4. The workspace subdomain
+## 4. The workspace
 
-The workspace is the product frontend and does not live in `landing/`. When it has
-a home in this repository, create a second Vercel project pointed at that
-directory, add `app.example.com` to it, and create the CNAME with **that**
-project's target — it differs from the site's.
+The v6 demo workspace ships inside the site at `landing/public/app/` — four static
+files, hash routing, no network calls, sharing `/assets/` with the site. It needs
+no subdomain, no second Vercel project and no rewrite rules, and the four CTAs
+already point at `/app/`, so nothing has to be repointed.
 
-## 5. Point the site's buttons at the workspace
+`landing/scripts/set-app-url.mjs` stays for the day the real product frontend gets
+its own deployment: it moves those four links to an absolute URL and back.
 
-Four links — header CTA, hero CTA, "Open App", closing CTA — point at `/app/`.
-Once the subdomain answers:
-
-```bash
-node landing/scripts/set-app-url.mjs https://app.example.com
-node landing/scripts/set-app-url.mjs          # verify: ×4 at the new URL
-git commit -am "Point the site's app links at the workspace" && git push
-```
-
-Idempotent and reversible — pass `/app/` to put them back.
+**It is a demo, and the page barely says so.** No provider, no authorization, no
+API; the figures are invented. The only standing disclosure is a "Demo workspace"
+caption in the footer — every other one ("Production endpoints and credentials are
+not connected", "No money has been sent") appears only after the visitor interacts
+with something. A prospect who clicks "Open App" sees a working-looking dashboard
+first and the disclaimer second. Decide whether that is the impression you want
+before the domain is announced.
 
 ## 6. End-to-end check
 
 - [ ] `example.com` serves over HTTPS, `www` redirects to it
 - [ ] Favicon in the tab; fonts load (page is in Nimbus Sans, not Arial)
 - [ ] All three background renders appear: hero plate, city, flow
-- [ ] All four CTAs land on `app.example.com`
-- [ ] The workspace loads there and its brand link returns to `example.com`
-- [ ] Lighthouse mobile run on both
+- [ ] All four CTAs open `/app/` and the workspace renders
+- [ ] The workspace's brand link in the sidebar returns to the site
+- [ ] Lighthouse mobile run on both `/` and `/app/`
 - [ ] The contact dialog still only prepares a local brief
 
 ## Before this is a launch rather than a preview
