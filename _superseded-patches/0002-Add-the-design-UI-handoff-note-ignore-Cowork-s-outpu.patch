@@ -1,0 +1,217 @@
+From b88b968a4e70c783ae7307504b4441682606ffa4 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 7 Sep 2026 08:07:49 +0000
+Subject: [PATCH 2/2] Add the design/UI handoff note; ignore Cowork's output
+ directory
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+HANDOFF_DESIGN_UI.md is the state-of-play note for the design/UI-UX
+workstream: where the code is, what exists, what is missing, which frozen
+constraints govern, and the open questions. It sits with the STAGE*_NOTES
+files because it is the same kind of document — what a reader needs before
+touching this repository, rather than a record of one stage.
+
+`Claude outputs/` is Cowork's output directory on a developer's machine. It
+mirrors files that already live here, so tracking it would store each of them
+twice. `scripts/check-secrets.mjs` already refuses it as a tracked path; this
+keeps it out of `git status` as well.
+
+`design-prototypes/` stays deliberately untracked. Where it belongs depends on
+an open decision — the landing in its own repository or in this monorepo — and
+`APPLYING-TO-PRODUCT.md § 6` answers that for the landing itself: its own
+repository. Committing 1.4MB of brand assets here before that is settled would
+mean moving them out of the history later.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01LPVnM7qXgs4pLQ3aDpGsxx
+---
+ .gitignore           |   4 ++
+ HANDOFF_DESIGN_UI.md | 162 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 166 insertions(+)
+ create mode 100644 HANDOFF_DESIGN_UI.md
+
+diff --git a/.gitignore b/.gitignore
+index 505d8bc..228e2c1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -40,3 +40,7 @@ id_ed25519
+ .npmrc
+ .git-credentials
+ secrets/
++
++# Cowork's own output directory on a developer's machine. It mirrors files that
++# already live in the repository, so tracking it would store each of them twice.
++Claude outputs/
+diff --git a/HANDOFF_DESIGN_UI.md b/HANDOFF_DESIGN_UI.md
+new file mode 100644
+index 0000000..c140237
+--- /dev/null
++++ b/HANDOFF_DESIGN_UI.md
+@@ -0,0 +1,162 @@
++# Передаточная записка — дизайн-система, UI/UX, лендинг
++
++Вставьте это в новый чат первым сообщением. Здесь всё, что нужно знать, чтобы не
++начинать с раскопок, и всё, чего трогать нельзя.
++
++---
++
++## 1. Где что лежит
++
++| | |
++|---|---|
++| Репозиторий | `github.com/Gatsby01k/INRSettling`, ветка `main` |
++| Текущий коммит | `2e078209d63e383e0db63e191f7db14da9e228c2` |
++| Локально | `~/Documents/inrsettle-vnext` (MacBook Air) |
++| Проверка | `pnpm run verify` — 83 файла, 1 653 теста, зелёный |
++| CI | GitHub Actions зелёный на обоих коммитах |
++| Лендинг | отдельный трек: Next.js App Router + Tailwind + Framer Motion, dark-fintech |
++
++Старые папки на Mac (`~/appsettle`, `~/Documents/inrsettle` и подобные) —
++**не читать и не переиспользовать**. Это сознательное решение проекта.
++
++---
++
++## 2. Что построено (Stages 1–10)
++
++**`packages/ui`** — дизайн-система:
++
++- примитивы из каталога `DESIGN_SYSTEM.md § 5` — Button, Input, Select, Modal,
++  Drawer, Tabs, Toast, Tooltip, Skeleton, EmptyState и остальные
++- доменные компоненты: `AmountDisplay`, `AmountInput`, `SettlementProgress`,
++  `QuoteSummary`, `Reference`, `StatusIndicator`, `RequirementCard`,
++  `BeneficiaryPicker`, `MetricTile`, `EventRow`, `DesktopTask`
++- токены (`tokens.ts`) и два листа стилей: `primitives.css.ts` (компоненты),
++  `screens.css.ts` (раскладка экранов и четыре брейкпоинта)
++- каталог движения `tokens/motion.ts` — семь разрешённых анимаций как данные
++
++**`apps/app/src`** — пять экранов, **презентационных**: принимают `props` и
++колбэки, данные берут из фикстур.
++
++- `overview/` — Overview, четыре метрики
++- `settlements/` — New Settlement, Settlement detail
++- `beneficiaries/`, `developers/`
++
++**Гейты, которые придётся уважать** (все в `pnpm verify`):
++
++| Гейт | Что ловит |
++|---|---|
++| `check-styles.mjs` | класс без правила; `var()` без токена; два компонента на одном блоке; брейкпоинт не из § 8 |
++| `check-motion.mjs` | восьмая анимация; >400 мс; хардкод длительности; отсутствие reduced-motion; запрещённый список § 6 |
++| `check-secrets.mjs` | строка, похожая на ключ; трекинг `.env` и ключевого материала |
++| `check-liquidity-copy.mjs` | слова balance / wallet / credit / facility в клиентских текстах |
++| `screens.test.ts` | экран без объявленных пяти состояний |
++| `accessibility.test.tsx` | WCAG 2.2 AA на составных экранах, axe с реальным CSS |
++
++Каждый гейт имеет собственный тест, доказывающий, что он **отклоняет** дефект,
++ради которого написан. Ослаблять гейт, чтобы что-то прошло, — неправильный ход.
++
++---
++
++## 3. Чего нет — настоящий долг
++
++**Оболочки приложения.** Проверено грепом, не по памяти:
++
++```
++точка входа (main.tsx / index.html)   не найдено
++роутер                                 не найдено
++createRoot / ReactDOM.render           не найдено
++сетевые вызовы из UI                   ни одного
++```
++
++Пять экранов существуют, но их **некуда открыть**. К бэкенду Stages 1–9 они не
++подключены ни одной строкой. Поэтому Vercel падает с
++`Could not resolve entry module "index.html"` — это не сломанная конфигурация,
++а отсутствующее приложение.
++
++Нужно: точка входа, роутинг по пяти экранам, HTTP-клиент к `/v1` с маппингом на
++view-models, сессия в браузере, error boundaries, загрузка и сетевые отказы,
++сборка и хостинг.
++
++**Важно:** в замороженном `IMPLEMENTATION_PLAN.md` **нет этапа, который это
++делает**. Греп по router / SPA / entry point / bundle / deploy / hosting —
++пусто. Stage 11 — интеграции с провайдерами, Stage 12 — production hardening.
++Между «экраны готовы» и «есть что задеплоить» в плане дыра. Это изменение
++объёма подписанного плана, и решение о нём принимает основатель.
++
++---
++
++## 4. Что заморожено и не меняется
++
++Восемь документов в `docs/` под SHA-256 манифестом в `README.md`. Любое
++изменение — новая ревизия и новый манифест, по явному решению.
++
++Для дизайн-работы держать в голове:
++
++- **`DESIGN_SYSTEM.md § 1`** — пять принципов. «Число — это интерфейс».
++  «Сдержанность читается как доверие». «Глубина из типографики и отступов, не из
++  теней, градиентов и стекла»
++- **`§ 5`** — закрытый каталог примитивов. § 12: *компонент, который есть в
++  приложении, но не в `packages/ui` — это баг*
++- **`§ 6`** — семь разрешённых анимаций и явный запрет: конфетти, взрывы
++  галочек, частицы, parallax, кинематографические секвенции, зацикленная фоновая
++  анимация, всё длиннее 400 мс, и всё, что движется, пока человек читает число
++- **`§ 7`** — доступность, цвет никогда не единственный носитель смысла
++- **`§ 8`** — четыре брейкпоинта: 1280 / 1024 / 768 / ниже. Ниже 768 —
++  «мониторинг»: создание батча, CSV-импорт и API-ключи прямо говорят, что это
++  задачи для компьютера, а не деградируют
++- **`§ 10`** — пять состояний у каждого компонента и каждого экрана
++- **`PRODUCT.md § 12`** — продуктовая поверхность: Overview, Settlements,
++  Beneficiaries, Batches, Developers. И всё
++- **`§ 12.1`** — Overview отвечает на четыре вопроса, пятой метрики нет
++  (Revision 5 удалила предложенную)
++- **`§ 12.2`** — порядок чтения New Settlement, морфинг суммы, кнопка всегда
++  называет сумму
++- **`§ 12.3`** — детали сеттлмента: три вещи в шапке, таймлайн человеческим
++  языком, уведомление о возврате читается первым
++- **`§ 17`** — тест Алекса
++
++---
++
++## 5. Открытые вопросы для нового чата
++
++1. **Куда отнести оболочку приложения** — отдельный этап между 10 и 11,
++   расширение Stage 11, или Stage 12. Изменение объёма плана.
++2. **Граница двух дизайн-систем.** Продукт и лендинг должны расходиться
++   осознанно. Общее — только бренд-токены: палитра и подпись саффран→бирюза
++   (`DESIGN_SYSTEM.md` строка 65 — единственное упоминание маркетинга во всём
++   замороженном наборе). Расходятся: движение (§ 6 запрещает ровно то, чем живёт
++   Framer Motion), плотность, тон. Без записанной границы поедет в обе стороны:
++   либо parallax приедет в Settlement detail, либо продуктовая сдержанность
++   высосет жизнь из лендинга.
++3. **Лендинг — отдельный репозиторий или монорепо.** Рекомендация: отдельный.
++   Разные правила, разный темп, общий CI им только мешает.
++4. **Тест Алекса всё ещё открыт.** `docs/ALEX_TEST_PROTOCOL.md` готов,
++   `docs/ALEX_TEST_RECORD.md` говорит NOT RUN, `check-alex-test.mjs` роняет
++   сборку, если какой-нибудь документ заявит обратное. Закрывается только
++   реальной сессией с неподготовленным человеком.
++5. **Vercel** сейчас падает на каждом пуше. Либо отключить проект, либо
++   нацелить на `pnpm build-storybook` → `storybook-static`. Учесть: это делает
++   всю дизайн-систему публичной.
++6. **`engines.node`** — `>=24.x` в манифесте, `node-version: 22` в CI. Прогоны
++   зелёные (pnpm по умолчанию только предупреждает), но манифест заявляет порог,
++   который CI не проверяет.
++
++---
++
++## 6. Что принести в новый чат
++
++- **референсы** — то, что хотели показать
++- решение по вопросу 1 (куда относить оболочку) или готовность его обсудить
++- решение по вопросу 3 (репозиторий лендинга)
++
++---
++
++## 7. Правила работы
++
++- Не начинать Stage 11 — он ждёт закрытия Stage 10, то есть теста Алекса
++- Не менять замороженные документы без новой ревизии и нового манифеста
++- Не менять продуктовое поведение под предлогом дизайн-работы
++- Не ослаблять гейты, чтобы что-то прошло — гейт написан против конкретного
++  дефекта, и у каждого есть тест, доказывающий, что он его ловит
++- Держать объём этапа строго: поведение более поздних этапов не реализуется
++  раньше только потому, что документы его уже описывают
+-- 
+2.43.0
+

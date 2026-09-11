@@ -40,3 +40,7 @@ id_ed25519
 .npmrc
 .git-credentials
 secrets/
+
+# Cowork's output directory on a developer machine. It mirrors files that
+# already live in the repository, so tracking it would store each of them twice.
+Claude outputs/

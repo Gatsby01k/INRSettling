@@ -1,0 +1,369 @@
+From 6de22292190044193d12854fecd8475f8152dc9d Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sun, 6 Sep 2026 22:40:43 +0000
+Subject: [PATCH 1/2] Bring the five screens to the prototype's anatomy and
+ density
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Applies design-prototypes/APPLYING-TO-PRODUCT.md. No frozen document is
+touched, no gate is weakened, and no new token is minted.
+
+Content pass first, per § 1. The five screens already satisfied the § 2
+mapping: the divergences README.md lists — vanity metrics, delta chips, the
+greeting hero, Processing/Failed, on-chain vocabulary, nav outside § 12 — are
+in the prototype, not in the product. Verified rather than rewritten.
+
+What crosses, as anatomy and density:
+
+  - Table density. Cells were 6px 8px / 8px; they are now 8px 16px / 12px 16px.
+    The prototype pads 13px vertical and 18px horizontal with 11.5px labels,
+    and none of those three is on a frozen scale — space runs 12/16/20 and the
+    type scale stops at 12. § 5.1 says express the look with existing tokens,
+    so this is the nearest rhythm the scales can state. What crosses is the
+    shape of the rhythm: tight rows with generous horizontal air.
+
+  - A hairline-framed panel around each table, with the count on the right of
+    its head. The prototype draws the same surface with layered shadows and a
+    16px radius; § 1.3 puts depth in typography and spacing, and 16px is not on
+    the radius scale, so one 1px hairline does the structural work.
+
+  - The filter toolbar: filters left, primary action right. On the beneficiary
+    list the action moves out of the page header to get there — the thing you
+    do to the list belongs with the controls that shape it.
+
+  - The detail drawer. Drawer was already in the § 5 catalogue, so this is
+    composition, not a new primitive. Audited with axe inside the dialog, where
+    heading order and labelling most often go wrong.
+
+What deliberately does not cross: the cool ground #EFF4F8, the mint #2FD9A8,
+blue Processing, --shadow-card and --shadow-lift, the 16px radius, and the
+#93A1B2 micro-labels — the last at roughly 2.6:1, fine as marketing decoration
+and a § 7 failure as product content. No glass, ribbons, dotted map or city
+silhouette. README.md's "what to take" line names glass; APPLYING-TO-PRODUCT
+§ 3 excludes it and § 5.2 makes it a founder decision, and the normative
+document wins.
+
+The Alex test stays NOT RUN. § 6 of the applying document is explicit that a
+run before the restyle is invalidated by it, so it comes next — with a real
+person, and after the Stage 10.5 shell gives them somewhere to click.
+
+Verification: pnpm run verify clean — 83 files, 1654 tests.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01LPVnM7qXgs4pLQ3aDpGsxx
+---
+ apps/app/src/__tests__/accessibility.test.tsx | 18 +++++++
+ apps/app/src/beneficiaries/surfaces.tsx       | 32 +++++++++---
+ apps/app/src/overview/surfaces.tsx            | 52 +++++++++++++------
+ apps/app/src/settlements/detail.stories.tsx   | 29 +++++++++++
+ packages/ui/src/components/primitives.css.ts  | 26 +++++++++-
+ packages/ui/src/components/screens.css.ts     | 50 ++++++++++++++++++
+ 6 files changed, 182 insertions(+), 25 deletions(-)
+
+diff --git a/apps/app/src/__tests__/accessibility.test.tsx b/apps/app/src/__tests__/accessibility.test.tsx
+index 9b309b1..749d77f 100644
+--- a/apps/app/src/__tests__/accessibility.test.tsx
++++ b/apps/app/src/__tests__/accessibility.test.tsx
+@@ -33,6 +33,7 @@ import { DevelopersPage } from '../developers/surfaces.js'
+ import {
+   API_KEYS, ENDPOINTS, EVENTS, EVENT_TYPES, EXAMPLES, REFERENCE_ENDPOINTS, REQUESTS,
+ } from '../developers/fixtures.js'
++import { Drawer } from '@inrsettle/ui'
+ import { BeneficiaryList } from '../beneficiaries/surfaces.js'
+ import { ROWS as BENEFICIARY_ROWS } from '../beneficiaries/fixtures.js'
+ 
+@@ -229,6 +230,23 @@ const SCREENS: readonly [string, () => React.ReactElement][] = [
+       />
+     ),
+   ],
++  [
++    // The prototype's drawer pattern (APPLYING § 3). Audited because a dialog
++    // is where heading order, focus and labelling most often go wrong, and
++    // because the detail screen was written to be a page.
++    'Settlement detail — in the drawer',
++    () => (
++      <Drawer open title="Settlement stl_2Rn8Kq5TzYw6" onClose={noop}>
++        <SettlementDetail
++          {...DETAIL_BASE}
++          presentation={SETTLED_DESIGN_ONLY}
++          internalStatus="SETTLED"
++          authorizedAt={new Date('2026-09-02T08:32:00Z')}
++          timeline={TIMELINE}
++        />
++      </Drawer>
++    ),
++  ],
+   [
+     'Settlement detail — loading',
+     () => (
+diff --git a/apps/app/src/beneficiaries/surfaces.tsx b/apps/app/src/beneficiaries/surfaces.tsx
+index 00d46dc..77cfedd 100644
+--- a/apps/app/src/beneficiaries/surfaces.tsx
++++ b/apps/app/src/beneficiaries/surfaces.tsx
+@@ -49,16 +49,32 @@ export function BeneficiaryList({
+     <section aria-labelledby="beneficiaries-heading">
+       <header className="is-page__header">
+         <h1 id="beneficiaries-heading">Beneficiaries</h1>
+-        <Button onClick={onCreate}>New beneficiary</Button>
+       </header>
+ 
+-      <Input
+-        id="beneficiary-search"
+-        label="Search"
+-        value={query}
+-        placeholder="Search by name"
+-        onChange={(e) => onQueryChange(e.target.value)}
+-      />
++      {/*
++        * The filter toolbar from the prototype's anatomy (APPLYING § 3):
++        * filters on the left, the primary action on the right, on one line
++        * above the list.
++        *
++        * The action moves out of the page header to get here. That is the point
++        * of the pattern — the thing you do to the list sits with the controls
++        * that shape the list, at the eye's return point after scanning a row,
++        * rather than in the page furniture at the top.
++        */}
++      <div className="is-toolbar">
++        <div className="is-toolbar__filters">
++          <Input
++            id="beneficiary-search"
++            label="Search"
++            value={query}
++            placeholder="Search by name"
++            onChange={(e) => onQueryChange(e.target.value)}
++          />
++        </div>
++        <div className="is-toolbar__action">
++          <Button onClick={onCreate}>New beneficiary</Button>
++        </div>
++      </div>
+ 
+       {error && (
+         <EmptyState
+diff --git a/apps/app/src/overview/surfaces.tsx b/apps/app/src/overview/surfaces.tsx
+index 9af2f5b..abfc1fc 100644
+--- a/apps/app/src/overview/surfaces.tsx
++++ b/apps/app/src/overview/surfaces.tsx
+@@ -111,19 +111,40 @@ function SettlementSection({
+   id, title, rows, onOpen, loading, emptyBody,
+ }: SettlementSectionProps): React.ReactElement {
+   return (
+-    <section aria-labelledby={`${id}-title`}>
+-      <h2 id={`${id}-title`} className="is-section__title">{title}</h2>
+-
+-      {loading ? (
+-        <div role="status" aria-busy="true" aria-label={`Loading ${title.toLowerCase()}`}>
+-          <Skeleton height={44} />
+-          <Skeleton height={44} />
+-          <Skeleton height={44} />
++    <section aria-labelledby={`${id}-title`} className="is-section">
++      {/*
++        * The framed surface from the prototype's anatomy (APPLYING § 3): the
++        * table sits inside a hairline frame with its own head, rather than bare
++        * on the page. The count goes on the right of that head — it is the one
++        * number a scanning eye wants before reading any row.
++        */}
++      <div className="is-panel">
++        <div className="is-panel__head">
++          <h2 id={`${id}-title`} className="is-panel__title">{title}</h2>
++          {!loading && rows.length > 0 && (
++            <span className="is-panel__count">{rows.length}</span>
++          )}
+         </div>
+-      ) : rows.length === 0 ? (
+-        emptyBody ? <EmptyState title="Nothing here" body={emptyBody} /> : <></>
+-      ) : (
+-        <table className="is-table">
++
++        {loading ? (
++          <div
++            className="is-panel__body"
++            role="status"
++            aria-busy="true"
++            aria-label={`Loading ${title.toLowerCase()}`}
++          >
++            <Skeleton height={44} />
++            <Skeleton height={44} />
++            <Skeleton height={44} />
++          </div>
++        ) : rows.length === 0 ? (
++          emptyBody ? (
++            <div className="is-panel__body">
++              <EmptyState title="Nothing here" body={emptyBody} />
++            </div>
++          ) : <></>
++        ) : (
++          <table className="is-table">
+           <thead>
+             <tr>
+               <th scope="col">Beneficiary</th>
+@@ -162,9 +183,10 @@ function SettlementSection({
+                 </td>
+               </tr>
+             ))}
+-          </tbody>
+-        </table>
+-      )}
++            </tbody>
++          </table>
++        )}
++      </div>
+     </section>
+   )
+ }
+diff --git a/apps/app/src/settlements/detail.stories.tsx b/apps/app/src/settlements/detail.stories.tsx
+index b784f7d..532e303 100644
+--- a/apps/app/src/settlements/detail.stories.tsx
++++ b/apps/app/src/settlements/detail.stories.tsx
+@@ -1,4 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react'
++import { Drawer } from '@inrsettle/ui'
+ import { SettlementDetail } from './surfaces.js'
+ import {
+   ACTION_REQUIRED,
+@@ -224,3 +225,31 @@ export const DetailReturnResolved: StoryObj<typeof SettlementDetail> = {
+     },
+   },
+ }
++
++/* ── Анатомия прототипа: правая шторка вместо отдельной страницы ────────── */
++
++export const InDrawer: StoryObj<typeof SettlementDetail> = {
++  name: 'In the detail drawer',
++  render: () => (
++    <Drawer open title="Settlement stl_2Rn8Kq5TzYw6" onClose={noop}>
++      <SettlementDetail
++        {...DETAIL_BASE}
++        presentation={SETTLED_DESIGN_ONLY}
++        internalStatus="SETTLED"
++        authorizedAt={new Date('2026-09-02T08:32:00Z')}
++        timeline={TIMELINE}
++      />
++    </Drawer>
++  ),
++  parameters: {
++    docs: {
++      description: {
++        story:
++          'The drawer pattern from the console prototype, which `APPLYING-TO-PRODUCT § 3` lists as crossing: ' +
++          'opening a settlement keeps the list behind it instead of replacing the page. `Drawer` is already in the ' +
++          '`§ 5` catalogue, so this is composition rather than a new primitive — the shell that wires it to a ' +
++          'route is Stage 10.5.',
++      },
++    },
++  },
++}
+diff --git a/packages/ui/src/components/primitives.css.ts b/packages/ui/src/components/primitives.css.ts
+index 54e6f2a..15f01f7 100644
+--- a/packages/ui/src/components/primitives.css.ts
++++ b/packages/ui/src/components/primitives.css.ts
+@@ -418,8 +418,27 @@ textarea.is-field__control { min-height: 84px; padding: var(--space-2) var(--spa
+   width: 100%; border-collapse: collapse;
+   font-size: var(--type-body-size);
+ }
++/*
++ * Density comes from the console prototype, expressed on the frozen scales.
++ *
++ * The prototype pads cells 13px vertical and 18px horizontal and sets its
++ * micro-labels at 11.5px. None of those three is on a scale: space runs
++ * 12 -> 16 -> 20, and the type scale stops at 12. APPLYING-TO-PRODUCT 5.1 is
++ * explicit that the look is expressed with existing tokens rather than by
++ * minting new ones, so this is the nearest rhythm the scales can say:
++ * 12px vertical, 16px horizontal, labels at 12px.
++ *
++ * What actually crosses is the *shape* of that rhythm -- tight rows with
++ * generous horizontal air -- not the exact pixels. 16px also matches the card
++ * padding already in use, so the table and the surfaces around it share one
++ * measure instead of two that nearly agree.
++ *
++ * The label colour deliberately does not follow the prototype. Its micro-labels
++ * sit near #93A1B2 on white, about 2.6:1 -- fine for marketing decoration and a
++ * 7 failure for product content, which these labels are.
++ */
+ .is-table th {
+-  text-align: left; padding: var(--space-2) var(--space-3);
++  text-align: left; padding: var(--space-3) var(--space-5);
+   border-bottom: 1px solid var(--color-border-strong);
+   color: var(--color-ink-muted);
+   font-size: var(--type-label-size); font-weight: var(--type-label-weight);
+@@ -427,9 +446,12 @@ textarea.is-field__control { min-height: 84px; padding: var(--space-2) var(--spa
+   white-space: nowrap;
+ }
+ .is-table td {
+-  padding: var(--space-3); border-bottom: 1px solid var(--color-border);
++  padding: var(--space-4) var(--space-5);
++  border-bottom: 1px solid var(--color-border);
+   vertical-align: baseline;
+ }
++/* The last row ends on the frame, not on a second hairline beside it. */
++.is-table tbody tr:last-child td { border-bottom: 0; }
+ .is-table__row:hover td { background: var(--color-bg-hover); }
+ .is-table__mono { font-family: var(--font-mono); font-size: var(--type-mono-sm-size); }
+ .is-table__num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+diff --git a/packages/ui/src/components/screens.css.ts b/packages/ui/src/components/screens.css.ts
+index c755ab3..80e7bf9 100644
+--- a/packages/ui/src/components/screens.css.ts
++++ b/packages/ui/src/components/screens.css.ts
+@@ -42,6 +42,56 @@ export const screensCss = `
+ }
+ .is-muted { color: var(--color-ink-muted); }
+ 
++/*
++ * The framed surface, and the toolbar above it.
++ *
++ * Both come from the console prototype's anatomy, which APPLYING-TO-PRODUCT 3
++ * lists as crossing: a table sits inside a hairline-framed surface rather than
++ * bare on the page, and the filter row puts filters on the left with the
++ * primary action on the right.
++ *
++ * The frame is one 1px hairline and a radius. The prototype draws the same
++ * surface with layered soft shadows and a 16px radius; neither crosses --
++ * 1.3 says depth comes from typography and spacing rather than shadow, and
++ * 16px is not on the radius scale. A hairline does the structural work, which
++ * is what the frame is for.
++ */
++.is-panel {
++  border: 1px solid var(--color-border);
++  border-radius: var(--radius-lg);
++  background: var(--color-bg-surface);
++  overflow: hidden;
++}
++.is-panel__head {
++  display: flex; align-items: baseline; justify-content: space-between;
++  gap: var(--space-4);
++  padding: var(--space-4) var(--space-5);
++  border-bottom: 1px solid var(--color-border);
++}
++.is-panel__title {
++  margin: 0;
++  font-size: var(--type-h3-size); line-height: var(--type-h3-line);
++  font-weight: var(--type-h3-weight);
++}
++.is-panel__count {
++  color: var(--color-ink-muted);
++  font-size: var(--type-label-size); font-weight: var(--type-label-weight);
++  letter-spacing: var(--type-label-tracking); text-transform: uppercase;
++}
++/* Anything in the frame that is not a table brings its own padding. */
++.is-panel__body { padding: var(--space-5); }
++
++/* Sections breathe; the gap is space, not a rule or a shadow (1.3). */
++.is-section { margin-top: var(--space-8); }
++
++.is-toolbar {
++  display: flex; align-items: center; justify-content: space-between;
++  gap: var(--space-4);
++  margin-bottom: var(--space-5);
++}
++.is-toolbar__filters { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
++.is-toolbar__action { flex: none; }
++
+ /* --------------------------------------------------------- overview ----- */
+ .is-overview { display: block; }
+ .is-overview__metrics {
+-- 
+2.43.0
+
