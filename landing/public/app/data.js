@@ -5,7 +5,8 @@
 // top-level product areas "without user research proving they must".
 export const routes = [
   ['overview', 'Overview', 'home'], ['settlements', 'Settlements', 'wallet-cards'],
-  ['beneficiaries', 'Beneficiaries', 'users'], ['batches', 'Batches', 'layers'],
+  ['liquidity', 'Liquidity', 'wallet'], ['beneficiaries', 'Beneficiaries', 'users'],
+  ['batches', 'Batches', 'layers'], ['reconciliation', 'Reconciliation', 'file-check'],
   ['developers', 'Developers', 'network']
 ];
 export const accountRoutes = [['settings', 'Settings', 'settings']];
@@ -47,6 +48,7 @@ export function batchStatus(batch){
   return order.filter(k=>batch.breakdown[k]).map(k=>({status:k,count:batch.breakdown[k]}));
 }
 
+export const balances=[{currency:'USDC',amount:5952000,share:48,network:'Ethereum · Polygon',change:'+8.4%',color:'#1fcbb8'},{currency:'USDT',amount:3968000,share:32,network:'Ethereum · Tron',change:'+6.2%',color:'#47d9cc'},{currency:'EURC',amount:1488000,share:12,network:'Ethereum · Base',change:'+3.1%',color:'#84e5de'},{currency:'INR',amount:992000,share:8,network:'Local collection account',change:'+4.8%',color:'#e7af53'}];
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const currencySymbol = currency => ({INR:'₹',USDC:'$',USDT:'$',USD:'$',EURC:'€',AED:'AED',SGD:'S$'}[currency]||currency);
 export function money(value,currency='INR',decimals){const n=Number(value);const precision=decimals??(Number.isInteger(n)?0:2);return currencySymbol(currency)+' '+n.toLocaleString(currency==='INR'?'en-IN':'en-US',{minimumFractionDigits:precision,maximumFractionDigits:precision});}

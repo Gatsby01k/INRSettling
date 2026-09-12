@@ -55,12 +55,19 @@ test('blocked, ready and cancelled settlements have truthful liquidity and miles
   assert.equal(settlementNetwork(blocked).kind,'fiat');
 });
 
-// PRODUCT.md § 12 — "Primary navigation, and nothing else", followed by the
-// list of sections that do not become top-level product areas. A nav that
-// drifts back is the failure this guards.
-test('the primary navigation is the five sections PRODUCT.md fixes',()=>{
-  assert.deepEqual(routes.map(r=>r[0]),['overview','settlements','beneficiaries','batches','developers']);
-  for(const barred of ['treasury','liquidity','providers','compliance','reconciliation','documents','analytics','wallet','crypto','stablecoins'])
+// PRODUCT.md § 12 fixes five sections and names ten that do not become
+// top-level product areas. Two of those ten — Liquidity and Reconciliation —
+// are in the navigation anyway, restored on 2026-09-12 by founder decision
+// together with the archive's Overview, whose Liquidity & Treasury and
+// Reconciliation & Audit panels are doors into them.
+//
+// This test does not pretend otherwise. It pins the deviation so that it stays
+// a decision on the record rather than drift, and still guards the eight barred
+// sections nobody has asked for.
+test('the navigation is the five § 12 sections plus the two restored by decision',()=>{
+  assert.deepEqual(routes.map(r=>r[0]),
+    ['overview','settlements','liquidity','beneficiaries','batches','reconciliation','developers']);
+  for(const barred of ['treasury','providers','compliance','documents','analytics','wallet','crypto','stablecoins'])
     assert.ok(!routes.some(r=>r[0]===barred),`${barred} is named in § 12's prohibition list`);
   // § 12: "Settings lives under account/workspace controls, not in the primary nav."
   assert.ok(!routes.some(r=>r[0]==='settings'));
