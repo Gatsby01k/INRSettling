@@ -17,7 +17,7 @@
     "check:source-tree": "node scripts/check-source-tree.mjs",
     "check:requirement-copy": "node scripts/check-requirement-copy.mjs",
     "check:liquidity-copy": "node scripts/check-liquidity-copy.mjs",
-    "verify": "pnpm typecheck && pnpm check:source-tree && pnpm lint && pnpm check:money-columns && pnpm check:requirement-copy && pnpm check:liquidity-copy && pnpm check:finality && pnpm check:ops-boundaries && pnpm check:migration-order && pnpm check:styles && pnpm check:motion && pnpm check:alex-test && pnpm check:secrets && pnpm build-storybook && pnpm test",
+    "verify": "pnpm typecheck && pnpm check:source-tree && pnpm lint && pnpm check:money-columns && pnpm check:requirement-copy && pnpm check:liquidity-copy && pnpm check:finality && pnpm check:ops-boundaries && pnpm check:migration-order && pnpm check:styles && pnpm check:motion && pnpm check:alex-test && pnpm check:secrets && pnpm test:workspace && pnpm build-storybook && pnpm test",
     "check:finality": "node scripts/check-finality-integrity.mjs",
     "build:api-reference": "UPDATE_API_REFERENCE=1 vitest run apps/api/src/__tests__/reference-doc.test.ts",
     "check:ops-boundaries": "node scripts/check-ops-boundaries.mjs",
@@ -25,7 +25,8 @@
     "check:styles": "node scripts/check-styles.mjs",
     "check:motion": "node scripts/check-motion.mjs",
     "check:alex-test": "node scripts/check-alex-test.mjs",
-    "check:secrets": "node scripts/check-secrets.mjs"
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "test:workspace": "node --test \"landing/tests/*.test.mjs\""
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.6.18",
