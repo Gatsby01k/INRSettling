@@ -1,5 +1,6 @@
 import {escapeHtml as esc} from './data.js';
 import {currencies,currencyIcon} from './currency.js';
+import {openChoiceMotion} from './motion.js';
 
 // The original select remains the form value and validation source.
 // The visible combobox and its listbox are shared by filters and forms.
@@ -92,6 +93,7 @@ function open(widget,edge){
   popup.style.top=`${rect.bottom+7}px`;
   if(typeof popup.showPopover==='function')popup.showPopover();
   if(placeAbove)popup.style.top=`${Math.max(12,rect.top-popup.offsetHeight-7)}px`;
+  openChoiceMotion(popup,placeAbove);
   trigger.setAttribute('aria-expanded','true');
   const availableIndices=widget.options.map((o,i)=>!o.disabled?i:-1).filter(i=>i>=0);
   const selected=select.selectedIndex;
