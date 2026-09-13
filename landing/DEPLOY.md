@@ -66,7 +66,37 @@ Njalla has no ALIAS/ANAME, which is why the apex is an A record. Leave existing 
 and TXT records alone — you are changing web records, not moving nameservers.
 Vercel issues the certificate itself once the records resolve.
 
-## 4. The workspace
+## 4. Keeping the workspace private
+
+`middleware.js` at the repository root gates `/app` behind a shared access code.
+It runs at the edge, before anything is served, which is the only place a gate
+on a static site can hold: the workspace files sit on a public CDN, so a check
+written inside `workspace.js` is read and skipped by opening that file directly.
+
+One setting turns it on — Vercel project → Settings → Environment Variables →
+`APP_ACCESS_CODE`, for Production (and Preview, if you want previews closed too).
+Redeploy after setting it.
+
+- **Unset** — the gate does nothing and `/app` is open. That is the default, so
+  deploying the file changes nothing until you decide.
+- **Set** — `/app` asks for the code and remembers a correct answer for 30 days
+  in a signed, HttpOnly cookie scoped to `/app`.
+
+The code is also the signing key. **To revoke everyone, change the variable and
+redeploy** — every cookie issued under the old code stops verifying. There is no
+list to clean up.
+
+The gate logs one line per entry to the function log, with the email if the
+visitor typed one, so you can see who came in. It never logs the code.
+
+What it is not: this is not the product's authentication. `SECURITY.md § 3.1`
+fixes that — email identity with a mandatory second factor, TOTP at minimum and
+WebAuthn preferred, sessions short, device-bound and revocable — and it needs the
+API behind an HTTP host with a database, which is Stage 10.5. This is a shared
+code on a preview of demonstration data. The gate page says so in those words,
+and no copy on it suggests an account or a sign-in.
+
+## 5. The workspace
 
 The v6 demo workspace ships inside the site at `landing/public/app/` — four static
 files, hash routing, no network calls, sharing `/assets/` with the site. It needs
@@ -91,6 +121,7 @@ before the domain is announced.
 - [ ] All three background renders appear: hero plate, city, flow
 - [ ] All four CTAs open `/app/` and the workspace renders
 - [ ] The workspace's brand link in the sidebar returns to the site
+- [ ] With `APP_ACCESS_CODE` set, `/app` asks for it and `/app/workspace.js` is not served without it
 - [ ] Lighthouse mobile run on both `/` and `/app/`
 - [ ] The contact dialog still only prepares a local brief
 
