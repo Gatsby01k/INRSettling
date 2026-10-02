@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { telegramSettings, sendTelegramInquiry } from '../landing/server/telegram.mjs';
+import { telegramSettings, sendTelegramInquiry, TelegramDeliveryError } from '../landing/server/telegram.mjs';
 
 const MAX_BYTES = 12_000;
 const EMAIL = /^[^\s@<>\r\n]+@[^\s@<>\r\n]+\.[^\s@<>\r\n]+$/;
@@ -10,7 +10,7 @@ const INTEREST_LABELS = { settlements: 'Settlement workflow', integration: 'API 
 const VOLUME_LABELS = { evaluating: 'Still evaluating', 'under-100k': 'Under $100k', '100k-1m': '$100k–$1m', 'over-1m': 'Over $1m' };
 // A warm-instance guard, not a distributed limiter. Configure a deployment-level
 // rate-limit rule on /api/contact before public launch (see landing/DEPLOY.md).
-export function createContactHandler({ env = process.env, send = fetch, now = Date.now } = {}) {
+export function createContactHandler({ env = process.env, send = fetch, now = Date.now, report = event => console.error('[inquiry-delivery]', JSON.stringify(event)) } = {}) {
   const attempts = new Map();
   const telegramDeliveries = new Map();
   function configuration() {
@@ -94,7 +94,19 @@ export function createContactHandler({ env = process.env, send = fetch, now = Da
       if (typeof result.id !== 'string' || !result.id) return reply(502, { error: 'delivery_failed' });
       // Provider acceptance is not an inbox-delivery guarantee.
       return reply(202, { accepted: true });
-    } catch { return reply(502, { error: 'delivery_failed' }); }
+    } catch (error) {
+      if (delivery.channel === 'telegram') {
+        const failure = { channel: 'telegram', requestId, reason: 'request_failed' };
+        if (error instanceof TelegramDeliveryError) {
+          failure.reason = error.reason;
+          if (error.providerStatus) failure.providerStatus = error.providerStatus;
+        } else if (error?.name === 'TimeoutError' || error?.name === 'AbortError') failure.reason = 'request_timeout';
+        // Logs stay useful to the owner without exposing the token, provider
+        // response, recipient ID, URL, stack or the visitor's personal data.
+        try { report(failure); } catch { /* Logging must not change the response. */ }
+      }
+      return reply(502, { error: 'delivery_failed' });
+    }
   };
 }
 export default createContactHandler();

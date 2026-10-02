@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createContactHandler } from '../../api/contact.js';
+import { createContactHandler as createHandler } from '../../api/contact.js';
+const createContactHandler = options => createHandler({ report: () => {}, ...options });
 
 // Deliberately fake credentials; every delivery call is mocked.
 const env = { SITE_URL: 'https://www.inrsettle.com', CONTACT_DELIVERY: 'telegram', TELEGRAM_BOT_TOKEN: '123456789:unit_test_token_1234567890', TELEGRAM_CHAT_ID: '987654321' };
@@ -69,6 +70,45 @@ test('Telegram errors, missing acknowledgements and wrong chats never report suc
     assert.equal(res.statusCode, 502);
     assert.deepEqual(res.body, { error: 'delivery_failed' });
   }
+});
+
+test('private delivery logs classify Telegram failures without retaining provider text or inquiry details', async () => {
+  const cases = [
+    [401, `Unauthorized ${env.TELEGRAM_BOT_TOKEN}`, 'token_rejected'],
+    [400, `Bad Request: chat not found ${env.TELEGRAM_CHAT_ID}`, 'chat_unavailable'],
+    [403, `Forbidden: bot was blocked by the user ${data.email}`, 'bot_blocked'],
+    [403, "Forbidden: bot can't initiate conversation with a user", 'chat_not_started'],
+    [403, 'Forbidden: user is deactivated', 'chat_forbidden'],
+    [429, 'Too Many Requests: retry later', 'provider_rate_limited'],
+    [500, 'Internal Server Error', 'provider_unavailable'],
+  ];
+  for (const [status, description, reason] of cases) {
+    const logs = [];
+    const handler = createContactHandler({ env, report: entry => logs.push(entry), send: async () => new Response(JSON.stringify({ ok: false, error_code: status, description }), { status }) });
+    const res = await invoke(handler);
+    assert.deepEqual(res.body, { error: 'delivery_failed' });
+    assert.deepEqual(logs, [{ channel: 'telegram', requestId: headers['idempotency-key'], reason, providerStatus: status }]);
+    for (const value of [env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, data.email, data.message, 'api.telegram.org']) assert.ok(!JSON.stringify(logs).includes(value));
+  }
+});
+
+test('unexpected responses, timeouts and logging failures preserve the public failure contract', async () => {
+  const cases = [
+    [async () => new Response('not json'), 'invalid_response'],
+    [async () => new Response('{"ok":true,"result":{}}'), 'invalid_acknowledgement'],
+    [async () => accepted('111'), 'unexpected_recipient'],
+    [async () => { throw new DOMException('Secret-bearing URL must not be logged', 'TimeoutError'); }, 'request_timeout'],
+    [async () => { throw new Error(`Failed request https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`); }, 'request_failed'],
+  ];
+  for (const [send, reason] of cases) {
+    const logs = [];
+    const res = await invoke(createContactHandler({ env, send, report: entry => logs.push(entry) }));
+    assert.equal(res.statusCode, 502);
+    assert.deepEqual(logs, [{ channel: 'telegram', requestId: headers['idempotency-key'], reason }]);
+  }
+  const res = await invoke(createContactHandler({ env, send: async () => new Response('{}', { status: 500 }), report: () => { throw new Error('logger unavailable'); } }));
+  assert.equal(res.statusCode, 502);
+  assert.deepEqual(res.body, { error: 'delivery_failed' });
 });
 
 test('long Unicode inquiries preserve all content and respect Telegram message bounds', async () => {
