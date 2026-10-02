@@ -3,6 +3,12 @@
 export const origin = 'https://www.inrsettle.com';
 export const brand = 'INRSettle';
 export const shareImage = '/assets/seo-share-20261002.png';
+export const socialProfiles = [
+  { label: 'LinkedIn', url: 'https://www.linkedin.com/company/inrsettle/' },
+  { label: 'X', url: 'https://x.com/INRSettle' },
+  { label: 'Telegram', url: 'https://t.me/INRSettle' },
+];
+export const twitterHandle = '@INRSettle';
 export const legacyRedirects = { '/legal/privacy': '/privacy', '/contact': '/#contact-dialog' };
 export const home = {
   path: '/',

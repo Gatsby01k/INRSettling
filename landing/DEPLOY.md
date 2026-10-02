@@ -101,7 +101,7 @@ and no copy on it suggests an account or a sign-in.
 The v6 demo workspace ships inside the site at `landing/public/app/` — four static
 files, hash routing, no network calls, sharing `/assets/` with the site. It needs
 no subdomain, no second Vercel project and no rewrite rules. Explore App points
-at `/app/`; Get Started opens a business inquiry.
+at `/app/`; Contact and Talk to Our Team open a business inquiry.
 
 `landing/scripts/set-app-url.mjs` stays for the day the real product frontend gets
 its own deployment: it moves the Explore App link to an absolute URL and back,
@@ -157,7 +157,8 @@ online submission publicly.
 - [ ] `www.inrsettle.com` serves over HTTPS; `inrsettle.com` redirects to `www`, preserving path and query
 - [ ] Favicon in the tab; fonts load (page is in Nimbus Sans, not Arial)
 - [ ] All three background renders appear: hero plate, city, flow
-- [ ] Get Started / Talk to Our Team open the inquiry dialog; Explore App opens `/app/`
+- [ ] Contact / Talk to Our Team open the inquiry dialog; Explore App opens `/app/`
+- [ ] LinkedIn, X and Telegram footer links point to the official profiles on every public page
 - [ ] The workspace's brand link in the sidebar returns to the site
 - [ ] With `APP_ACCESS_CODE` set, `/app` asks for it and `/app/workspace.js` is not served without it
 - [ ] Lighthouse mobile run on both `/` and `/app/`

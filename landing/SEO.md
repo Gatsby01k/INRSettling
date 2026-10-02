@@ -29,8 +29,11 @@ are not presented as business performance in Google snippets.
 
 - Canonical origin, titles, descriptions and public page copy:
   `landing/content/pages.mjs`.
+- Owner-provided LinkedIn, X and Telegram profiles live in `socialProfiles` in
+  that same file. The build uses them for every public footer and Organization
+  `sameAs`; `twitterHandle` identifies the official account in sharing metadata.
 - Build: `node landing/scripts/build-seo.mjs` or `pnpm build:seo`. It regenerates
-  the homepage SEO block, resource HTML, sitemap and robots.txt deterministically.
+  the homepage SEO and social blocks, resource HTML, sitemap and robots.txt deterministically.
 - Public resource styles: `landing/public/resources.css`. The resource pages are
   readable without JavaScript and link into the existing inquiry dialog.
 - Sharing artwork source: `landing/brand/seo-share.svg`. It reuses the brand marks
