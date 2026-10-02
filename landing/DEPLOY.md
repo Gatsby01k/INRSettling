@@ -129,9 +129,10 @@ Existing email-only deployments without `CONTACT_DELIVERY` remain compatible;
 when Telegram settings are present, auto-selection chooses Telegram and requires
 complete valid settings rather than silently falling back to email.
 
-Until the selected transport and `SITE_URL` are configured, the contact dialog
-explicitly prepares an email draft. It never reports a draft as sent. With online
-delivery enabled, success is shown only after the provider acknowledges delivery.
+The form always submits to `/api/contact`. Missing configuration or a failed
+readiness check shows an availability notice, never opens a mail draft. The form
+retains entered details on failed confirmation so submission can be retried.
+Success is shown only after the provider acknowledges delivery.
 Telegram acknowledgements must identify the configured personal chat. Long
 inquiries are split into numbered messages without discarding route context.
 For Telegram, `GET /api/contact` verifies @inrslead_bot with `getMe` and the

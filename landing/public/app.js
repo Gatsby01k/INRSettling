@@ -288,12 +288,10 @@
     if (tourStep > 0) { tourStep -= 1; renderTour(); }
   });
 
-  const inquiryLabels = { settlements: 'Settlement workflow', integration: 'API integration', partnership: 'Banking & liquidity partnership', investor: 'Investor information' };
   const contactForm = $('#contact-form');
   const contactSubmit = $('#contact-submit');
   const contactStatus = $('#contact-status');
-  let onlineDelivery = false;
-  let deliveryChannel = 'email';
+  let deliveryChannel = null;
   let requestId = crypto.randomUUID();
   let inquirySending = false;
   document.addEventListener('inrsettle:inquiry', event => {
@@ -323,17 +321,18 @@
   });
   contactForm.addEventListener('input', () => { requestId = crypto.randomUUID(); });
   async function checkInquiryDelivery() {
+    let available = false;
     try {
       const response = await fetch('/api/contact', { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(5000) });
       const availability = await response.json();
-      onlineDelivery = response.ok && availability.available === true;
-      deliveryChannel = availability.channel === 'telegram' ? 'telegram' : 'email';
-    } catch { onlineDelivery = false; }
+      available = response.ok && availability.available === true;
+      if (available) deliveryChannel = availability.channel === 'telegram' ? 'telegram' : 'email';
+    } catch { /* Submission still retries the server; never switch to a mail draft. */ }
     if (!inquirySending) {
-      contactSubmit.innerHTML = (onlineDelivery ? 'Send Inquiry ' : 'Prepare Email ') + icon('arrow');
-      $('#contact-mode').textContent = onlineDelivery
+      contactSubmit.innerHTML = 'Send Inquiry ' + icon('arrow');
+      $('#contact-mode').textContent = available
         ? 'Your inquiry is sent directly to the INRSettle team.'
-        : 'Opens your email app. Review and send your inquiry to info@inrsettle.com.';
+        : 'Online submission is temporarily unavailable. You can retry without losing your details.';
     }
   }
   function reportInquiry(message, error = false) {
@@ -347,13 +346,6 @@
     if (inquirySending || !contactForm.reportValidity()) return;
     const data = Object.fromEntries(new FormData(contactForm));
     if (data.website) return;
-    if (!onlineDelivery) {
-      const role = inquiryLabels[data.interest];
-      const brief = `Name: ${data.name}\nWork email: ${data.email}\nCompany: ${data.company}\nInterest: ${role}\n\n${data.message}${data.context ? '\n\n' + data.context : ''}`;
-      window.location.href = `mailto:info@inrsettle.com?subject=${encodeURIComponent('INRSettle inquiry — ' + data.company)}&body=${encodeURIComponent(brief)}`;
-      reportInquiry('Your email app should open with a draft. Review and send it to info@inrsettle.com. If no app opens, email us directly; your details remain in this form.');
-      return;
-    }
     inquirySending = true;
     contactSubmit.disabled = true;
     contactSubmit.textContent = 'Sending…';
@@ -384,7 +376,7 @@
   });
   function showInquiryPrivacy() {
     if ($('#contact-dialog').open) closeDialog($('#contact-dialog'));
-    $('#detail-content').innerHTML = `<p class="eyebrow">Business inquiries</p><h2 id="detail-title">Start a conversation.<br><span class="teal-text">Keep it clear.</span></h2><p class="detail-description">Share business contact details and a short description of your settlement needs. Please don’t include bank details, identity documents, credentials or customer information.</p><ul class="detail-list"><li>${icon('check')}<span>When online submission is enabled, your inquiry is delivered to the INRSettle team through ${deliveryChannel === 'telegram' ? 'Telegram' : 'our email delivery service'}. Your work email is used for the reply.</span></li><li>${icon('check')}<span>“Prepare Email” opens a draft in your own email app. You choose whether to send it; the website does not send the draft.</span></li><li>${icon('check')}<span>Inquiries are handled as business correspondence. For questions, corrections or a deletion request, contact info@inrsettle.com.</span></li></ul><a class="contact-email-link" href="mailto:info@inrsettle.com">info@inrsettle.com ${icon('arrow')}</a><div class="actions"><button class="button secondary" data-detail-contact>Back to Inquiry</button></div>`;
+    $('#detail-content').innerHTML = `<p class="eyebrow">Business inquiries</p><h2 id="detail-title">Start a conversation.<br><span class="teal-text">Keep it clear.</span></h2><p class="detail-description">Share business contact details and a short description of your settlement needs. Please don’t include bank details, identity documents, credentials or customer information.</p><ul class="detail-list"><li>${icon('check')}<span>Your inquiry is submitted through the website to the INRSettle team${deliveryChannel === 'telegram' ? ' through Telegram' : deliveryChannel === 'email' ? ' through our email delivery service' : ''}. Your work email is used for the reply.</span></li><li>${icon('check')}<span>Submission is confirmed only after the delivery service accepts your inquiry. If confirmation fails, your details stay in the form so you can retry.</span></li><li>${icon('check')}<span>Inquiries are handled as business correspondence. For questions, corrections or a deletion request, contact info@inrsettle.com.</span></li></ul><a class="contact-email-link" href="mailto:info@inrsettle.com">info@inrsettle.com ${icon('arrow')}</a><div class="actions"><button class="button secondary" data-detail-contact>Back to Inquiry</button></div>`;
     $('#detail-dialog').setAttribute('aria-labelledby', 'detail-title');
     openDialog($('#detail-dialog'));
   }
