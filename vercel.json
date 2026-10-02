@@ -11,6 +11,16 @@
       "has": [{ "type": "host", "value": "inrsettle.com" }],
       "destination": "https://www.inrsettle.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/legal/privacy",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/#contact-dialog",
+      "permanent": true
     }
   ],
   "headers": [

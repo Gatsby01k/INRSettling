@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 
 const repo = new URL('../../', import.meta.url);
 const origin = 'https://www.inrsettle.com';
-const paths = ['/', '/developers', '/docs', '/docs/integration', '/security', '/privacy'];
+const paths = ['/', '/developers', '/docs', '/docs/integration', '/docs/reconciliation', '/security', '/privacy'];
 let preview;
 let base;
 const documents = new Map();
@@ -167,5 +167,18 @@ test('Vercel deployment configurations preserve domain paths and mark every app 
     }
     assert.equal(config.trailingSlash, false);
     assert.match(config.buildCommand, /build-seo\.mjs$/);
+    assert.ok(config.redirects.some(item => item.source === '/legal/privacy' && item.destination === '/privacy' && item.permanent));
+    assert.ok(config.redirects.some(item => item.source === '/contact' && item.destination === '/#contact-dialog' && item.permanent));
+  }
+});
+
+test('legacy URLs reported by Search Console preserve their original intent', async () => {
+  for (const [source, target] of [['/legal/privacy.html', '/privacy'], ['/contact.html', '/#contact-dialog'], ['/docs/reconciliation.html', '/docs/reconciliation']]) {
+    const response = await fetch(base + source + '?ref=legacy', { redirect: 'manual' });
+    assert.equal(response.status, 308, source);
+    const destination = new URL(response.headers.get('location'), base);
+    assert.equal(destination.pathname + destination.hash, target);
+    assert.equal(destination.search, '?ref=legacy');
+    assert.equal((await fetch(destination)).status, 200);
   }
 });

@@ -10,11 +10,13 @@ Search Console report or a measurement of rankings.
 | --- | --- | --- |
 | `https://www.inrsettle.com/` | 200; title and description, no canonical or social metadata | Canonical, unique metadata, WebSite/Organization/WebPage JSON-LD and sharing card |
 | `/robots.txt` | 404 | Public crawl policy and sitemap discovery |
-| `/sitemap.xml` | 404 | Six canonical public page URLs |
+| `/sitemap.xml` | 404 | Seven canonical public page URLs |
 | `/developers` | 404; older content still appeared in search | Restore a public integration overview |
 | `/docs` | 404; older content still appeared in search | Restore a public workflow guide |
 | `/docs/integration` | 404; older content still appeared in search | Restore a relevant provider integration guide |
 | `/security` | 404; older content still appeared in search | Restore a page explaining the product model and preview boundaries |
+| `/docs/reconciliation.html` | Historical 404 confirmed in Search Console | Restore `/docs/reconciliation` and normalize the old HTML URL |
+| `/legal/privacy.html`, `/contact.html` | Historical 404s confirmed in Search Console | Permanent redirects to inquiry privacy and the inquiry dialog |
 | `/app` | 401 with an access-code gate and noindex | Keep the gate; add noindex to static workspace HTML and headers even when the gate is disabled |
 
 The existing homepage renders its text in static HTML, has one H1, a language,
@@ -64,25 +66,32 @@ SEO regression tests request the actual local HTTP server and verify canonical
 HTML, structured data, sitemap contents, PNG dimensions, internal links and
 fragments, permanent duplicate-URL redirects, real 404s and noindex without a
 configured access code. Vercel configuration checks cover domain-path preservation
-and workspace headers. Local tests do not emulate the Vercel edge; confirm its
+and workspace headers. Legacy redirect checks preserve query parameters and contact
+fragments. With Vercel `cleanUrls`, custom redirect sources omit `.html`; verify
+the original HTML URLs on the deployed preview too. Local tests do not emulate the Vercel edge; confirm its
 headers and redirects on the deployed preview before merging.
 
 ## Owner handoff after publication
 
-1. In [Google Search Console](https://search.google.com/search-console), use an
-   existing verified property for `inrsettle.com`, or verify a Domain property
-   with the TXT record Google supplies. Preserve existing mail and verification
-   DNS records. Repository access does not establish Search Console access.
-2. Submit `https://www.inrsettle.com/sitemap.xml`. Inspect the homepage and the
-   four restored URLs; check crawl permission, rendered HTML and the selected
+1. In [Google Search Console](https://search.google.com/search-console), reuse the
+   existing verified Domain property for `inrsettle.com`. Existing authenticated
+   access was confirmed during this audit; no new verification is needed.
+2. Resubmit the existing `https://www.inrsettle.com/sitemap.xml` entry after it
+   returns the new XML. Inspect the homepage and restored public URLs; check
+   crawl permission, rendered HTML and the selected
    canonical. Request indexing once the deployed responses are correct.
 3. Validate the structured data with
    [Google’s Rich Results Test](https://search.google.com/test/rich-results).
    Organization and site identity markup describe the brand; appearance remains
    subject to Google’s eligibility and selection rules.
-4. Inspect Page Indexing for the previous 404s and for unwanted app URLs. Do not
+4. Inspect Page Indexing for the previous 404s, the homepage canonical and unwanted app URLs. Do not
    block a URL in robots.txt before its noindex can be read. Check that preview
    deployments return noindex and do not appear in the production sitemap.
+   Redirect and alternate-canonical exclusions are usually expected. Review old
+   discovered URLs individually: restore useful content or redirect to a true
+   equivalent, and retain a real 404 for retired pages without an equivalent.
+   Legal terms, compliance assurances and a service-status page need business-
+   approved content and an actual operational source before publication.
 5. Add or reuse a verified site in
    [Bing Webmaster Tools](https://www.bing.com/webmasters) and submit the same
    sitemap. Use the canonical website URL consistently in verified company

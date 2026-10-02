@@ -162,7 +162,8 @@ online submission publicly.
 - [ ] With `APP_ACCESS_CODE` set, `/app` asks for it and `/app/workspace.js` is not served without it
 - [ ] Lighthouse mobile run on both `/` and `/app/`
 - [ ] `/robots.txt` and `/sitemap.xml` return 200 with text and XML content types
-- [ ] `/developers`, `/docs`, `/docs/integration`, `/security` and `/privacy` return 200
+- [ ] `/developers`, `/docs`, `/docs/integration`, `/docs/reconciliation`, `/security` and `/privacy` return 200
+- [ ] Legacy `/legal/privacy.html`, `/contact.html` and `/docs/reconciliation.html` redirect to their current equivalents, preserving query parameters and the inquiry fragment
 - [ ] Public pages have one canonical URL on `https://www.inrsettle.com`
 - [ ] `/app` and `/app/workspace.js` carry `X-Robots-Tag: noindex` even when the access code is unset
 - [ ] The Open Graph PNG URL returns 200 without authentication
