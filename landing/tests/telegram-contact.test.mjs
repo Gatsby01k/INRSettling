@@ -9,13 +9,19 @@ const data = { name: 'Test Operator', email: 'operator@example.test', company: '
 const headers = { origin: env.SITE_URL, 'content-type': 'application/json', 'idempotency-key': '89dd4ae1-a769-4ccd-a8ba-2ff169d2d731' };
 const request = overrides => ({ method: 'POST', headers: { ...headers }, body: { ...data }, ...overrides });
 const accepted = (chatId = env.TELEGRAM_CHAT_ID) => new Response(JSON.stringify({ ok: true, result: { message_id: 42, chat: { id: Number(chatId), type: 'private' } } }));
+const verified = async (url, options) => {
+  const method = url.split('/').at(-1);
+  assert.ok(['getMe', 'getChat'].includes(method), 'readiness must never send messages');
+  const result = method === 'getMe' ? { id: 123456789, is_bot: true, username: 'inrslead_bot' } : { id: Number(JSON.parse(options.body).chat_id), type: 'private' };
+  return new Response(JSON.stringify({ ok: true, result }));
+};
 async function invoke(handler, req = request()) {
   const res = { headers: {}, setHeader(key, value) { this.headers[key] = value; }, end(value) { this.body = JSON.parse(value); } };
   await handler(req, res); return res;
 }
 
 test('Telegram-only availability needs the canonical HTTPS origin, a valid token and personal chat ID', async () => {
-  assert.deepEqual((await invoke(createContactHandler({ env }), request({ method: 'GET' }))).body, { available: true, channel: 'telegram' });
+  assert.deepEqual((await invoke(createContactHandler({ env, send: verified }), request({ method: 'GET' }))).body, { available: true, channel: 'telegram' });
   const cases = [
     { TELEGRAM_BOT_TOKEN: '' }, { TELEGRAM_CHAT_ID: '' }, { TELEGRAM_CHAT_ID: '@inrslead_bot' },
     { TELEGRAM_CHAT_ID: '-1001234567890' }, { TELEGRAM_CHAT_ID: '1/other' },
@@ -31,7 +37,7 @@ test('Telegram-only availability needs the canonical HTTPS origin, a valid token
 
 test('Telegram settings take priority automatically and partial settings do not silently fall back to email', async () => {
   const automatic = { ...env, CONTACT_DELIVERY: '', RESEND_API_KEY: 'fake-key', CONTACT_FROM: 'Website <website@example.test>' };
-  assert.equal((await invoke(createContactHandler({ env: automatic }), request({ method: 'GET' }))).body.channel, 'telegram');
+  assert.equal((await invoke(createContactHandler({ env: automatic, send: verified }), request({ method: 'GET' }))).body.channel, 'telegram');
   const partial = { ...automatic, TELEGRAM_CHAT_ID: '' };
   assert.equal((await invoke(createContactHandler({ env: partial }), request({ method: 'GET' }))).body.available, false);
   assert.equal((await invoke(createContactHandler({ env: { ...partial, CONTACT_DELIVERY: 'email' } }), request({ method: 'GET' }))).body.channel, 'email');
@@ -78,7 +84,9 @@ test('private delivery logs classify Telegram failures without retaining provide
     [400, `Bad Request: chat not found ${env.TELEGRAM_CHAT_ID}`, 'chat_unavailable'],
     [403, `Forbidden: bot was blocked by the user ${data.email}`, 'bot_blocked'],
     [403, "Forbidden: bot can't initiate conversation with a user", 'chat_not_started'],
-    [403, 'Forbidden: user is deactivated', 'chat_forbidden'],
+    [403, 'Forbidden: user is deactivated', 'account_deactivated'],
+    [403, "Forbidden: bots can't send messages to bots", 'recipient_is_bot'],
+    [403, 'Forbidden: another rejection', 'chat_forbidden'],
     [429, 'Too Many Requests: retry later', 'provider_rate_limited'],
     [500, 'Internal Server Error', 'provider_unavailable'],
   ];
@@ -90,6 +98,55 @@ test('private delivery logs classify Telegram failures without retaining provide
     assert.deepEqual(logs, [{ channel: 'telegram', requestId: headers['idempotency-key'], reason, providerStatus: status }]);
     for (const value of [env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, data.email, data.message, 'api.telegram.org']) assert.ok(!JSON.stringify(logs).includes(value));
   }
+});
+
+test('readiness verifies the actual bot and private chat, sharing a four-second timeout', async () => {
+  const calls = []; const logs = [];
+  const handler = createContactHandler({ env, report: event => logs.push(event), send: async (url, options) => { calls.push({ method: url.split('/').at(-1), options }); return verified(url, options); } });
+  assert.deepEqual((await invoke(handler, request({ method: 'GET' }))).body, { available: true, channel: 'telegram' });
+  assert.deepEqual(calls.map(call => call.method), ['getMe', 'getChat']);
+  assert.deepEqual(JSON.parse(calls[1].options.body), { chat_id: env.TELEGRAM_CHAT_ID });
+  assert.equal(calls[0].options.signal, calls[1].options.signal);
+  assert.deepEqual(logs, [{ channel: 'telegram', operation: 'configuration_check', reason: 'bot_and_chat_verified' }]);
+});
+
+test('readiness rejects invalid bot/chat responses and logs only fixed classifications', async () => {
+  const cases = [
+    ['getMe', { id: 123456789, is_bot: true, username: 'another_bot' }, 'unexpected_bot'],
+    ['getMe', { id: Number(env.TELEGRAM_CHAT_ID), is_bot: true, username: 'inrslead_bot' }, 'recipient_is_bot'],
+    ['getMe', { is_bot: true }, 'invalid_response'],
+    ['getChat', { id: 777, type: 'private', first_name: 'Private Name' }, 'unexpected_recipient'],
+    ['getChat', { id: Number(env.TELEGRAM_CHAT_ID), type: 'group' }, 'unexpected_recipient'],
+  ];
+  for (const [method, result, reason] of cases) {
+    const logs = [];
+    const handler = createContactHandler({ env, report: event => logs.push(event), send: async (url, options) => url.endsWith('/' + method) ? new Response(JSON.stringify({ ok: true, result })) : verified(url, options) });
+    assert.deepEqual((await invoke(handler, request({ method: 'GET' }))).body, { available: false });
+    assert.deepEqual(logs, [{ channel: 'telegram', operation: 'configuration_check', reason }]);
+    for (const value of [env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, 'Private Name', 'api.telegram.org']) assert.ok(!JSON.stringify(logs).includes(value));
+  }
+  const logs = [];
+  const handler = createContactHandler({ env, report: event => logs.push(event), send: async () => new Response(JSON.stringify({ ok: false, error_code: 401, description: env.TELEGRAM_BOT_TOKEN }), { status: 401 }) });
+  assert.deepEqual((await invoke(handler, request({ method: 'GET' }))).body, { available: false });
+  assert.deepEqual(logs, [{ channel: 'telegram', operation: 'configuration_check', reason: 'token_rejected', providerStatus: 401 }]);
+});
+
+test('readiness coalesces callers, caches success/failure and rechecks after expiry or credentials change', async () => {
+  let clock = 0; let calls = 0; let fail = false; let release;
+  const settings = { ...env }; const gate = new Promise(resolve => { release = resolve; });
+  const handler = createContactHandler({ env: settings, now: () => clock, send: async (url, options) => {
+    calls++; await gate;
+    if (fail) throw new DOMException('Secret URL', 'TimeoutError');
+    return verified(url, options);
+  } });
+  const get = () => invoke(handler, request({ method: 'GET' }));
+  const first = get(); const second = get(); assert.equal(calls, 1); release();
+  assert.ok((await first).body.available); assert.ok((await second).body.available); assert.equal(calls, 2);
+  await get(); assert.equal(calls, 2);
+  clock = 60000; fail = true; assert.equal((await get()).body.available, false); assert.equal(calls, 3);
+  await get(); assert.equal(calls, 3);
+  settings.TELEGRAM_CHAT_ID = '12345'; fail = false; assert.equal((await get()).body.available, true); assert.equal(calls, 5);
+  settings.TELEGRAM_BOT_TOKEN = '123456789:another_fake_token_1234567890'; await get(); assert.equal(calls, 7);
 });
 
 test('unexpected responses, timeouts and logging failures preserve the public failure contract', async () => {

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { telegramSettings, sendTelegramInquiry, TelegramDeliveryError } from '../landing/server/telegram.mjs';
+import { telegramSettings, sendTelegramInquiry, verifyTelegramDestination, TelegramDeliveryError } from '../landing/server/telegram.mjs';
 
 const MAX_BYTES = 12_000;
 const EMAIL = /^[^\s@<>\r\n]+@[^\s@<>\r\n]+\.[^\s@<>\r\n]+$/;
@@ -10,9 +10,35 @@ const INTEREST_LABELS = { settlements: 'Settlement workflow', integration: 'API 
 const VOLUME_LABELS = { evaluating: 'Still evaluating', 'under-100k': 'Under $100k', '100k-1m': '$100k–$1m', 'over-1m': 'Over $1m' };
 // A warm-instance guard, not a distributed limiter. Configure a deployment-level
 // rate-limit rule on /api/contact before public launch (see landing/DEPLOY.md).
-export function createContactHandler({ env = process.env, send = fetch, now = Date.now, report = event => console.error('[inquiry-delivery]', JSON.stringify(event)) } = {}) {
+export function createContactHandler({ env = process.env, send = fetch, now = Date.now, report = event => console[event.reason === 'bot_and_chat_verified' ? 'info' : 'error']('[inquiry-delivery]', JSON.stringify(event)) } = {}) {
   const attempts = new Map();
   const telegramDeliveries = new Map();
+  let telegramCheck;
+  function safeReport(event) { try { report(event); } catch { /* Logging must not change the response. */ } }
+  function failureDetails(error) {
+    if (error instanceof TelegramDeliveryError) return { reason: error.reason, ...(error.providerStatus ? { providerStatus: error.providerStatus } : {}) };
+    return { reason: error?.name === 'TimeoutError' || error?.name === 'AbortError' ? 'request_timeout' : 'request_failed' };
+  }
+  async function telegramReady(settings) {
+    const key = createHash('sha256').update(`${settings.token}/${settings.chatId}`).digest('hex');
+    // Coalesce probes and cache both outcomes for one minute per warm instance.
+    // Credentials changing must never reuse the previous destination's result.
+    if (!telegramCheck || telegramCheck.key !== key || (!telegramCheck.pending && now() >= telegramCheck.expires)) {
+      const check = { key, expires: 0, pending: null };
+      telegramCheck = check;
+      check.pending = (async () => {
+        try {
+          await verifyTelegramDestination({ settings, send, signal: AbortSignal.timeout(4000) });
+          safeReport({ channel: 'telegram', operation: 'configuration_check', reason: 'bot_and_chat_verified' });
+          return true;
+        } catch (error) {
+          safeReport({ channel: 'telegram', operation: 'configuration_check', ...failureDetails(error) });
+          return false;
+        }
+      })().then(available => { check.available = available; check.expires = now() + 60_000; check.pending = null; return available; });
+    }
+    return telegramCheck.pending || telegramCheck.available;
+  }
   function configuration() {
     try {
       const site = new URL(env.SITE_URL);
@@ -31,7 +57,10 @@ export function createContactHandler({ env = process.env, send = fetch, now = Da
     res.setHeader('X-Content-Type-Options', 'nosniff');
     const reply = (code, body) => { res.statusCode = code; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(body)); };
     const delivery = configuration();
-    if (req.method === 'GET') return reply(200, delivery ? { available: true, channel: delivery.channel } : { available: false });
+    if (req.method === 'GET') {
+      const available = delivery && (delivery.channel !== 'telegram' || await telegramReady(delivery.telegram));
+      return reply(200, available ? { available: true, channel: delivery.channel } : { available: false });
+    }
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return reply(405, { error: 'method_not_allowed' }); }
     if (!delivery) return reply(503, { error: 'delivery_unavailable' });
     if (req.headers.origin !== delivery.origin) return reply(403, { error: 'origin_not_allowed' });
@@ -96,14 +125,9 @@ export function createContactHandler({ env = process.env, send = fetch, now = Da
       return reply(202, { accepted: true });
     } catch (error) {
       if (delivery.channel === 'telegram') {
-        const failure = { channel: 'telegram', requestId, reason: 'request_failed' };
-        if (error instanceof TelegramDeliveryError) {
-          failure.reason = error.reason;
-          if (error.providerStatus) failure.providerStatus = error.providerStatus;
-        } else if (error?.name === 'TimeoutError' || error?.name === 'AbortError') failure.reason = 'request_timeout';
         // Logs stay useful to the owner without exposing the token, provider
         // response, recipient ID, URL, stack or the visitor's personal data.
-        try { report(failure); } catch { /* Logging must not change the response. */ }
+        safeReport({ channel: 'telegram', requestId, ...failureDetails(error) });
       }
       return reply(502, { error: 'delivery_failed' });
     }

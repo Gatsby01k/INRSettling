@@ -26,9 +26,33 @@ function rejected(status, result) {
   else if (code >= 500) reason = 'provider_unavailable';
   else if (code === 400 && description.includes('chat not found')) reason = 'chat_unavailable';
   else if (code === 403 && description.includes('blocked')) reason = 'bot_blocked';
+  else if (code === 403 && description.includes('user is deactivated')) reason = 'account_deactivated';
+  else if (code === 403 && description.includes('send messages to bots')) reason = 'recipient_is_bot';
   else if (code === 403 && description.includes("can't initiate conversation")) reason = 'chat_not_started';
   else if (code === 403) reason = 'chat_forbidden';
   return new TelegramDeliveryError(reason, code);
+}
+
+// Read-only Bot API methods. Never send a message or expose account metadata.
+export async function verifyTelegramDestination({ settings, send, signal }) {
+  async function read(method, body) {
+    const response = await send(`https://api.telegram.org/bot${settings.token}/${method}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body), signal,
+    });
+    let result;
+    try { result = await response.json(); }
+    catch { throw response.ok ? new TelegramDeliveryError('invalid_response') : rejected(response.status); }
+    if (!response.ok || result?.ok !== true) throw rejected(response.status, result);
+    return result.result;
+  }
+  const bot = await read('getMe', {});
+  if (bot?.is_bot !== true || !Number.isSafeInteger(bot.id) || bot.id <= 0) throw new TelegramDeliveryError('invalid_response');
+  if (bot.username?.toLowerCase() !== 'inrslead_bot') throw new TelegramDeliveryError('unexpected_bot');
+  if (String(bot.id) === settings.chatId) throw new TelegramDeliveryError('recipient_is_bot');
+  const chat = await read('getChat', { chat_id: settings.chatId });
+  if (String(chat?.id) !== settings.chatId || chat.type !== 'private') throw new TelegramDeliveryError('unexpected_recipient');
+  // Chat metadata is not proof that sendMessage will be permitted.
 }
 
 function messageParts(text) {

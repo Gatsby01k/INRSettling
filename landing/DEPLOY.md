@@ -134,6 +134,10 @@ explicitly prepares an email draft. It never reports a draft as sent. With onlin
 delivery enabled, success is shown only after the provider acknowledges delivery.
 Telegram acknowledgements must identify the configured personal chat. Long
 inquiries are split into numbered messages without discarding route context.
+For Telegram, `GET /api/contact` verifies @inrslead_bot with `getMe` and the
+personal destination with `getChat`, without sending messages. Results are cached
+for one minute per warm instance. A successful metadata check does not establish
+send permission; verify delivery with a controlled inquiry after setup.
 
 The endpoint validates and limits input, checks origin, binds retries to the
 message, includes a honeypot and avoids logging inquiry data. Its in-memory limit
