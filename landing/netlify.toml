@@ -1,6 +1,22 @@
 [build]
   publish = "public"
-  command = ""
+  command = "node scripts/build-seo.mjs"
+
+[[redirects]]
+  from = "https://inrsettle.com/*"
+  to = "https://www.inrsettle.com/:splat"
+  status = 301
+  force = true
+
+[[headers]]
+  for = "/app"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"
+
+[[headers]]
+  for = "/app/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"
 
 [[headers]]
   for = "/assets/*"
