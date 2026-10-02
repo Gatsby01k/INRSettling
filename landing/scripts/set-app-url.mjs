@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Point the site's "Get Started" / "Open App" links at the workspace.
+// Point the site's "Explore App" link at the workspace. Inquiry CTAs stay intact.
 //
 //   node scripts/set-app-url.mjs https://app.example.com
 //   node scripts/set-app-url.mjs /app/            # back to a same-origin path
@@ -13,13 +13,13 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const PAGE = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "index.html");
-const ANCHOR = /(<a\b[^>]*\bhref=")([^"]*)("[^>]*>\s*(?:Get Started|Open App)\b)/g;
+const ANCHOR = /(<a\b[^>]*\bhref=")([^"]*)("[^>]*>\s*Explore App\b)/g;
 
 const html = readFileSync(PAGE, "utf8");
 const current = [...html.matchAll(ANCHOR)].map((m) => m[2]);
 
 if (current.length === 0) {
-  console.error("No Get Started / Open App links found in public/index.html.");
+  console.error("No Explore App link found in public/index.html.");
   process.exit(1);
 }
 

@@ -28,7 +28,6 @@
   let activeView = 'overview';
   let activeChart = 'inr';
   let selectedMonth = 3;
-  let inquiryText = '';
   let tourStep = 0;
   let tourAmount = 1250000;
   let tourCurrency = 'USDT';
@@ -85,9 +84,9 @@
   });
 
   const roleDescriptions = {
-    psps: 'A complete infrastructure layer to move value with speed, certainty and control.',
-    merchants: 'Collect locally. Settle globally. Bring your cross-border payments into one clear workflow.',
-    otc: 'Coordinate liquidity, counterparties and settlement evidence across your trading operations.',
+    psps: 'Bring funding, settlement instructions and reconciliation into one connected cross-border payment workflow.',
+    merchants: 'Connect collections to settlement across currencies and markets, with a clear view of amounts, requirements and results.',
+    otc: 'Coordinate fiat and stablecoin liquidity, counterparties and settlement evidence across your trading operations.',
     operators: 'Manage every settlement from preflight to reconciliation, with a clear view of what needs attention.',
     banks: 'Connect institutional workflows with digital liquidity and consistent settlement controls.'
   };
@@ -100,6 +99,7 @@
     });
     $('#role-panel').setAttribute('aria-labelledby', button.id);
     $('#role-description').textContent = roleDescriptions[button.dataset.role];
+    document.dispatchEvent(new CustomEvent('inrsettle:role-change', { detail: { role: button.dataset.role } }));
     if (focus) button.focus();
   }
   $('.role-tabs').addEventListener('keydown', event => {
@@ -130,9 +130,9 @@
 
   const details = {
     overview: {
-      icon: 'globe', eyebrow: 'One connected settlement layer', title: 'Everything moves <span class="teal-text">together.</span>',
+      icon: 'globe', eyebrow: 'One connected settlement layer', title: 'One settlement layer.<br><span class="teal-text">Connected operations.</span>',
       description: 'Bring funding, settlement controls and operational visibility into a single workflow for your business.',
-      items: ['Specify the INR amount and verified beneficiary before funding.', 'See the requirements that must be resolved before a settlement can proceed.', 'Follow the settlement through routing, reconciliation and final evidence.']
+      items: ['Bring the amount, destination and business purpose into one instruction.', 'Review requirements and agreed terms before committing to execution.', 'Connect funding, routing and delivery to a clear reconciliation record.']
     },
     treasury: {
       icon: 'bank', eyebrow: 'Treasury movement', title: 'Put liquidity <span class="teal-text">in motion.</span>',
@@ -145,8 +145,8 @@
       items: ['Check available liquidity before committing to a settlement.', 'Surface funding gaps and pending requirements early.', 'Follow the timing of each stage in the settlement lifecycle.']
     },
     routing: {
-      icon: 'route', eyebrow: 'Settlement routing', title: 'A clearer route <span class="teal-text">to India.</span>',
-      description: 'Connect settlement intent to a suitable provider through a consistent operational workflow.',
+      icon: 'route', eyebrow: 'Settlement routing', title: 'A clearer route <span class="teal-text">to settlement.</span>',
+      description: 'Connect your settlement requirements to a suitable route, with the destination, execution constraints and evidence kept in one workflow.',
       items: ['Keep beneficiary, purpose and destination requirements together.', 'Review route availability and settlement constraints.', 'Trace provider updates back to the original settlement.']
     },
     reconciliation: {
@@ -167,14 +167,14 @@
     openDialog($('#detail-dialog'));
   }
 
-  const codeExample = `POST /v1/settlements\nAuthorization: Bearer YOUR_API_KEY\nIdempotency-Key: unique-request-id\n\n{\n  "beneficiary_id": "your_verified_beneficiary",\n  "destination_currency": "INR",\n  "destination_amount": "1250000.00",\n  "source_currency": "USDT",\n  "purpose": "commercial_payment"\n}`;
+  const codeExample = `POST /v1/settlements\nAuthorization: Bearer YOUR_API_KEY\nIdempotency-Key: unique-request-id\nContent-Type: application/json\n\n{\n  "beneficiary_id": "ben_7Ld2ZxKp0Wq4",\n  "recipient_amount": {\n    "currency": "INR",\n    "minor_units": "125000000"\n  },\n  "funding_currency": "USDT",\n  "purpose_code": "SOFTWARE_SERVICES",\n  "quote_id": "qt_9Xm4Bv7NsLt2",\n  "external_reference": "INVOICE-2026-0142"\n}`;
   function showDevelopers() {
-    $('#detail-content').innerHTML = `<span class="round-icon detail-icon">${icon('code')}</span><p class="eyebrow">Built for your stack</p><h2 id="detail-title">One integration.<br><span class="teal-text">Connected operations.</span></h2><p class="detail-description">Express your settlement intent, check readiness and follow status changes through a consistent API workflow.</p><pre class="code-block"><code>${escapeHtml(codeExample)}</code></pre><p class="code-caption">Illustrative request. Confirm the final API contract and credentials with your INRSettle contact.</p><div class="actions"><button class="button primary" data-copy-api>${icon('copy')}Copy Example</button><button class="button secondary" data-detail-contact>Talk to Our Team</button></div>`;
+    $('#detail-content').innerHTML = `<span class="round-icon detail-icon">${icon('code')}</span><p class="eyebrow">Built for your stack</p><h2 id="detail-title">One integration.<br><span class="teal-text">Connected operations.</span></h2><p class="detail-description">Express your settlement intent, check readiness and follow status changes through a consistent API workflow.</p><pre class="code-block"><code>${escapeHtml(codeExample)}</code></pre><p class="code-caption">Example INR settlement request. Credentials, valid quotes and endpoint availability are confirmed during technical onboarding.</p><div class="actions"><button class="button primary" data-copy-api>${icon('copy')}Copy Example</button><a class="button secondary" href="https://github.com/Gatsby01k/INRSettling/blob/main/reference/api/README.md" target="_blank" rel="noopener">API Reference</a><button class="text-button" data-detail-contact>Discuss Integration</button></div>`;
     $('#detail-dialog').setAttribute('aria-labelledby', 'detail-title');
     openDialog($('#detail-dialog'));
   }
   function showCorridors() {
-    $('#detail-content').innerHTML = `<p class="eyebrow">From India to opportunity</p><h2 id="detail-title">A more connected<br><span class="teal-text">world.</span></h2><p class="detail-description">Explore the corridors in the product preview. Available routes depend on your provider and business requirements.</p><div class="corridor-modal-list">${corridors.map(c => `<div class="corridor-option"><span class="round-icon"><span class="currency-flag flag-${c.flag}">${c.symbol}</span></span><div><strong>${c.name}</strong><p>${c.detail}</p></div><span>Preview route</span></div>`).join('')}</div><button class="button primary" data-detail-contact>Discuss Your Corridor ${icon('arrow')}</button>`;
+    $('#detail-content').innerHTML = `<p class="eyebrow">India and the global economy</p><h2 id="detail-title">A more connected<br><span class="teal-text">world.</span></h2><p class="detail-description">Explore sample corridor workflows across fiat and digital currencies. Discuss supported routes, funding, limits and delivery requirements for your business with our team.</p><div class="corridor-modal-list">${corridors.map(c => `<div class="corridor-option"><span class="round-icon"><span class="currency-flag flag-${c.flag}">${c.symbol}</span></span><div><strong>${c.name}</strong><p>${c.detail}</p></div><span>Preview route</span></div>`).join('')}</div><button class="button primary" data-detail-contact>Discuss Your Corridor ${icon('arrow')}</button>`;
     $('#detail-dialog').setAttribute('aria-labelledby', 'detail-title');
     openDialog($('#detail-dialog'));
   }
@@ -187,7 +187,7 @@
   }
   function renderOverview() {
     const multiplier = activeChart === 'inr' ? 1 : .67;
-    return `${appTitle('Global Settlement Overview')}<div class="dashboard-kpis">${kpi('Total Volume (YTD)', '<b>$</b> 248.4M', '+12%')}${kpi('Successful Settlements', '12,428', '99.9%')}${kpi('Average Settlement Time', '48s', '−32%')}${kpi('Active Corridors', '52', '+6 new')}</div><div class="app-overview-bottom"><div class="chart-panel"><div class="panel-heading"><h4>Settlement Volume</h4><div class="chart-switch" role="group" aria-label="Chart funding currency"><button class="${activeChart === 'inr' ? 'active' : ''}" data-chart="inr" aria-pressed="${activeChart === 'inr'}">INR</button><button class="${activeChart === 'stablecoins' ? 'active' : ''}" data-chart="stablecoins" aria-pressed="${activeChart === 'stablecoins'}">Stablecoins</button></div></div><div class="chart" aria-label="Illustrative monthly settlement volume in millions of US dollars"><div class="chart-scale" aria-hidden="true"><span>50</span><span>25</span><span>0</span></div>${monthly.map((value, i) => `<div class="bar-wrap" style="--bar-height:${(value * multiplier / 55 * 100).toFixed(1)}%"><button class="chart-bar ${i === selectedMonth ? 'selected' : ''}" data-month="${i}" style="--delay:${i * .04}s" aria-label="${months[i]}: $${(value * multiplier).toFixed(1)} million" aria-pressed="${i === selectedMonth}"></button><span class="bar-label">${months[i]}</span>${i === selectedMonth ? `<span class="bar-tooltip">$${(value * multiplier).toFixed(1)}M</span>` : ''}</div>`).join('')}</div></div><div class="corridor-panel"><div class="panel-heading"><h4>Corridors</h4></div>${corridors.map(c => `<div class="corridor-row"><span class="currency-flag flag-${c.flag}">${c.symbol}</span><span>${c.name}</span><span class="status">Live</span></div>`).join('')}</div></div>`;
+    return `${appTitle('Global Settlement Overview')}<div class="dashboard-kpis">${kpi('Sample INR volume', '₹ 69.85L')}${kpi('Sample settlements', '5')}${kpi('Final records', '4')}${kpi('Sample corridors', '5')}</div><div class="app-overview-bottom"><div class="chart-panel"><div class="panel-heading"><h4>Settlement Volume</h4><div class="chart-switch" role="group" aria-label="Chart funding currency"><button class="${activeChart === 'inr' ? 'active' : ''}" data-chart="inr" aria-pressed="${activeChart === 'inr'}">INR</button><button class="${activeChart === 'stablecoins' ? 'active' : ''}" data-chart="stablecoins" aria-pressed="${activeChart === 'stablecoins'}">Stablecoins</button></div></div><div class="chart" aria-label="Illustrative monthly settlement volume in millions of US dollars"><div class="chart-scale" aria-hidden="true"><span>50</span><span>25</span><span>0</span></div>${monthly.map((value, i) => `<div class="bar-wrap" style="--bar-height:${(value * multiplier / 55 * 100).toFixed(1)}%"><button class="chart-bar ${i === selectedMonth ? 'selected' : ''}" data-month="${i}" style="--delay:${i * .04}s" aria-label="${months[i]}: $${(value * multiplier).toFixed(1)} million" aria-pressed="${i === selectedMonth}"></button><span class="bar-label">${months[i]}</span>${i === selectedMonth ? `<span class="bar-tooltip">$${(value * multiplier).toFixed(1)}M</span>` : ''}</div>`).join('')}</div></div><div class="corridor-panel"><div class="panel-heading"><h4>Corridors</h4></div>${corridors.map(c => `<div class="corridor-row"><span class="currency-flag flag-${c.flag}">${c.symbol}</span><span>${c.name}</span><span class="status">Example</span></div>`).join('')}</div></div>`;
   }
   function renderSettlements() {
     const query = $('#app-search').value.trim().toLowerCase();
@@ -202,7 +202,7 @@
     return `${appTitle('Counterparties')}<div class="app-table-wrap"><table class="app-table"><thead><tr><th>Business</th><th>Market</th><th>Currency</th><th>Verification</th></tr></thead><tbody>${names.map(name => `<tr><td>${name}</td><td>India</td><td>INR</td><td><span class="status-pill">Verified</span></td></tr>`).join('')}</tbody></table></div><p class="app-footnote">Illustrative counterparties for the product preview.</p>`;
   }
   function renderCorridorView() {
-    return `${appTitle('Global Corridors')}<div class="app-table-wrap"><table class="app-table"><thead><tr><th>Corridor</th><th>Volume</th><th>Avg. time</th><th>Status</th></tr></thead><tbody>${corridors.map(c => `<tr><td><span class="currency-flag flag-${c.flag}" style="display:inline-flex;vertical-align:middle;margin-right:6px">${c.symbol}</span>${c.name}</td><td class="amount">${c.volume}</td><td>${c.time}</td><td><span class="status-pill">Active</span></td></tr>`).join('')}</tbody></table></div>`;
+    return `${appTitle('Global Corridors')}<div class="app-table-wrap"><table class="app-table"><thead><tr><th>Corridor</th><th>Volume</th><th>Avg. time</th><th>Status</th></tr></thead><tbody>${corridors.map(c => `<tr><td><span class="currency-flag flag-${c.flag}" style="display:inline-flex;vertical-align:middle;margin-right:6px">${c.symbol}</span>${c.name}</td><td class="amount">${c.volume}</td><td>${c.time}</td><td><span class="status-pill">Example</span></td></tr>`).join('')}</tbody></table></div>`;
   }
   function renderReports() {
     return `${appTitle('Reports & Reconciliation')}<div class="report-row">${icon('file')}<div><strong>Settlement register</strong><span>5 sample records · CSV</span></div><button data-report="settlements">Export ${icon('download')}</button></div><div class="report-row">${icon('chart')}<div><strong>Monthly settlement volume</strong><span>January – July · CSV</span></div><button data-report="volume">Export ${icon('download')}</button></div><div class="report-row">${icon('globe')}<div><strong>Corridor overview</strong><span>5 sample corridors · CSV</span></div><button data-report="corridors">Export ${icon('download')}</button></div><p class="app-footnote">Exports contain the illustrative data shown in this preview.</p>`;
@@ -248,11 +248,11 @@
     const nextLabels = ['Run Preflight', 'View Settlement', 'Explore Overview'];
     $('#tour-next').innerHTML = nextLabels[tourStep] + icon('arrow');
     if (tourStep === 0) {
-      $('#tour-content').innerHTML = `<div class="tour-body"><h3>Start with the destination.</h3><p>Set the exact amount your verified Indian beneficiary should receive.</p><label class="tour-amount">Recipient gets · INR<input id="tour-amount" type="number" min="1" max="1000000000" step="0.01" value="${tourAmount}" inputmode="decimal" required aria-label="Sample recipient amount in INR"></label><div class="sample-beneficiary"><span class="round-icon">MC</span><div><strong>Meridian Commerce</strong><p>Sample beneficiary · India</p></div>${icon('check')}</div><label style="margin-top:14px">Funding currency<select id="tour-currency"><option${tourCurrency === 'USDT' ? ' selected' : ''}>USDT</option><option${tourCurrency === 'USDC' ? ' selected' : ''}>USDC</option></select></label></div>`;
+      $('#tour-content').innerHTML = `<div class="tour-body"><h3>Start with the destination.</h3><p>Set the exact amount your verified Indian beneficiary should receive.</p><label class="tour-amount">Recipient gets · INR<input id="tour-amount" type="number" min="1" max="1000000000" step="0.01" value="${tourAmount}" inputmode="decimal" required aria-label="Sample recipient amount in INR"></label><div class="sample-beneficiary"><span class="round-icon">MC</span><div><strong>Meridian Commerce</strong><p>Sample beneficiary · India</p></div>${icon('check')}</div><fieldset class="choice-field tour-currencies" id="tour-currency"><legend>Funding currency</legend><div class="choice-card-grid">${['USDT', 'USDC'].map(code => `<label class="choice-option"><input class="choice-radio" type="radio" name="tour-currency" value="${code}"${tourCurrency === code ? ' checked' : ''}><span class="choice-card"><img class="choice-currency-icon" src="/assets/currencies/${code.toLowerCase()}.svg" width="32" height="32" alt=""><span class="choice-card-copy"><strong>${code}</strong><small>${code === 'USDT' ? 'Tether USD' : 'USD Coin'}</small></span><svg class="icon choice-card-check" aria-hidden="true"><use href="#i-check"/></svg></span></label>`).join('')}</div></fieldset></div>`;
     } else if (tourStep === 1) {
       $('#tour-content').innerHTML = `<div class="tour-body"><h3>Clarity before money moves.</h3><p>Preflight checks the requirements for a ₹ ${formatted} settlement funded in ${tourCurrency}.</p><div class="preflight-list"><div class="preflight-item" style="--delay:0s">${icon('check')}Beneficiary verification<span>Ready</span></div><div class="preflight-item" style="--delay:.1s">${icon('check')}Payment purpose<span>Ready</span></div><div class="preflight-item" style="--delay:.2s">${icon('check')}Funding & route availability<span>Ready</span></div><div class="preflight-item" style="--delay:.3s">${icon('shield')}Settlement preflight<span>READY</span></div></div></div>`;
     } else {
-      $('#tour-content').innerHTML = `<div class="tour-body"><h3>A clear record of the result.</h3><p>Follow delivery, provider references and reconciliation in the same settlement view.</p><div class="tour-result"><span class="round-icon">${icon('check')}</span><strong>₹ ${formatted}</strong><p>Example result · Delivered to Meridian Commerce</p><div class="tour-receipt"><span>Settlement <b>STL-10482</b></span><span>Reconciled <b>48s</b></span></div></div></div>`;
+      $('#tour-content').innerHTML = `<div class="tour-body"><h3>A clear record of the result.</h3><p>Follow delivery, provider references and reconciliation in the same settlement view.</p><div class="tour-result"><span class="round-icon">${icon('check')}</span><strong>₹ ${formatted}</strong><p>Example result · Delivered to Meridian Commerce</p><div class="tour-receipt"><span>Settlement <b>STL-10482</b></span><span>Record <b>Matched</b></span></div></div></div>`;
     }
   }
   function startTour() {
@@ -267,7 +267,7 @@
       const amount = Number(input.value);
       if (!Number.isFinite(amount) || amount < 1 || amount > 1000000000) return;
       tourAmount = amount;
-      tourCurrency = $('#tour-currency').value;
+      tourCurrency = $('input[name="tour-currency"]:checked').value;
     }
     if (tourStep < 2) {
       tourStep += 1;
@@ -288,23 +288,106 @@
     if (tourStep > 0) { tourStep -= 1; renderTour(); }
   });
 
-  $('#contact-form').addEventListener('submit', event => {
-    event.preventDefault();
-    if (!event.currentTarget.reportValidity()) return;
-    const data = new FormData(event.currentTarget);
-    inquiryText = `INRSETTLE — PARTNERSHIP INQUIRY\n\nName: ${String(data.get('name')).trim()}\nWork email: ${String(data.get('email')).trim()}\nCompany: ${String(data.get('company')).trim()}\nBusiness: ${data.get('role')}\n\nSettlement needs\n${String(data.get('message')).trim()}\n\nPrepared locally. This inquiry has not been sent.`;
-    $('#inquiry-preview').textContent = inquiryText;
-    $('#contact-form').hidden = true;
-    $('#contact-result').hidden = false;
-    $('#download-inquiry').focus();
+  const inquiryLabels = { settlements: 'Settlement workflow', integration: 'API integration', partnership: 'Banking & liquidity partnership', investor: 'Investor information' };
+  const contactForm = $('#contact-form');
+  const contactSubmit = $('#contact-submit');
+  const contactStatus = $('#contact-status');
+  let onlineDelivery = false;
+  let deliveryChannel = 'email';
+  let requestId = crypto.randomUUID();
+  let inquirySending = false;
+  document.addEventListener('inrsettle:inquiry', event => {
+    if (inquirySending) return openDialog($('#contact-dialog'));
+    if (contactForm.hidden) {
+      contactForm.hidden = false;
+      $('#contact-result').hidden = true;
+      contactStatus.hidden = true;
+    }
+    const { interest, volume, context, contextLabel } = event.detail || {};
+    if (['settlements', 'integration', 'partnership', 'investor'].includes(interest)) contactForm.elements.interest.value = interest;
+    if (['evaluating', 'under-100k', '100k-1m', 'over-1m'].includes(volume)) contactForm.elements.volume.value = volume;
+    if (context) {
+      contactForm.elements.context.value = String(context).slice(0, 2000);
+      $('#contact-context-summary').textContent = String(contextLabel || 'Your selected workflow');
+      $('#contact-context').hidden = false;
+      requestId = crypto.randomUUID();
+    }
+    if ($('#detail-dialog').open) closeDialog($('#detail-dialog'));
+    void checkInquiryDelivery();
+    openDialog($('#contact-dialog'));
   });
-  $('#download-inquiry').addEventListener('click', () => download(inquiryText, 'INRSettle-inquiry.txt'));
-  $('#copy-inquiry').addEventListener('click', () => copyText(inquiryText, 'Your inquiry was copied.'));
+  $('#contact-context-remove').addEventListener('click', () => {
+    contactForm.elements.context.value = '';
+    $('#contact-context').hidden = true;
+    requestId = crypto.randomUUID();
+  });
+  contactForm.addEventListener('input', () => { requestId = crypto.randomUUID(); });
+  async function checkInquiryDelivery() {
+    try {
+      const response = await fetch('/api/contact', { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(5000) });
+      const availability = await response.json();
+      onlineDelivery = response.ok && availability.available === true;
+      deliveryChannel = availability.channel === 'telegram' ? 'telegram' : 'email';
+    } catch { onlineDelivery = false; }
+    if (!inquirySending) {
+      contactSubmit.innerHTML = (onlineDelivery ? 'Send Inquiry ' : 'Prepare Email ') + icon('arrow');
+      $('#contact-mode').textContent = onlineDelivery
+        ? 'Your inquiry is sent directly to the INRSettle team.'
+        : 'Opens your email app. Review and send your inquiry to info@inrsettle.com.';
+    }
+  }
+  function reportInquiry(message, error = false) {
+    contactStatus.textContent = message;
+    contactStatus.hidden = false;
+    contactStatus.classList.toggle('error', error);
+    contactStatus.focus({ preventScroll: true });
+  }
+  contactForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (inquirySending || !contactForm.reportValidity()) return;
+    const data = Object.fromEntries(new FormData(contactForm));
+    if (data.website) return;
+    if (!onlineDelivery) {
+      const role = inquiryLabels[data.interest];
+      const brief = `Name: ${data.name}\nWork email: ${data.email}\nCompany: ${data.company}\nInterest: ${role}\n\n${data.message}${data.context ? '\n\n' + data.context : ''}`;
+      window.location.href = `mailto:info@inrsettle.com?subject=${encodeURIComponent('INRSettle inquiry — ' + data.company)}&body=${encodeURIComponent(brief)}`;
+      reportInquiry('Your email app should open with a draft. Review and send it to info@inrsettle.com. If no app opens, email us directly; your details remain in this form.');
+      return;
+    }
+    inquirySending = true;
+    contactSubmit.disabled = true;
+    contactSubmit.textContent = 'Sending…';
+    contactStatus.hidden = true;
+    try {
+      const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': requestId }, body: JSON.stringify(data), signal: AbortSignal.timeout(12000) });
+      const result = await response.json();
+      if (!response.ok || result.accepted !== true) throw new Error('delivery_failed');
+      contactForm.hidden = true;
+      $('#contact-result').hidden = false;
+      $('#edit-inquiry').focus();
+      contactForm.reset();
+      $('#contact-context').hidden = true;
+      requestId = crypto.randomUUID();
+    } catch {
+      reportInquiry('We couldn’t confirm submission. Your details are still here. Try again, or email info@inrsettle.com directly.', true);
+    } finally {
+      inquirySending = false;
+      contactSubmit.disabled = false;
+      contactSubmit.innerHTML = 'Send Inquiry ' + icon('arrow');
+    }
+  });
   $('#edit-inquiry').addEventListener('click', () => {
     $('#contact-result').hidden = true;
-    $('#contact-form').hidden = false;
-    $('#contact-form input').focus();
+    contactForm.hidden = false;
+    contactStatus.hidden = true;
+    $('input', contactForm).focus();
   });
+  function showInquiryPrivacy() {
+    if ($('#contact-dialog').open) closeDialog($('#contact-dialog'));
+    $('#detail-content').innerHTML = `<p class="eyebrow">Business inquiries</p><h2 id="detail-title">Start a conversation.<br><span class="teal-text">Keep it clear.</span></h2><p class="detail-description">Share business contact details and a short description of your settlement needs. Please don’t include bank details, identity documents, credentials or customer information.</p><ul class="detail-list"><li>${icon('check')}<span>When online submission is enabled, your inquiry is delivered to the INRSettle team through ${deliveryChannel === 'telegram' ? 'Telegram' : 'our email delivery service'}. Your work email is used for the reply.</span></li><li>${icon('check')}<span>“Prepare Email” opens a draft in your own email app. You choose whether to send it; the website does not send the draft.</span></li><li>${icon('check')}<span>Inquiries are handled as business correspondence. For questions, corrections or a deletion request, contact info@inrsettle.com.</span></li></ul><a class="contact-email-link" href="mailto:info@inrsettle.com">info@inrsettle.com ${icon('arrow')}</a><div class="actions"><button class="button secondary" data-detail-contact>Back to Inquiry</button></div>`;
+    $('#detail-dialog').setAttribute('aria-labelledby', 'detail-title');
+    openDialog($('#detail-dialog'));
+  }
 
   const menuToggle = $('.menu-toggle');
   const mobileNav = $('#mobile-nav');
@@ -335,8 +418,9 @@
     if (target.hasAttribute('data-close')) return closeDialog(target.closest('dialog'));
     if (target.hasAttribute('data-tour')) return startTour();
     if (target.hasAttribute('data-detail-tour')) { closeDialog($('#detail-dialog')); return startTour(); }
-    if (target.hasAttribute('data-detail-contact')) { closeDialog($('#detail-dialog')); return openDialog($('#contact-dialog')); }
-    if (target.dataset.open === 'contact') return openDialog($('#contact-dialog'));
+    if (target.hasAttribute('data-detail-contact')) { closeDialog($('#detail-dialog')); void checkInquiryDelivery(); return openDialog($('#contact-dialog')); }
+    if (target.dataset.open === 'contact') { event.preventDefault(); void checkInquiryDelivery(); return openDialog($('#contact-dialog')); }
+    if (target.dataset.open === 'privacy') return showInquiryPrivacy();
     if (target.dataset.open === 'developers') return showDevelopers();
     if (target.dataset.open === 'corridors') return showCorridors();
     if (target.dataset.role) return setRole(target);
@@ -372,7 +456,32 @@
     if (target.dataset.report) exportReport(target.dataset.report);
   });
 
-  // Animation work is restricted to transform/opacity, with a reduced-motion path.
+  // Animate the two ribbons only. Preserve a visitor's pause choice and
+  // stop the light passes outside the visible hero.
+  const heroMotionButton = $('#hero-motion-toggle');
+  let heroPaused = false;
+  try { heroPaused = sessionStorage.getItem('inrsettle:hero-paused') === 'true'; } catch { /* Optional preference. */ }
+  function updateHeroMotion() {
+    document.documentElement.classList.toggle('motion-paused', heroPaused || prefersReducedMotion.matches);
+    heroMotionButton.setAttribute('aria-pressed', String(heroPaused));
+    heroMotionButton.setAttribute('aria-label', heroPaused ? 'Play hero animation' : 'Pause hero animation');
+    heroMotionButton.innerHTML = heroPaused ? 'Play animation <span aria-hidden="true">▷</span>' : 'Pause animation <span aria-hidden="true">Ⅱ</span>';
+  }
+  heroMotionButton.addEventListener('click', () => {
+    heroPaused = !heroPaused;
+    try { sessionStorage.setItem('inrsettle:hero-paused', String(heroPaused)); } catch { /* Optional preference. */ }
+    updateHeroMotion();
+  });
+  prefersReducedMotion.addEventListener('change', updateHeroMotion);
+  updateHeroMotion();
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      document.documentElement.classList.toggle('hero-offscreen', !entries[0].isIntersecting);
+    }).observe($('.hero-shell'));
+  }
+  document.documentElement.classList.toggle('page-inactive', document.hidden);
+
+  // Reveal transitions have a reduced-motion path.
   if ('IntersectionObserver' in window && !prefersReducedMotion.matches) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
@@ -407,23 +516,6 @@
   window.addEventListener('scroll', () => {
     if (!scrollPending) { scrollPending = true; requestAnimationFrame(updateScroll); }
   }, { passive: true });
-  const heroArt = $('.hero-art');
-  $('.hero-shell').addEventListener('pointermove', event => {
-    if (prefersReducedMotion.matches || !hoverPointer.matches || window.innerWidth < 820) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - .5;
-    const y = (event.clientY - rect.top) / rect.height - .5;
-    heroArt.style.setProperty('--art-x', `${x * 9}px`);
-    heroArt.style.setProperty('--art-y', `${y * 5}px`);
-    heroArt.style.setProperty('--emblem-x', `${x * 3}px`);
-    heroArt.style.setProperty('--emblem-y', `${y * 2}px`);
-  }, { passive: true });
-  $('.hero-shell').addEventListener('pointerleave', () => {
-    heroArt.style.setProperty('--art-x', '0px');
-    heroArt.style.setProperty('--art-y', '0px');
-    heroArt.style.setProperty('--emblem-x', '0px');
-    heroArt.style.setProperty('--emblem-y', '0px');
-  });
   let glassFrame = 0;
   let glassTarget = null;
   let glassPointerX = 0;
@@ -446,7 +538,7 @@
   document.addEventListener('visibilitychange', () => {
     const state = document.hidden ? 'paused' : 'running';
     document.documentElement.classList.toggle('page-inactive', document.hidden);
-    $$('.hero-light, .flow-track span').forEach(element => element.style.animationPlayState = state);
+    $$('.flow-track span').forEach(element => element.style.animationPlayState = state);
   });
   renderApp();
   updateScroll();

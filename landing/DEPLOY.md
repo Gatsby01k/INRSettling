@@ -6,9 +6,9 @@ from the same deployment.
 
 The repository root carries a `vercel.json` pointing `outputDirectory` at
 `landing/public` with the install and build commands blanked, so importing this
-repository with **default settings** serves the site. Setting Root Directory to
-`landing` works too — Vercel then reads `landing/vercel.json` instead — but it is
-no longer the setting everything depends on.
+repository with **default settings** serves the site. The inquiry endpoint and
+workspace middleware are at the repository root, so keep Root Directory there.
+A static-only deployment from `landing` excludes both server features.
 
 Replace `example.com` with the real domain. DNS is at Njalla.
 
@@ -16,8 +16,8 @@ Replace `example.com` with the real domain. DNS is at Njalla.
 
 ## 1. Push
 
-Everything is committed on `main` in this repository, whose origin is
-`github.com/Gatsby01k/INRSettling`. From the repository root on the Mac:
+Review and commit the intended changes before pushing the deployment branch.
+The repository origin is `github.com/Gatsby01k/INRSettling`:
 
 ```bash
 git push
@@ -31,19 +31,18 @@ with **Contents: read and write**. The macOS keychain remembers it afterwards.
 
 vercel.com/new → import `Gatsby01k/INRSettling`.
 
-- **Root Directory: `landing`** — this is the one setting that matters; without it
-  Vercel tries to build the monorepo
+- **Root Directory: repository root** (leave the field blank)
 - Framework preset: Other
 - Build command: empty
-- Output directory: `public` — already in `landing/vercel.json`, leave it
+- Output directory: `landing/public` — already in the root `vercel.json`
 - Install command: empty
+- Node runtime: 24.x
 
 Deploy, then check the `*.vercel.app` URL before touching DNS.
 
-Note: a Vercel project already exists against this repository from an earlier
-attempt and fails on every push, because it tries to build the product app that has
-no entry point. Point that project at `landing` or delete it — otherwise every push
-keeps producing a failed deployment.
+For an existing project, check for dashboard overrides to the root configuration.
+The marketing site needs no monorepo build. Confirm `/api/contact` responds with
+JSON and `/app` is gated when `APP_ACCESS_CODE` is set.
 
 ## 3. Domain
 
@@ -100,35 +99,69 @@ and no copy on it suggests an account or a sign-in.
 
 The v6 demo workspace ships inside the site at `landing/public/app/` — four static
 files, hash routing, no network calls, sharing `/assets/` with the site. It needs
-no subdomain, no second Vercel project and no rewrite rules, and the four CTAs
-already point at `/app/`, so nothing has to be repointed.
+no subdomain, no second Vercel project and no rewrite rules. Explore App points
+at `/app/`; Get Started opens a business inquiry.
 
 `landing/scripts/set-app-url.mjs` stays for the day the real product frontend gets
-its own deployment: it moves those four links to an absolute URL and back.
+its own deployment: it moves the Explore App link to an absolute URL and back,
+without changing inquiry CTAs.
 
-**It is a demo, and the page barely says so.** No provider, no authorization, no
-API; the figures are invented. The only standing disclosure is a "Demo workspace"
-caption in the footer — every other one ("Production endpoints and credentials are
-not connected", "No money has been sent") appears only after the visitor interacts
-with something. A prospect who clicks "Open App" sees a working-looking dashboard
-first and the disclaimer second. Decide whether that is the impression you want
-before the domain is announced.
+The workspace uses illustrative data and makes no financial API calls. The landing
+labels its embedded dashboard as a product preview and the tour as an illustrative
+walkthrough. Use `APP_ACCESS_CODE` for private prospect walkthroughs.
+
+## Inquiry delivery
+
+`api/contact.js` supports business inquiries through **@inrslead_bot** to the
+owner's personal Telegram chat, or to **info@inrsettle.com** through
+[Resend's email API](https://resend.com/docs/api-reference/emails/send-email).
+Configure server environment variables (see `.env.example`):
+
+- `SITE_URL=https://www.inrsettle.com`: the canonical HTTPS origin. The apex currently redirects to `www`; submissions from other origins are rejected.
+- `CONTACT_DELIVERY=telegram`: use the personal Telegram chat.
+- `TELEGRAM_BOT_TOKEN`: the token of @inrslead_bot, server-only.
+- `TELEGRAM_CHAT_ID`: the owner's positive numeric personal-chat ID.
+
+See [TELEGRAM.md](TELEGRAM.md) for safe chat-ID discovery. To use email instead,
+set `CONTACT_DELIVERY=email`, `RESEND_API_KEY` and a verified `CONTACT_FROM`
+such as `INRSettle <website@inrsettle.com>`. Both channels are not sent together.
+Existing email-only deployments without `CONTACT_DELIVERY` remain compatible;
+when Telegram settings are present, auto-selection chooses Telegram and requires
+complete valid settings rather than silently falling back to email.
+
+Until the selected transport and `SITE_URL` are configured, the contact dialog
+explicitly prepares an email draft. It never reports a draft as sent. With online
+delivery enabled, success is shown only after the provider acknowledges delivery.
+Telegram acknowledgements must identify the configured personal chat. Long
+inquiries are split into numbered messages without discarding route context.
+
+The endpoint validates and limits input, checks origin, binds retries to the
+message, includes a honeypot and avoids logging inquiry data. Its in-memory limit
+is per warm instance. Configure deployment-level rate limiting on `/api/contact`
+and delivery monitoring before public launch. Telegram retries are coalesced and
+acknowledged message parts are resumed for ten minutes within one warm instance.
+Telegram's API does not provide an idempotency key: this guard cannot prevent
+duplicates across instances or after an ambiguous timeout. Each message carries
+the inquiry reference. A persistent outbox is needed for durable retry tracking.
+Send a controlled test and verify it arrives in the owner's chat before enabling
+online submission publicly.
 
 ## 6. End-to-end check
 
 - [ ] `example.com` serves over HTTPS, `www` redirects to it
 - [ ] Favicon in the tab; fonts load (page is in Nimbus Sans, not Arial)
 - [ ] All three background renders appear: hero plate, city, flow
-- [ ] All four CTAs open `/app/` and the workspace renders
+- [ ] Get Started / Talk to Our Team open the inquiry dialog; Explore App opens `/app/`
 - [ ] The workspace's brand link in the sidebar returns to the site
 - [ ] With `APP_ACCESS_CODE` set, `/app` asks for it and `/app/workspace.js` is not served without it
 - [ ] Lighthouse mobile run on both `/` and `/app/`
-- [ ] The contact dialog still only prepares a local brief
+- [ ] Hero ribbon motion works; Pause and reduced-motion preferences are respected
+- [ ] Inquiry validation, retry and failure states preserve visitor input
+- [ ] A controlled inquiry arrives in the owner's Telegram chat (or email for email mode), including all fields and selected workflow
 
-## Before this is a launch rather than a preview
+## Before public launch
 
-The illustrative figures are still on the page — `1000+`, `99.9%`, `50+`, `< 60s`,
-the dashboard numbers, the corridor list. They reproduce the design reference and
-are not claims about the business; a B2B buyer checks these in diligence. Replace
-or remove them, and connect the contact form to a real inbox, before the domain is
-announced anywhere.
+Confirm the operational claims, supported corridors and current availability with
+the business. Hero cards do not claim invented throughput, uptime or customer
+counts. The embedded dashboard and corridor list remain illustrative product
+examples, and should not be presented as actual business performance.

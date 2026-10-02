@@ -14,6 +14,8 @@
   <link rel="preload" as="font" type="font/otf" href="/assets/bold.otf" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
+  <script type="module" src="/market.js"></script>
+  <script type="module" src="/hero-flow.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -49,7 +51,7 @@
       <nav class="desktop-nav" aria-label="Main navigation"><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#corridors">Corridors</a><button type="button" data-open="developers">Developers</button><a href="#company">Company</a></nav>
       <button class="menu-toggle icon-button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav"><svg class="icon"><use href="#i-menu"/></svg></button>
     </div>
-    <a class="button primary nav-cta" href="/app/">Get Started <svg class="icon"><use href="#i-arrow"/></svg></a>
+    <a class="button primary nav-cta" href="mailto:info@inrsettle.com" data-open="contact">Get Started <svg class="icon"><use href="#i-arrow"/></svg></a>
     <nav class="mobile-nav glass" id="mobile-nav" aria-label="Mobile navigation" hidden><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#corridors">Corridors</a><button data-open="developers">Developers</button><a href="#company">Company</a></nav>
   </header>
 
@@ -58,31 +60,27 @@
       <div class="hero-art" aria-hidden="true">
         <div class="hero-visual">
           <img class="hero-scene" src="/assets/hero-plate.webp" width="1659" height="948" alt="" fetchpriority="high">
+          <canvas class="hero-streams" id="hero-streams" width="1659" height="948" aria-hidden="true"></canvas>
           <img class="hero-emblem" src="/assets/brand-symbol.svg" width="833" height="676" alt="">
-          <span class="hero-lens-shine"></span>
-          <img class="pedestal-wordmark" src="/assets/brand-wordmark.svg" width="934" height="95" alt="">
-          <span class="pedestal-caption">People · Payments · Progress</span>
         </div>
-        <div class="hero-light"></div>
       </div>
       <div class="hero content">
         <div class="hero-copy">
           <p class="eyebrow">Global settlements. A stronger India.</p>
           <h1 id="hero-heading">Cross-border settlement<br class="desktop-break"> infrastructure <span class="teal-text">for India</span></h1>
           <p class="hero-description">Move INR and stablecoins across global corridors with liquidity, routing, compliance, and reconciliation — built for the next generation of financial infrastructure.</p>
-          <div class="actions"><a class="button primary" href="/app/">Get Started <svg class="icon"><use href="#i-arrow"/></svg></a><button class="button secondary" data-open="contact">Talk to Our Team</button></div>
-          <div class="trust-row"><span><svg class="icon"><use href="#i-check"/></svg>Secure &amp; Compliant</span><span><svg class="icon"><use href="#i-check"/></svg>Enterprise Ready</span><span><svg class="icon"><use href="#i-check"/></svg>Built for Global Scale</span></div>
+          <div class="actions"><a class="button primary" href="mailto:info@inrsettle.com" data-open="contact">Get Started <svg class="icon"><use href="#i-arrow"/></svg></a><button class="button secondary" data-open="contact">Talk to Our Team</button></div>
+          <div class="trust-row"><span><svg class="icon"><use href="#i-check"/></svg>India-focused</span><span><svg class="icon"><use href="#i-check"/></svg>Fiat &amp; stablecoin rails</span><span><svg class="icon"><use href="#i-check"/></svg>End-to-end records</span></div>
         </div>
-        <p class="side-note hero-note-top">Liquidity<br>connects<br>opportunities</p>
-        <p class="side-note hero-note-bottom">India<br>to the world<br><br>Faster. Safer.<br>Together.</p>
       </div>
-      <div class="metrics content" aria-label="Platform figures from the design reference">
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-bolt"/></svg></span><div><strong>&lt; 60s</strong><span>Typical settlement time</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><div><strong>24/7</strong><span>Global operations</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-shield"/></svg></span><div><strong>99.9%</strong><span>Platform reliability</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-globe"/></svg></span><div><strong>50+</strong><span>Global corridors</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-users"/></svg></span><div><strong>1000+</strong><span>Businesses onboarded</span></div></div>
-        <span class="metrics-note">Illustrative platform figures</span>
+      <div class="metrics content" aria-label="Connected settlement capabilities">
+        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-bolt"/></svg></span><div><strong>INR ↔</strong><span>Fiat &amp; digital liquidity</span></div></div>
+        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><div><strong>API</strong><span>Connected workflows</span></div></div>
+        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-shield"/></svg></span><div><strong>Track</strong><span>Settlement visibility</span></div></div>
+        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-globe"/></svg></span><div><strong>Verify</strong><span>Preflight controls</span></div></div>
+        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-users"/></svg></span><div><strong>Record</strong><span>Reconciliation evidence</span></div></div>
+        <span class="metrics-note">One connected settlement layer</span>
+        <button class="hero-motion-toggle" id="hero-motion-toggle" type="button" aria-pressed="false" aria-label="Pause hero animation">Pause animation <span aria-hidden="true">Ⅱ</span></button>
       </div>
     </section>
 
@@ -95,50 +93,90 @@
         <button id="role-operators" class="role-tab" role="tab" aria-selected="false" aria-controls="role-panel" tabindex="-1" data-role="operators"><svg class="icon"><use href="#i-card"/></svg><span>Payment Operators</span></button>
         <button id="role-banks" class="role-tab" role="tab" aria-selected="false" aria-controls="role-panel" tabindex="-1" data-role="banks"><svg class="icon"><use href="#i-bank"/></svg><span>Banks</span></button>
       </div>
-      <p class="side-note ecosystem-note">Different roles.<br>A stronger network.</p>
     </section>
 
     <section class="features content section-grid reveal" id="solutions" aria-labelledby="solutions-heading">
       <div class="section-copy" id="role-panel" role="tabpanel" aria-labelledby="role-psps" tabindex="0">
         <p class="eyebrow">Powering global settlements</p>
-        <h2 id="solutions-heading">Everything you need<br>for <span class="teal-text">borderless movement</span></h2>
-        <p id="role-description">A complete infrastructure layer to move value with speed, certainty and control.</p>
+        <h2 id="solutions-heading">An operating layer for<br><span class="teal-text">India-linked payments.</span></h2>
+        <p id="role-description">Bring funding, settlement instructions and reconciliation into one connected cross-border payment workflow.</p>
         <button class="button small secondary" data-feature="overview">Learn More <svg class="icon"><use href="#i-arrow"/></svg></button>
       </div>
       <div class="feature-grid">
-        <button class="feature-card glass" data-feature="treasury"><span class="round-icon"><svg class="icon"><use href="#i-bank"/></svg></span><span><strong>Treasury Movement</strong><span>Move liquidity efficiently<br>across entities and regions.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="timing"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><span><strong>Liquidity Timing</strong><span>Access liquidity when<br>you need it, everywhere.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="routing"><span class="round-icon"><svg class="icon"><use href="#i-route"/></svg></span><span><strong>Settlement Routing</strong><span>Intelligent routing for<br>optimal speed and cost.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="reconciliation"><span class="round-icon"><svg class="icon"><use href="#i-file"/></svg></span><span><strong>Reconciliation</strong><span>Automated, accurate<br>and audit-ready.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-open="developers"><span class="round-icon"><svg class="icon"><use href="#i-code"/></svg></span><span><strong>API-first Workflows</strong><span>Build and integrate<br>with ease.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="visibility"><span class="round-icon"><svg class="icon"><use href="#i-chart"/></svg></span><span><strong>Corridor Visibility</strong><span>Real-time insights across<br>global corridors.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="treasury"><span class="round-icon"><svg class="icon"><use href="#i-bank"/></svg></span><span><strong>Treasury Movement</strong><span>Coordinate INR and digital<br>liquidity across operations.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="timing"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><span><strong>Liquidity Timing</strong><span>Align funding with<br>settlement obligations.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="routing"><span class="round-icon"><svg class="icon"><use href="#i-route"/></svg></span><span><strong>Settlement Routing</strong><span>Connect each instruction<br>to the right settlement route.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="reconciliation"><span class="round-icon"><svg class="icon"><use href="#i-file"/></svg></span><span><strong>Reconciliation</strong><span>Match movements, references<br>and settlement evidence.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-open="developers"><span class="round-icon"><svg class="icon"><use href="#i-code"/></svg></span><span><strong>API-first Workflows</strong><span>Connect quotes, preflight<br>and settlement status.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="visibility"><span class="round-icon"><svg class="icon"><use href="#i-chart"/></svg></span><span><strong>Corridor Visibility</strong><span>Follow route availability,<br>execution and exceptions.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+      </div>
+      <div class="solution-scenario glass" aria-labelledby="scenario-title">
+        <div class="scenario-copy"><p class="eyebrow" id="scenario-label">For payment service providers</p><h3 id="scenario-title">Embed India settlement into your payment product.</h3><p id="scenario-description">Connect payment instructions, INR liquidity and settlement updates while keeping your own customer experience.</p><button class="button small secondary" id="scenario-contact" type="button">Discuss this workflow <svg class="icon"><use href="#i-arrow"/></svg></button></div>
+        <div class="scenario-steps" id="scenario-steps"><div class="scenario-step"><span>01</span><h4>Send the instruction</h4><p>Recipient, amount, payment purpose and your customer reference.</p></div><div class="scenario-step"><span>02</span><h4>Coordinate execution</h4><p>Funding, agreed route and requirements in the same workflow.</p></div><div class="scenario-step"><span>03</span><h4>Return the result</h4><p>Status and settlement references back to your platform.</p></div></div>
+        <p class="sr-only" id="scenario-status" role="status"></p>
       </div>
     </section>
 
     <section class="flow-section reveal" id="corridors" aria-labelledby="flow-heading">
       <img class="flow-background" src="/assets/flow.webp" alt="" width="2151" height="731" loading="lazy" aria-hidden="true">
       <div class="content section-grid flow-layout">
-        <div class="section-copy"><p class="eyebrow">From INR to a borderless world</p><h2 id="flow-heading">Seamless flow.<br>Greater <span class="teal-text">possibilities.</span></h2><p>INRSettle connects local markets to global opportunities through a unified settlement infrastructure.</p><button class="button small secondary" data-open="corridors">Explore Corridors <svg class="icon"><use href="#i-arrow"/></svg></button></div>
+        <div class="section-copy"><p class="eyebrow">From INR to a borderless world</p><h2 id="flow-heading">INR. Digital rails.<br>Global <span class="teal-text">settlement.</span></h2><p>Connect INR liquidity and stablecoin rails through one layer for funding, routing, settlement controls and reconciliation.</p><button class="button small secondary" data-open="corridors">Explore Corridors <svg class="icon"><use href="#i-arrow"/></svg></button></div>
         <div class="flow-diagram" aria-label="How settlement flows from INR to global destinations">
           <div class="flow-track"><span></span><span></span><span></span></div>
-          <button class="flow-node orange" data-flow="inr" aria-pressed="true"><span class="flow-coin rupee">₹</span><strong>INR</strong><span>Local Collections<br>&amp; Liquidity</span></button>
+          <button class="flow-node orange" data-flow="inr" aria-pressed="true"><span class="flow-coin"><img class="flow-currency-icon" src="/assets/currencies/inr-mark.svg" width="64" height="64" alt=""></span><strong>INR</strong><span>Local Collections<br>&amp; Liquidity</span></button>
           <svg class="icon flow-arrow orange-text"><use href="#i-arrow"/></svg>
           <button class="flow-node engine" data-flow="engine" aria-pressed="false"><span class="flow-coin"><img class="brand-symbol" src="/assets/brand-symbol.svg" width="833" height="676" alt=""></span><strong class="flow-wordmark"><img src="/assets/brand-wordmark.svg" width="934" height="95" alt="INRSettle"></strong><span>Liquidity · Routing<br>Compliance · Reconciliation</span></button>
           <svg class="icon flow-arrow"><use href="#i-arrow"/></svg>
-          <button class="flow-node stable" data-flow="stable" aria-pressed="false"><span class="flow-coin tether">₮</span><strong>Stablecoins</strong><span>Multi-chain Support<br>(USDT, USDC &amp; more)</span></button>
+          <button class="flow-node stable" data-flow="stable" aria-pressed="false"><span class="flow-coin"><span class="stablecoin-marks" role="img" aria-label="USDT and USDC"><img class="usdt-mark" src="/assets/currencies/usdt.svg" width="32" height="32" alt=""><img class="usdc-mark" src="/assets/currencies/usdc.svg" width="32" height="32" alt=""></span></span><strong>Stablecoins</strong><span>Multi-chain Support<br>(USDT, USDC &amp; more)</span></button>
           <svg class="icon flow-arrow"><use href="#i-arrow"/></svg>
-          <button class="flow-node global" data-flow="global" aria-pressed="false"><span class="flow-coin"><svg class="icon"><use href="#i-globe"/></svg></span><strong>Global Settlements</strong><span>To 50+ Corridors<br>Worldwide</span></button>
+          <button class="flow-node global" data-flow="global" aria-pressed="false"><span class="flow-coin"><img class="flow-settlement-icon" src="/assets/settlement-network.svg" width="64" height="64" alt=""></span><strong>Global Settlements</strong><span>Cross-border Workflows<br>&amp; Global Connectivity</span></button>
           <div class="flow-detail" aria-live="polite"><span class="flow-detail-line"></span><span id="flow-detail-text">A single starting point for local INR liquidity.</span></div>
         </div>
-        <p class="side-note flow-note">Local<br>liquidity.<br>Global<br>opportunities.</p>
+      </div>
+    </section>
+
+    <section class="corridor-discovery content reveal" aria-labelledby="planner-heading">
+      <div class="section-intro"><div><p class="eyebrow">India ↔ World</p><h2 id="planner-heading">Map your next<br><span class="teal-text">India settlement.</span></h2></div><p>Choose a direction, currency and use case. See the funding, destination and operating details to discuss with our team.</p></div>
+      <div class="corridor-planner glass" id="corridor-planner">
+        <div class="planner-config">
+          <p class="planner-overline">Scope your workflow</p>
+          <div class="direction-switch" id="plan-direction" role="group" aria-label="Settlement direction"><button type="button" data-direction="to-india" aria-pressed="true">World <span aria-hidden="true">→</span> India</button><button type="button" data-direction="from-india" aria-pressed="false">India <span aria-hidden="true">→</span> World</button></div>
+          <div class="planner-picker picker-currency" data-columns="3">
+            <span class="picker-label" id="plan-currency-label">Funding currency</span>
+            <input type="hidden" id="plan-currency" value="USDC">
+            <button class="picker-trigger" id="plan-currency-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-currency-options" aria-labelledby="plan-currency-label plan-currency-value"><span class="picker-value" id="plan-currency-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
+            <div class="picker-panel" id="plan-currency-options" role="dialog" hidden></div>
+          </div>
+          <div class="planner-picker picker-purpose" data-columns="2">
+            <span class="picker-label" id="plan-purpose-label">Business use</span>
+            <input type="hidden" id="plan-purpose" value="supplier-payments">
+            <button class="picker-trigger" id="plan-purpose-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-purpose-options" aria-labelledby="plan-purpose-label plan-purpose-value"><span class="picker-value" id="plan-purpose-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
+            <div class="picker-panel" id="plan-purpose-options" role="dialog" hidden></div>
+          </div>
+          <div class="planner-picker picker-volume" data-columns="2">
+            <span class="picker-label" id="plan-volume-label">Indicative monthly volume</span>
+            <input type="hidden" id="plan-volume" value="evaluating">
+            <button class="picker-trigger" id="plan-volume-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-volume-options" aria-labelledby="plan-volume-label plan-volume-value"><span class="picker-value" id="plan-volume-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
+            <div class="picker-panel" id="plan-volume-options" role="dialog" hidden></div>
+          </div>
+          <p class="planner-help">Prepare your currencies, use case and volume for a focused conversation with our team.</p>
+        </div>
+        <div class="planner-result">
+          <div class="planner-result-heading"><div><p class="planner-overline">Your proposed flow</p><h3 id="plan-title">USDC → INR</h3></div><span class="planner-purpose" id="plan-purpose-result">Supplier &amp; service payments</span></div>
+          <div class="planner-journey" aria-label="Funding, orchestration and delivery"><div><span class="journey-coin" id="plan-source"><img src="/assets/currencies/usdc.svg" width="32" height="32" alt="USD Coin"></span><strong class="journey-code" id="plan-source-code">USDC</strong><p id="plan-source-label">Digital currency funding</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin journey-brand"><img src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></span><p>Route &amp; settlement controls</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin" id="plan-destination"><img src="/assets/currencies/inr-mark.svg" width="64" height="64" alt="Indian rupee"></span><strong class="journey-code" id="plan-destination-code">INR</strong><p id="plan-destination-label">Indian bank destination</p></div></div>
+          <ul class="plan-checks" id="plan-checks"></ul>
+          <div class="planner-actions"><button class="button primary" id="plan-contact" type="button">Discuss this route <svg class="icon"><use href="#i-arrow"/></svg></button><button class="text-button" id="plan-download" type="button">Download route brief <svg class="icon"><use href="#i-download"/></svg></button></div>
+          <p class="planner-note" id="plan-note">Route availability and execution terms are confirmed during onboarding.</p>
+          <p class="sr-only" role="status" id="plan-announcement"></p>
+        </div>
       </div>
     </section>
 
     <section class="product-section reveal" id="product" aria-labelledby="product-heading">
-      <img class="product-city" src="/assets/city.webp" width="2001" height="786" alt="" loading="lazy" aria-hidden="true">
+      <img class="product-city" src="/assets/city-clean.webp" width="2001" height="786" alt="" loading="lazy" aria-hidden="true">
       <div class="product-glow" aria-hidden="true"></div>
       <div class="content product-layout">
-        <div class="section-copy"><p class="eyebrow">Built for real operators</p><h2 id="product-heading">A clearer view<br>of global settlement</h2><p>Monitor liquidity, track settlements, manage counterparts and get complete visibility — all in one place.</p><div class="actions"><a class="button small secondary" href="/app/">Open App <svg class="icon"><use href="#i-arrow"/></svg></a><button class="text-button" data-tour>See Product Tour</button></div></div>
+        <div class="section-copy"><p class="eyebrow">Built for real operators</p><h2 id="product-heading">A clearer view<br>of global settlement</h2><p>Bring funding, settlement status, counterparties and reconciliation into one operational view.</p><div class="actions"><a class="button small secondary" href="/app/">Explore App <svg class="icon"><use href="#i-arrow"/></svg></a><button class="text-button" data-tour>See Product Tour</button></div></div>
         <div class="dashboard-stage">
           <div class="dashboard-shadow glass" aria-hidden="true"></div>
           <div class="dashboard" aria-label="Interactive product preview">
@@ -146,22 +184,43 @@
             <div class="dashboard-main"><div class="app-toolbar"><span class="toolbar-mark">↖</span><label class="app-search"><svg class="icon"><use href="#i-search"/></svg><input id="app-search" type="search" aria-label="Search sample settlements" placeholder="Search settlements, counterparts…"></label><span class="app-avatar" aria-label="Preview workspace">IN</span></div><div id="app-view" aria-live="polite"></div></div>
           </div>
         </div>
-        <p class="side-note product-note">Data<br>clarity.<br>Confidence<br>at scale.</p>
-        <div class="insights-tile glass" aria-hidden="true"><svg class="icon"><use href="#i-chart"/></svg><span>Real-time<br>global insights</span></div>
+      </div>
+    </section>
+
+    <section class="operating-controls content reveal" aria-labelledby="controls-heading">
+      <div class="section-intro"><div><p class="eyebrow">The details behind the settlement</p><h2 id="controls-heading">India-specific detail.<br><span class="teal-text">Global operating discipline.</span></h2></div><p>The bank leg, the digital leg and the business record need to agree. Define the requirements before value moves.</p></div>
+      <div class="control-grid">
+        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-users"/></svg></span><h3>Entity &amp; recipient</h3><p>Business identity, beneficiary details and counterparties aligned with the proposed payment flow.</p><span class="control-detail">KYB · Beneficiary · IFSC</span></article>
+        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-file"/></svg></span><h3>Purpose &amp; documents</h3><p>Link the instruction to its commercial purpose, invoice or supporting business evidence.</p><span class="control-detail">Purpose · Invoice · Reference</span></article>
+        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-route"/></svg></span><h3>Execution terms</h3><p>Confirm the funding method, route, FX, fees, limits and operating windows before execution.</p><span class="control-detail">Funding · Route · Terms</span></article>
+        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-check"/></svg></span><h3>Records that reconcile</h3><p>Connect the instruction, provider references and delivery evidence to the reconciliation record.</p><span class="control-detail">Status · Evidence · Match</span></article>
+      </div>
+      <div class="integration-path glass"><div><p class="eyebrow">From first conversation to integration</p><h3>From corridor scope<br>to <span class="teal-text">integration.</span></h3><div class="actions"><button class="button small secondary" type="button" data-inquiry-interest="integration">Discuss integration <svg class="icon"><use href="#i-arrow"/></svg></button><button class="text-button" type="button" data-inquiry-interest="partnership">Become a partner</button></div></div><ol><li><span>01</span><div><h4>Scope the flow</h4><p>Entities, directions, currencies, use case and expected volumes.</p></div></li><li><span>02</span><div><h4>Confirm the operating model</h4><p>Route availability, eligibility, responsibilities and commercial terms.</p></div></li><li><span>03</span><div><h4>Connect &amp; validate</h4><p>API workflow, status updates, reconciliation and acceptance criteria.</p></div></li></ol></div>
+    </section>
+
+    <section class="settlement-faq content reveal" aria-labelledby="faq-heading">
+      <div class="faq-intro"><p class="eyebrow">Before we build</p><h2 id="faq-heading">India settlement,<br><span class="teal-text">explained.</span></h2><p>Start with the operating details, then define the right settlement structure for your business.</p><button type="button" class="button small secondary" data-inquiry-interest="settlements">Ask our team <svg class="icon"><use href="#i-arrow"/></svg></button></div>
+      <div class="faq-list">
+        <details><summary>What does INRSettle connect?<span aria-hidden="true">+</span></summary><p>INRSettle brings INR liquidity, fiat and stablecoin settlement workflows, routing, payment requirements and reconciliation into one infrastructure layer. The exact currencies, providers and settlement responsibilities are agreed for your business during onboarding.</p></details>
+        <details><summary>Can we discuss flows into and out of India?<span aria-hidden="true">+</span></summary><p>Use the planner to scope an India-linked flow in either direction. Our team reviews the entities, payment purpose, funding currency and destination together to agree the route and operating requirements.</p></details>
+        <details><summary>Does every settlement have to use stablecoins?<span aria-hidden="true">+</span></summary><p>The settlement design starts with your funding and destination needs. Fiat and digital currency legs can have different operating requirements. We confirm the permitted structure, currencies and responsibilities for your proposed route before execution.</p></details>
+        <details><summary>Which details matter for the India leg?<span aria-hidden="true">+</span></summary><p>For an Indian bank destination, discussions typically cover beneficiary account and IFSC details, payment purpose and supporting commercial records. The required documents, permitted purpose and available bank rail depend on the route and the relevant provider’s requirements.</p></details>
+        <details><summary>How are cost and delivery time determined?<span aria-hidden="true">+</span></summary><p>Request a route review for your currency pair and use case. Our team will confirm the funding requirements, FX, fees, limits and delivery windows together before you commit to execution.</p></details>
+        <details><summary>What should we prepare for a first conversation?<span aria-hidden="true">+</span></summary><p>Your business role, operating jurisdictions, proposed currencies and direction, payment use case and indicative monthly volumes. The route brief brings these points together. Share business information only; bank credentials and sensitive customer records are not needed for an initial inquiry.</p></details>
       </div>
     </section>
 
     <section class="closing-section" id="company" aria-labelledby="closing-heading">
-      <img class="city-image" src="/assets/city.webp" width="2001" height="786" alt="A luminous waterfront city connected by sweeping bridges" loading="lazy">
+      <img class="city-image" src="/assets/city-clean.webp" width="2001" height="786" alt="A luminous waterfront city connected by sweeping bridges" loading="lazy">
       <div class="closing-shade" aria-hidden="true"></div>
-      <div class="content closing-content reveal"><div><p class="eyebrow">A more connected financial future</p><h2 id="closing-heading">Let’s build a more open,<br>prosperous world <span class="teal-text">together.</span></h2><p>Join leading businesses moving value across borders with INRSettle.</p><div class="actions"><a class="button primary" href="/app/">Get Started <svg class="icon"><use href="#i-arrow"/></svg></a><button class="button secondary" data-open="contact">Talk to Our Team</button></div></div><p class="side-note closing-note">India<br>connects<br>the world.</p></div>
+      <div class="content closing-content reveal"><div><p class="eyebrow">Let’s define the next step</p><h2 id="closing-heading">Build your India<br>settlement <span class="teal-text">workflow.</span></h2><p>Define your currencies, corridors and requirements. Build the settlement workflow around your business.</p><div class="actions"><a class="button primary" href="mailto:info@inrsettle.com" data-open="contact">Get Started <svg class="icon"><use href="#i-arrow"/></svg></a><button class="button secondary" data-open="contact">Talk to Our Team</button></div></div></div>
     </section>
   </main>
 
-  <footer class="footer content"><a class="brand" href="#" aria-label="INRSettle home"><img class="brand-lockup" src="/assets/brand-lockup.svg" width="934" height="152" alt=""></a><nav aria-label="Footer navigation"><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#corridors">Corridors</a><button data-open="developers">Developers</button><a href="#company">Company</a></nav><p>People. Payments. Progress.</p></footer>
+  <footer class="footer content"><a class="brand" href="#" aria-label="INRSettle home"><img class="brand-lockup" src="/assets/brand-lockup.svg" width="934" height="152" alt=""></a><nav aria-label="Footer navigation"><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#corridors">Corridors</a><button data-open="developers">Developers</button><a href="#company">Company</a></nav><p>People. Payments. Progress.</p><div class="footer-contact"><a href="mailto:info@inrsettle.com">info@inrsettle.com</a><button type="button" data-open="privacy">Inquiry privacy</button></div></footer>
 
   <dialog id="detail-dialog" class="modal"><button class="icon-button modal-close" data-close aria-label="Close dialog"><svg class="icon"><use href="#i-close"/></svg></button><div id="detail-content"></div></dialog>
-  <dialog id="contact-dialog" class="modal contact-modal" aria-labelledby="contact-title"><button class="icon-button modal-close" data-close aria-label="Close dialog"><svg class="icon"><use href="#i-close"/></svg></button><div class="modal-heading"><p class="eyebrow">Let’s build together</p><h2 id="contact-title">Start a <span class="teal-text">conversation.</span></h2><p>Prepare a short brief to share with your INRSettle contact.</p></div><form id="contact-form"><div class="form-row"><label>Your name<input name="name" autocomplete="name" required placeholder="Full name" maxlength="100"></label><label>Work email<input name="email" type="email" autocomplete="email" required placeholder="you@company.com" maxlength="254"></label></div><label>Company<input name="company" autocomplete="organization" required placeholder="Company name" maxlength="150"></label><label>What are you looking to build?<select name="role"><option>Payment service provider</option><option>Merchant payments</option><option>OTC settlement</option><option>Payment operations</option><option>Banking partnership</option></select></label><label>Your settlement needs<textarea name="message" rows="3" placeholder="Corridors, currencies, expected volumes…" required maxlength="2000"></textarea></label><button class="button primary form-submit" type="submit">Create Inquiry <svg class="icon"><use href="#i-arrow"/></svg></button><p class="form-note">Your details stay in this browser. Download or copy your brief to share it.</p></form><div id="contact-result" hidden><span class="result-icon round-icon"><svg class="icon"><use href="#i-check"/></svg></span><h3>Your brief is ready.</h3><p>Share it with your INRSettle contact to continue the conversation.</p><pre id="inquiry-preview"></pre><div class="actions"><button class="button primary" id="download-inquiry"><svg class="icon"><use href="#i-download"/></svg>Download brief</button><button class="button secondary" id="copy-inquiry"><svg class="icon"><use href="#i-copy"/></svg>Copy</button></div><button class="text-button" id="edit-inquiry">Edit your brief</button></div></dialog>
+  <dialog id="contact-dialog" class="modal contact-modal" aria-labelledby="contact-title"><button class="icon-button modal-close" data-close aria-label="Close dialog"><svg class="icon"><use href="#i-close"/></svg></button><div class="modal-heading"><p class="eyebrow">Let’s build together</p><h2 id="contact-title">Start a <span class="teal-text">conversation.</span></h2><p>Tell us about your business, corridors and settlement needs.</p></div><form id="contact-form" action="/api/contact" method="post"><div class="form-row"><label>Your name<input name="name" autocomplete="name" required placeholder="Full name" maxlength="100"></label><label>Work email<input name="email" type="email" autocomplete="email" required placeholder="you@company.com" maxlength="254"></label></div><label>Company<input name="company" autocomplete="organization" required placeholder="Company name" maxlength="150"></label><fieldset class="choice-field inquiry-topics"><legend>Your inquiry</legend><div class="choice-card-grid"><label class="choice-option"><input class="choice-radio" type="radio" name="interest" value="settlements" checked required><span class="choice-card"><svg class="icon choice-card-icon" aria-hidden="true"><use href="#i-route"/></svg><span class="choice-card-copy"><strong>Settlement workflow</strong><small>INR &amp; cross-border flows</small></span><svg class="icon choice-card-check" aria-hidden="true"><use href="#i-check"/></svg></span></label><label class="choice-option"><input class="choice-radio" type="radio" name="interest" value="integration" required><span class="choice-card"><svg class="icon choice-card-icon" aria-hidden="true"><use href="#i-code"/></svg><span class="choice-card-copy"><strong>API integration</strong><small>Connect your platform</small></span><svg class="icon choice-card-check" aria-hidden="true"><use href="#i-check"/></svg></span></label><label class="choice-option"><input class="choice-radio" type="radio" name="interest" value="partnership" required><span class="choice-card"><svg class="icon choice-card-icon" aria-hidden="true"><use href="#i-bank"/></svg><span class="choice-card-copy"><strong>Banking &amp; liquidity</strong><small>Institutional partnerships</small></span><svg class="icon choice-card-check" aria-hidden="true"><use href="#i-check"/></svg></span></label><label class="choice-option"><input class="choice-radio" type="radio" name="interest" value="investor" required><span class="choice-card"><svg class="icon choice-card-icon" aria-hidden="true"><use href="#i-chart"/></svg><span class="choice-card-copy"><strong>Investor information</strong><small>Company &amp; investment</small></span><svg class="icon choice-card-check" aria-hidden="true"><use href="#i-check"/></svg></span></label></div></fieldset><div id="contact-context" class="contact-context" hidden><div><strong>Selected workflow</strong><p id="contact-context-summary"></p><span>The workflow brief will be included with your inquiry.</span></div><button type="button" id="contact-context-remove" class="icon-button" aria-label="Remove selected workflow"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div><input type="hidden" name="context" value=""><label>Your settlement needs<textarea name="message" rows="3" placeholder="Corridors, currencies, expected volumes…" required minlength="10" maxlength="2000"></textarea></label><div class="inquiry-trap" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off"></label></div><input type="hidden" name="volume" value="evaluating"><button class="button primary form-submit" id="contact-submit" type="submit">Prepare Email <svg class="icon"><use href="#i-arrow"/></svg></button><p class="form-note" id="contact-mode">Opens your email app. Review and send your inquiry to info@inrsettle.com.</p><p class="form-note">Business contact details only. <button type="button" class="inline-link" data-open="privacy">Inquiry privacy</button></p><p id="contact-status" class="inquiry-status" role="status" tabindex="-1" hidden></p></form><div id="contact-result" hidden><span class="result-icon round-icon"><svg class="icon"><use href="#i-check"/></svg></span><h3>Your inquiry has been submitted.</h3><p>The team will reply to the work email you provided.</p><button class="button secondary" id="edit-inquiry" type="button">Start another inquiry</button></div></dialog>
   <dialog id="tour-dialog" class="modal tour-modal" aria-labelledby="tour-title"><button class="icon-button modal-close" data-close aria-label="Close dialog"><svg class="icon"><use href="#i-close"/></svg></button><div class="modal-heading"><p class="eyebrow">Inside INRSettle · Product walkthrough</p><h2 id="tour-title">From intent to <span class="teal-text">settled.</span></h2><p>Explore a sample INR settlement in three steps.</p></div><ol class="tour-steps" aria-label="Settlement stages"><li class="active">01 <span>Create</span></li><li>02 <span>Preflight</span></li><li>03 <span>Settle</span></li></ol><div id="tour-content"></div><div class="tour-controls"><button class="button secondary" id="tour-back">Back</button><span id="tour-progress" aria-live="polite">Step 1 of 3</span><button class="button primary" id="tour-next">Run Preflight <svg class="icon"><use href="#i-arrow"/></svg></button></div><p class="form-note">Illustrative walkthrough. No funds are moved.</p></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>

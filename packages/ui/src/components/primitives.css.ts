@@ -65,6 +65,13 @@ body {
 .is-field__help { font-size: var(--type-caption-size); color: var(--color-ink-muted); }
 .is-field__error { font-size: var(--type-caption-size); color: var(--status-action-required-fg); }
 textarea.is-field__control { min-height: 84px; padding: var(--space-2) var(--space-3); resize: vertical; }
+select.is-field__control {
+  appearance: none; -webkit-appearance: none;
+  padding-inline-end: var(--space-7); cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%23677986' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right var(--space-3) center;
+  background-size: 16px;
+}
 
 .is-check { display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer; }
 .is-check input:disabled + span { color: var(--color-ink-disabled); cursor: not-allowed; }

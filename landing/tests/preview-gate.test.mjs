@@ -106,7 +106,7 @@ test('a tampered or expired ticket is refused', async () => {
   const [expiry, signature] = [ticket.slice(0, ticket.indexOf('.')), ticket.slice(ticket.indexOf('.') + 1)]
 
   for (const forged of [
-    `${name}=${expiry}.${signature.slice(0, -1)}A`,          // signature edited
+    `${name}=${expiry}.${signature[0] === 'A' ? 'B' : 'A'}${signature.slice(1)}`, // guaranteed edit
     `${name}=${Number(expiry) + 86400000}.${signature}`,      // expiry pushed out
     `${name}=${Date.now() - 1000}.${signature}`,              // already expired
     `${name}=${expiry}`,                                      // no signature at all
