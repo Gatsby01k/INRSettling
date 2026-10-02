@@ -1,11 +1,41 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "",
+  "buildCommand": "node landing/scripts/build-seo.mjs",
   "installCommand": "",
   "outputDirectory": "landing/public",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "inrsettle.com" }],
+      "destination": "https://www.inrsettle.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/legal/privacy",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/#contact-dialog",
+      "permanent": true
+    }
+  ],
   "headers": [
+    {
+      "source": "/app",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, nosnippet" }]
+    },
+    {
+      "source": "/app/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, nosnippet" }]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
     {
       "source": "/assets/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]

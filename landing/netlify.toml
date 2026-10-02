@@ -1,6 +1,47 @@
 [build]
   publish = "public"
-  command = ""
+  command = "node scripts/build-seo.mjs"
+
+[[redirects]]
+  from = "https://inrsettle.com/*"
+  to = "https://www.inrsettle.com/:splat"
+  status = 301
+  force = true
+
+[[headers]]
+  for = "/app"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"
+
+[[redirects]]
+  from = "/legal/privacy.html"
+  to = "/privacy"
+  status = 301
+
+[[redirects]]
+  from = "/legal/privacy"
+  to = "/privacy"
+  status = 301
+
+[[redirects]]
+  from = "/contact.html"
+  to = "/#contact-dialog"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/#contact-dialog"
+  status = 301
+
+[[redirects]]
+  from = "/docs/reconciliation.html"
+  to = "/docs/reconciliation"
+  status = 301
+
+[[headers]]
+  for = "/app/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"
 
 [[headers]]
   for = "/assets/*"

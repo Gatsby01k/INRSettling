@@ -52,6 +52,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Receipt integration tests render PDFs with the browser pinned by the
+      # existing playwright-core dependency. A fresh GitHub runner does not
+      # contain the production image's /opt/pw-browsers executable.
+      - name: Install Chromium for receipt tests
+        run: |
+          pnpm --filter @inrsettle/providers exec playwright-core install --with-deps chromium
+          pnpm --filter @inrsettle/providers exec node --input-type=module -e "import { chromium } from 'playwright-core'; console.log('INRSETTLE_CHROMIUM_PATH=' + chromium.executablePath())" >> "$GITHUB_ENV"
+
       # `pnpm verify` runs: typecheck -> source-tree check -> lint ->
       # money-column check -> requirement-copy check -> build-storybook -> test.
       # The Storybook build is an input to the coverage test, so it precedes it.

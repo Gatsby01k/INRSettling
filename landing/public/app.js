@@ -534,4 +534,12 @@
   });
   renderApp();
   updateScroll();
+  // Public resource pages link directly to the inquiry dialog.
+  function openLinkedInquiry() {
+    if (window.location.hash === '#contact-dialog') {
+      document.dispatchEvent(new CustomEvent('inrsettle:inquiry'));
+    }
+  }
+  window.addEventListener('hashchange', openLinkedInquiry);
+  openLinkedInquiry();
 })();

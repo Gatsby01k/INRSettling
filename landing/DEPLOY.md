@@ -5,12 +5,13 @@ and the demo workspace is `landing/public/app/` inside it, so `/` and `/app/` co
 from the same deployment.
 
 The repository root carries a `vercel.json` pointing `outputDirectory` at
-`landing/public` with the install and build commands blanked, so importing this
+`landing/public` with installation disabled and a dependency-free SEO build, so importing this
 repository with **default settings** serves the site. The inquiry endpoint and
 workspace middleware are at the repository root, so keep Root Directory there.
 A static-only deployment from `landing` excludes both server features.
 
-Replace `example.com` with the real domain. DNS is at Njalla.
+The production canonical origin is `https://www.inrsettle.com`. The apex redirects
+to `www`, preserving the path and query. DNS is at Njalla.
 
 ---
 
@@ -33,7 +34,7 @@ vercel.com/new → import `Gatsby01k/INRSettling`.
 
 - **Root Directory: repository root** (leave the field blank)
 - Framework preset: Other
-- Build command: empty
+- Build command: `node landing/scripts/build-seo.mjs` — set in `vercel.json`
 - Output directory: `landing/public` — already in the root `vercel.json`
 - Install command: empty
 - Node runtime: 24.x
@@ -46,7 +47,7 @@ JSON and `/app` is gated when `APP_ACCESS_CODE` is set.
 
 ## 3. Domain
 
-Project → Settings → Domains → Add `example.com`, then `www.example.com`. Vercel
+Project → Settings → Domains → Add `inrsettle.com`, then `www.inrsettle.com`. Vercel
 shows the exact records.
 
 **Use the values from that screen, not from this file.** They are per-project now:
@@ -153,13 +154,19 @@ online submission publicly.
 
 ## 6. End-to-end check
 
-- [ ] `example.com` serves over HTTPS, `www` redirects to it
+- [ ] `www.inrsettle.com` serves over HTTPS; `inrsettle.com` redirects to `www`, preserving path and query
 - [ ] Favicon in the tab; fonts load (page is in Nimbus Sans, not Arial)
 - [ ] All three background renders appear: hero plate, city, flow
 - [ ] Get Started / Talk to Our Team open the inquiry dialog; Explore App opens `/app/`
 - [ ] The workspace's brand link in the sidebar returns to the site
 - [ ] With `APP_ACCESS_CODE` set, `/app` asks for it and `/app/workspace.js` is not served without it
 - [ ] Lighthouse mobile run on both `/` and `/app/`
+- [ ] `/robots.txt` and `/sitemap.xml` return 200 with text and XML content types
+- [ ] `/developers`, `/docs`, `/docs/integration`, `/docs/reconciliation`, `/security` and `/privacy` return 200
+- [ ] Legacy `/legal/privacy.html`, `/contact.html` and `/docs/reconciliation.html` redirect to their current equivalents, preserving query parameters and the inquiry fragment
+- [ ] Public pages have one canonical URL on `https://www.inrsettle.com`
+- [ ] `/app` and `/app/workspace.js` carry `X-Robots-Tag: noindex` even when the access code is unset
+- [ ] The Open Graph PNG URL returns 200 without authentication
 - [ ] Hero ribbon motion works; Pause and reduced-motion preferences are respected
 - [ ] Inquiry validation, retry and failure states preserve visitor input
 - [ ] A controlled inquiry arrives in the owner's Telegram chat (or email for email mode), including all fields and selected workflow
@@ -170,3 +177,11 @@ Confirm the operational claims, supported corridors and current availability wit
 the business. Hero cards do not claim invented throughput, uptime or customer
 counts. The embedded dashboard and corridor list remain illustrative product
 examples, and should not be presented as actual business performance.
+
+## Search appearance after deployment
+
+See [SEO.md](SEO.md) for the verified audit, metadata sources and Search Console
+handoff. Keep the build command in sync with the repository configuration; an
+old dashboard override of an empty build command skips metadata regeneration.
+The generated public HTML is committed too, so static deployments still have
+complete metadata. Inspect deployment responses before requesting indexing.
