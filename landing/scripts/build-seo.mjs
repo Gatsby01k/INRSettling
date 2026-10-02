@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { brand, origin, home, pages, shareImage } from '../content/pages.mjs';
+import { brand, origin, home, pages, shareImage, socialProfiles, twitterHandle } from '../content/pages.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../public');
 const escape = value => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -11,7 +11,8 @@ function metadata(page) {
   const canonical = url(page.path);
   const graph = [
     { '@type': 'Organization', '@id': url('/#organization'), name: brand, url: url('/'),
-      logo: { '@type': 'ImageObject', url: url('/assets/icon-512.png'), width: 512, height: 512 }, email: 'info@inrsettle.com' },
+      logo: { '@type': 'ImageObject', url: url('/assets/icon-512.png'), width: 512, height: 512 }, email: 'info@inrsettle.com',
+      sameAs: socialProfiles.map(profile => profile.url) },
     { '@type': 'WebSite', '@id': url('/#website'), name: brand, url: url('/'),
       inLanguage: 'en', publisher: { '@id': url('/#organization') } },
     { '@type': 'WebPage', '@id': canonical + '#webpage', url: canonical, name: page.title,
@@ -44,6 +45,7 @@ function metadata(page) {
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="INRSettle — cross-border settlement infrastructure for India">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="${twitterHandle}">
   <meta name="twitter:title" content="${escape(page.title)}">
   <meta name="twitter:description" content="${escape(page.description)}">
   <meta name="twitter:image" content="${url(shareImage)}">
@@ -54,6 +56,11 @@ function metadata(page) {
 function navigation(current, footer = false) {
   return pages.filter(page => footer || !page.parent && page.path !== '/privacy').map(page =>
     `<a href="${page.path}"${current === page.path ? ' aria-current="page"' : ''}>${page.label}</a>`).join('');
+}
+
+function socialNavigation() {
+  return `<nav class="social-links" aria-label="Social media">${socialProfiles.map(profile =>
+    `<a href="${escape(profile.url)}" target="_blank" rel="noopener noreferrer">${escape(profile.label)}</a>`).join('')}</nav>`;
 }
 
 function document(page) {
@@ -79,7 +86,7 @@ ${metadata(page)}
     ${page.body}
     <aside class="resource-cta"><p class="resource-eyebrow">From scope to integration</p><h2>Let’s define your India<br>settlement workflow.</h2><p>Bring your currencies, business use and operating requirements to a focused conversation with our team.</p><a class="resource-button" href="/#contact-dialog">Discuss your workflow <span aria-hidden="true">→</span></a></aside>
   </main>
-  <footer class="resource-footer"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Footer navigation">${navigation(page.path, true)}</nav><a href="mailto:info@inrsettle.com">info@inrsettle.com</a></footer>
+  <footer class="resource-footer"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Footer navigation">${navigation(page.path, true)}</nav><div class="resource-footer-meta">${socialNavigation()}<a href="mailto:info@inrsettle.com">info@inrsettle.com</a></div></footer>
 </body>
 </html>
 `;
@@ -89,7 +96,10 @@ const filename = path => resolve(root, '.' + (path === '/' ? '/index.html' : pat
 const mainFile = filename('/');
 const main = await readFile(mainFile, 'utf8');
 if (!main.includes('<!-- seo:start -->') || !main.includes('<!-- seo:end -->')) throw new Error('Home SEO markers are missing');
-await writeFile(mainFile, main.replace(/  <!-- seo:start -->[\s\S]*?  <!-- seo:end -->/, `  <!-- seo:start -->\n${metadata(home)}\n  <!-- seo:end -->`));
+if (!main.includes('<!-- socials:start -->') || !main.includes('<!-- socials:end -->')) throw new Error('Home social markers are missing');
+await writeFile(mainFile, main
+  .replace(/  <!-- seo:start -->[\s\S]*?  <!-- seo:end -->/, `  <!-- seo:start -->\n${metadata(home)}\n  <!-- seo:end -->`)
+  .replace(/<!-- socials:start -->[\s\S]*?<!-- socials:end -->/, `<!-- socials:start -->${socialNavigation()}<!-- socials:end -->`));
 for (const page of pages) {
   const file = filename(page.path);
   await mkdir(dirname(file), { recursive: true });
