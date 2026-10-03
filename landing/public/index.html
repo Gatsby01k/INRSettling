@@ -33,12 +33,13 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48">
   <link rel="apple-touch-icon" href="/assets/icon-180.png">
   <link rel="preload" as="image" href="/assets/hero-plate.webp" fetchpriority="high">
-  <link rel="preload" as="font" type="font/otf" href="/assets/regular.otf" crossorigin>
-  <link rel="preload" as="font" type="font/otf" href="/assets/bold.otf" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/sora-latin-variable.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/instrument-sans-latin-variable.woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/footer.css">
   <link rel="stylesheet" href="/hero.css">
-  <script src="/app.js?v=20261003-hero" defer></script>
+  <link rel="stylesheet" href="/typography.css?v=20261003">
+  <script src="/app.js?v=20261003-type" defer></script>
   <script type="module" src="/market.js"></script>
   <script type="module" src="/hero-flow.js?v=20261003-energy"></script>
 </head>
@@ -93,7 +94,7 @@
       <div class="hero content">
         <div class="hero-copy">
           <p class="eyebrow">Global settlements. A stronger India.</p>
-          <h1 id="hero-heading">Cross-border settlement<br class="desktop-break"> infrastructure <span class="teal-text">for India</span></h1>
+          <h1 id="hero-heading">Cross-border settlement infrastructure <span class="teal-text">for India</span></h1>
           <p class="hero-description">Move INR and stablecoins across global corridors with liquidity, routing, compliance, and reconciliation — built for the next generation of financial infrastructure.</p>
           <div class="actions"><a class="button primary" href="mailto:info@inrsettle.com" data-open="contact">Talk to Our Team <svg class="icon"><use href="#i-arrow"/></svg></a></div>
           <div class="trust-row"><span><svg class="icon"><use href="#i-check"/></svg>India-focused</span><span><svg class="icon"><use href="#i-check"/></svg>Fiat &amp; stablecoin rails</span><span><svg class="icon"><use href="#i-check"/></svg>End-to-end records</span></div>
@@ -130,12 +131,12 @@
         <button class="button small secondary" data-feature="overview">Learn More <svg class="icon"><use href="#i-arrow"/></svg></button>
       </div>
       <div class="feature-grid">
-        <button class="feature-card glass" data-feature="treasury"><span class="round-icon"><svg class="icon"><use href="#i-bank"/></svg></span><span><strong>Treasury Movement</strong><span>Coordinate INR and digital<br>liquidity across operations.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="timing"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><span><strong>Liquidity Timing</strong><span>Align funding with<br>settlement obligations.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="routing"><span class="round-icon"><svg class="icon"><use href="#i-route"/></svg></span><span><strong>Settlement Routing</strong><span>Connect each instruction<br>to the right settlement route.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="reconciliation"><span class="round-icon"><svg class="icon"><use href="#i-file"/></svg></span><span><strong>Reconciliation</strong><span>Match movements, references<br>and settlement evidence.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-open="developers"><span class="round-icon"><svg class="icon"><use href="#i-code"/></svg></span><span><strong>API-first Workflows</strong><span>Connect quotes, preflight<br>and settlement status.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
-        <button class="feature-card glass" data-feature="visibility"><span class="round-icon"><svg class="icon"><use href="#i-chart"/></svg></span><span><strong>Corridor Visibility</strong><span>Follow route availability,<br>execution and exceptions.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="treasury"><span class="round-icon"><svg class="icon"><use href="#i-bank"/></svg></span><span><strong>Treasury Movement</strong><span>Coordinate INR and digital liquidity across operations.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="timing"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><span><strong>Liquidity Timing</strong><span>Align funding with settlement obligations.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="routing"><span class="round-icon"><svg class="icon"><use href="#i-route"/></svg></span><span><strong>Settlement Routing</strong><span>Connect each instruction to the right settlement route.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="reconciliation"><span class="round-icon"><svg class="icon"><use href="#i-file"/></svg></span><span><strong>Reconciliation</strong><span>Match movements, references and settlement evidence.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-open="developers"><span class="round-icon"><svg class="icon"><use href="#i-code"/></svg></span><span><strong>API-first Workflows</strong><span>Connect quotes, preflight and settlement status.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
+        <button class="feature-card glass" data-feature="visibility"><span class="round-icon"><svg class="icon"><use href="#i-chart"/></svg></span><span><strong>Corridor Visibility</strong><span>Follow route availability, execution and exceptions.</span></span><svg class="icon card-arrow"><use href="#i-arrow"/></svg></button>
       </div>
       <div class="solution-scenario glass" aria-labelledby="scenario-title">
         <div class="scenario-copy"><p class="eyebrow" id="scenario-label">For payment service providers</p><h3 id="scenario-title">Embed India settlement into your payment product.</h3><p id="scenario-description">Connect payment instructions, INR liquidity and settlement updates while keeping your own customer experience.</p><button class="button small secondary" id="scenario-contact" type="button">Discuss this workflow <svg class="icon"><use href="#i-arrow"/></svg></button></div>
