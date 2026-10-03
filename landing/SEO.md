@@ -33,7 +33,9 @@ are not presented as business performance in Google snippets.
   that same file. The build uses them for every public footer and Organization
   `sameAs`; `twitterHandle` identifies the official account in sharing metadata.
 - Build: `node landing/scripts/build-seo.mjs` or `pnpm build:seo`. It regenerates
-  the homepage SEO and social blocks, resource HTML, sitemap and robots.txt deterministically.
+  the homepage SEO and footer blocks, resource HTML, sitemap and robots.txt deterministically.
+- Footer layout and social icons are shared by all public pages through the SEO
+  generator and `landing/public/footer.css`.
 - Public resource styles: `landing/public/resources.css`. The resource pages are
   readable without JavaScript and link into the existing inquiry dialog.
 - Sharing artwork source: `landing/brand/seo-share.svg`. It reuses the brand marks
