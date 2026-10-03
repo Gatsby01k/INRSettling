@@ -396,7 +396,7 @@
     menuToggle.setAttribute('aria-label', opening ? 'Close navigation' : 'Open navigation');
     $('use', menuToggle).setAttribute('href', opening ? '#i-close' : '#i-menu');
   });
-  window.matchMedia('(min-width: 821px)').addEventListener('change', event => {
+  window.matchMedia('(min-width: 1101px)').addEventListener('change', event => {
     if (event.matches) closeMenu();
   });
   document.addEventListener('keydown', event => {
