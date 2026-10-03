@@ -197,6 +197,10 @@ p { text-wrap: pretty; }
   .rail-step strong { font-size: 16px; }
   .rail-step p { font-size: 13px; }
   .rail-index { margin-bottom: 0; }
+  .role-tabs { height: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 6px; }
+  .role-tab { min-height: 54px; }
+  .role-tab + .role-tab::before { display: none; }
+  .role-tab:nth-child(4) { grid-column: span 2; }
 }
 @media (min-width: 601px) and (max-width: 700px) {
   .hero { min-height: 760px; }
