@@ -34,7 +34,7 @@ landing/
     planner-picker.js   keyboard-operable selection grids with currency artwork
     settlement-planner.js  validated discovery selections and downloadable briefs
     hero.css            connected settlement rail and responsive hero composition
-    hero-flow.js        smooth light filaments following the original ribbon curves
+    hero-flow.js        saturated energy pulses, lens highlights and pointer depth
     assets/             fonts, brand marks, three background renders, icons
   scripts/
     set-app-url.mjs     repoints the Explore App link
