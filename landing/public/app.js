@@ -448,30 +448,7 @@
     if (target.dataset.report) exportReport(target.dataset.report);
   });
 
-  // Animate the two ribbons only. Preserve a visitor's pause choice and
-  // stop the light passes outside the visible hero.
-  const heroMotionButton = $('#hero-motion-toggle');
-  let heroPaused = false;
-  try { heroPaused = sessionStorage.getItem('inrsettle:hero-paused') === 'true'; } catch { /* Optional preference. */ }
-  function updateHeroMotion() {
-    document.documentElement.classList.toggle('motion-paused', heroPaused || prefersReducedMotion.matches);
-    heroMotionButton.setAttribute('aria-pressed', String(heroPaused));
-    heroMotionButton.setAttribute('aria-label', heroPaused ? 'Play hero animation' : 'Pause hero animation');
-    heroMotionButton.innerHTML = heroPaused ? 'Play animation <span aria-hidden="true">▷</span>' : 'Pause animation <span aria-hidden="true">Ⅱ</span>';
-  }
-  heroMotionButton.addEventListener('click', () => {
-    heroPaused = !heroPaused;
-    try { sessionStorage.setItem('inrsettle:hero-paused', String(heroPaused)); } catch { /* Optional preference. */ }
-    updateHeroMotion();
-  });
-  prefersReducedMotion.addEventListener('change', updateHeroMotion);
-  updateHeroMotion();
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(entries => {
-      document.documentElement.classList.toggle('hero-offscreen', !entries[0].isIntersecting);
-    }).observe($('.hero-shell'));
-  }
-  document.documentElement.classList.toggle('page-inactive', document.hidden);
+  // Ribbon visibility and reduced motion are handled by hero-flow.js.
 
   // Reveal transitions have a reduced-motion path.
   if ('IntersectionObserver' in window && !prefersReducedMotion.matches) {

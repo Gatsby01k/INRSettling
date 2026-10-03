@@ -37,9 +37,10 @@
   <link rel="preload" as="font" type="font/otf" href="/assets/bold.otf" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/footer.css">
-  <script src="/app.js?v=20261003-footer" defer></script>
+  <link rel="stylesheet" href="/hero.css">
+  <script src="/app.js?v=20261003-hero" defer></script>
   <script type="module" src="/market.js"></script>
-  <script type="module" src="/hero-flow.js"></script>
+  <script type="module" src="/hero-flow.js?v=20261003-ribbons"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -97,14 +98,15 @@
           <div class="trust-row"><span><svg class="icon"><use href="#i-check"/></svg>India-focused</span><span><svg class="icon"><use href="#i-check"/></svg>Fiat &amp; stablecoin rails</span><span><svg class="icon"><use href="#i-check"/></svg>End-to-end records</span></div>
         </div>
       </div>
-      <div class="metrics content" aria-label="Connected settlement capabilities">
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-bolt"/></svg></span><div><strong>INR ↔</strong><span>Fiat &amp; digital liquidity</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-clock"/></svg></span><div><strong>API</strong><span>Connected workflows</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-shield"/></svg></span><div><strong>Track</strong><span>Settlement visibility</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-globe"/></svg></span><div><strong>Verify</strong><span>Preflight controls</span></div></div>
-        <div class="metric glass"><span class="round-icon"><svg class="icon"><use href="#i-users"/></svg></span><div><strong>Record</strong><span>Reconciliation evidence</span></div></div>
-        <span class="metrics-note">One connected settlement layer</span>
-        <button class="hero-motion-toggle" id="hero-motion-toggle" type="button" aria-pressed="false" aria-label="Pause hero animation">Pause animation <span aria-hidden="true">Ⅱ</span></button>
+      <div class="hero-rail content" aria-label="Connected settlement workflow">
+        <p class="rail-caption"><span>One connected settlement layer</span><span>INR · Fiat · Stablecoins</span></p>
+        <ol class="settlement-rail">
+          <li class="rail-step"><span class="rail-index" aria-hidden="true">01</span><div><strong>Liquidity</strong><p>INR, fiat &amp; digital funding</p></div></li>
+          <li class="rail-step"><span class="rail-index" aria-hidden="true">02</span><div><strong>Integration</strong><p>API-first workflows</p></div></li>
+          <li class="rail-step"><span class="rail-index" aria-hidden="true">03</span><div><strong>Preflight</strong><p>Requirements &amp; readiness</p></div></li>
+          <li class="rail-step"><span class="rail-index" aria-hidden="true">04</span><div><strong>Settlement</strong><p>Routing &amp; status</p></div></li>
+          <li class="rail-step"><span class="rail-index" aria-hidden="true">05</span><div><strong>Reconciliation</strong><p>References &amp; evidence</p></div></li>
+        </ol>
       </div>
     </section>
 

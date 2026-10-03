@@ -33,7 +33,8 @@ landing/
     market.js           business scenarios, corridor discovery and inquiry handoff
     planner-picker.js   keyboard-operable selection grids with currency artwork
     settlement-planner.js  validated discovery selections and downloadable briefs
-    hero-flow.js        travelling light trails along the original ribbon curves
+    hero.css            connected settlement rail and responsive hero composition
+    hero-flow.js        smooth light filaments following the original ribbon curves
     assets/             fonts, brand marks, three background renders, icons
   scripts/
     set-app-url.mjs     repoints the Explore App link
