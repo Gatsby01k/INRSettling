@@ -488,7 +488,7 @@
   }
   let scrollPending = false;
   let activeSection = null;
-  const sectionAnchors = $$('.desktop-nav a[href^="#"], .footer nav a[href^="#"]');
+  const sectionAnchors = $$('.desktop-nav a[href^="#"], .site-footer-column a[href^="#"]');
   const sectionElements = ['solutions', 'corridors', 'product', 'company'].map(id => document.getElementById(id));
   function updateScroll() {
     $('#topbar').classList.toggle('is-scrolled', window.scrollY > 100);

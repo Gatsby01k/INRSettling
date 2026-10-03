@@ -8,12 +8,12 @@ a{color:var(--teal);text-underline-offset:4px}
 a:focus-visible{outline:3px solid var(--teal);outline-offset:5px}
 .skip-link{position:absolute;top:8px;left:8px;padding:10px 16px;background:#fff;z-index:10;transform:translateY(-150%)}
 .skip-link:focus{transform:none}
-.resource-header,.resource-footer{width:min(1180px,90%);margin:24px auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+.resource-header{width:min(1180px,90%);margin:24px auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
 .resource-header{padding:20px 24px;border:1px solid #fff;border-radius:26px;background:rgba(255,255,255,.7);box-shadow:0 8px 40px rgba(60,101,126,.05)}
-.resource-header img,.resource-footer img{display:block;width:210px;height:auto}
-.resource-header nav,.resource-footer nav{display:flex;flex-wrap:wrap;gap:20px}
+.resource-header img{display:block;width:210px;height:auto}
+.resource-header nav{display:flex;flex-wrap:wrap;gap:20px}
 .resource-header nav{margin-left:auto}
-.resource-header nav a,.resource-footer nav a{font-size:14px;text-decoration:none;color:var(--ink)}
+.resource-header nav a{font-size:14px;text-decoration:none;color:var(--ink)}
 nav a[aria-current=page]{color:var(--teal);text-decoration:underline}
 .resource-button{display:inline-flex;gap:20px;align-items:center;justify-content:center;background:linear-gradient(135deg,#479a91,#276e70);color:#fff;padding:12px 20px;border-radius:24px;text-decoration:none;font-size:14px;font-weight:700;box-shadow:0 8px 20px rgba(38,125,121,.13)}
 .resource-main{width:min(980px,88%);margin:56px auto 80px}
@@ -44,12 +44,6 @@ dt{font-weight:700}dd{margin:0;color:var(--muted)}
 .resource-link{display:inline-block;margin-top:16px;font-weight:700}
 .resource-cta{margin:40px 0 0;padding:40px;border-radius:28px;background:linear-gradient(130deg,rgba(255,255,255,.85),rgba(174,226,217,.4));border:1px solid #fff}
 .resource-cta p:not(.resource-eyebrow){color:var(--muted);max-width:650px}
-.resource-footer{padding:28px 0;border-top:1px solid var(--line);font-size:14px}
-.resource-footer img{width:170px}
-.resource-footer-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;width:100%;order:4}
-.resource-footer .social-links{width:auto;order:initial;gap:24px}
-.resource-footer .social-links a{justify-content:center;min-width:44px;font-weight:600;color:var(--teal)}
-.resource-footer-meta a{display:inline-flex;align-items:center;min-height:44px}
-@media(max-width:800px){.resource-header{gap:20px}.resource-header nav{order:3;width:100%;margin-left:0;gap:18px}.resource-header>.resource-button{margin-left:auto}.resource-main{margin-top:32px}.resource-intro{padding:24px 0 32px}.resource-intro>p:last-child{font-size:18px}.resource-footer nav{width:100%;order:3}}
-@media(max-width:520px){.resource-header{padding:18px;width:92%}.resource-header img{width:150px}.resource-header>.resource-button{font-size:12px;padding:9px 13px;gap:8px}.resource-header nav{gap:16px}.resource-header nav a{font-size:13px}.resource-grid{grid-template-columns:1fr}.resource-main{width:88%}h2{font-size:26px}.resource-grid article,.resource-card{padding:22px}.resource-definitions>div{grid-template-columns:1fr;gap:4px}.resource-cta{padding:26px}.resource-footer{gap:20px}.resource-footer img{width:140px}.resource-footer-meta>a{font-size:12px}}
+@media(max-width:800px){.resource-header{gap:20px}.resource-header nav{order:3;width:100%;margin-left:0;gap:18px}.resource-header>.resource-button{margin-left:auto}.resource-main{margin-top:32px}.resource-intro{padding:24px 0 32px}.resource-intro>p:last-child{font-size:18px}}
+@media(max-width:520px){.resource-header{padding:18px;width:92%}.resource-header img{width:150px}.resource-header>.resource-button{font-size:12px;padding:9px 13px;gap:8px}.resource-header nav{gap:16px}.resource-header nav a{font-size:13px}.resource-grid{grid-template-columns:1fr}.resource-main{width:88%}h2{font-size:26px}.resource-grid article,.resource-card{padding:22px}.resource-definitions>div{grid-template-columns:1fr;gap:4px}.resource-cta{padding:26px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

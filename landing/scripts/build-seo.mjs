@@ -53,14 +53,33 @@ function metadata(page) {
   <script type="application/ld+json">${schema}</script>`;
 }
 
-function navigation(current, footer = false) {
-  return pages.filter(page => footer || !page.parent && page.path !== '/privacy').map(page =>
+function navigation(current) {
+  return pages.filter(page => !page.parent && page.path !== '/privacy').map(page =>
     `<a href="${page.path}"${current === page.path ? ' aria-current="page"' : ''}>${page.label}</a>`).join('');
 }
 
 function socialNavigation() {
-  return `<nav class="social-links" aria-label="Social media">${socialProfiles.map(profile =>
-    `<a href="${escape(profile.url)}" target="_blank" rel="noopener noreferrer">${escape(profile.label)}</a>`).join('')}</nav>`;
+  const icons = {
+    LinkedIn: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 10v7m4 0v-7m0 3a3 3 0 0 1 6 0v4"/><circle cx="7" cy="7" r=".8" fill="currentColor" stroke="none"/>',
+    X: '<path d="m4 4 12 16h4L8 4H4Zm0 16 6.7-7.7M20 4l-6.7 7.7"/>',
+    Telegram: '<path d="m21 3-4 18-6-6-4 3 .8-6L3 10 21 3ZM8 12l9-5-6 8"/>',
+  };
+  return `<nav class="site-footer-socials" aria-label="Social media">${socialProfiles.map(profile =>
+    `<a href="${escape(profile.url)}" aria-label="${escape(profile.label)}" title="${escape(profile.label)}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true">${icons[profile.label]}</svg></a>`).join('')}</nav>`;
+}
+
+function footer(current) {
+  const section = hash => current === '/' ? hash : '/' + hash;
+  const link = (label, href) => `<a href="${href}"${current === href ? ' aria-current="page"' : ''}>${label}</a>`;
+  return `<footer class="site-footer">
+    <div class="site-footer-grid">
+      <div class="site-footer-brand"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt=""></a><p>People. Payments. Progress.</p></div>
+      <nav class="site-footer-column site-footer-platform" aria-label="Footer platform"><h2>Platform</h2>${link('Product', section('#product'))}${link('Solutions', section('#solutions'))}${link('Corridors', section('#corridors'))}</nav>
+      <nav class="site-footer-column site-footer-resources" aria-label="Footer resources"><h2>Resources</h2>${link('Developers', '/developers')}${link('Documentation', '/docs')}${link('Security', '/security')}</nav>
+      <div class="site-footer-connect"><h2>Connect</h2><a class="site-footer-email" href="mailto:info@inrsettle.com">info@inrsettle.com</a>${socialNavigation()}</div>
+    </div>
+    <div class="site-footer-bottom"><p>© ${new Date().getUTCFullYear()} INRSettle</p>${link('Inquiry privacy', '/privacy')}</div>
+  </footer>`;
 }
 
 function document(page) {
@@ -76,6 +95,7 @@ ${metadata(page)}
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48">
   <link rel="apple-touch-icon" href="/assets/icon-180.png">
   <link rel="stylesheet" href="/resources.css">
+  <link rel="stylesheet" href="/footer.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -86,7 +106,7 @@ ${metadata(page)}
     ${page.body}
     <aside class="resource-cta"><p class="resource-eyebrow">From scope to integration</p><h2>Let’s define your India<br>settlement workflow.</h2><p>Bring your currencies, business use and operating requirements to a focused conversation with our team.</p><a class="resource-button" href="/#contact-dialog">Discuss your workflow <span aria-hidden="true">→</span></a></aside>
   </main>
-  <footer class="resource-footer"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Footer navigation">${navigation(page.path, true)}</nav><div class="resource-footer-meta">${socialNavigation()}<a href="mailto:info@inrsettle.com">info@inrsettle.com</a></div></footer>
+  ${footer(page.path)}
 </body>
 </html>
 `;
@@ -96,10 +116,10 @@ const filename = path => resolve(root, '.' + (path === '/' ? '/index.html' : pat
 const mainFile = filename('/');
 const main = await readFile(mainFile, 'utf8');
 if (!main.includes('<!-- seo:start -->') || !main.includes('<!-- seo:end -->')) throw new Error('Home SEO markers are missing');
-if (!main.includes('<!-- socials:start -->') || !main.includes('<!-- socials:end -->')) throw new Error('Home social markers are missing');
+if (!main.includes('<!-- footer:start -->') || !main.includes('<!-- footer:end -->')) throw new Error('Home footer markers are missing');
 await writeFile(mainFile, main
   .replace(/  <!-- seo:start -->[\s\S]*?  <!-- seo:end -->/, `  <!-- seo:start -->\n${metadata(home)}\n  <!-- seo:end -->`)
-  .replace(/<!-- socials:start -->[\s\S]*?<!-- socials:end -->/, `<!-- socials:start -->${socialNavigation()}<!-- socials:end -->`));
+  .replace(/  <!-- footer:start -->[\s\S]*?  <!-- footer:end -->/, `  <!-- footer:start -->\n  ${footer(home.path)}\n  <!-- footer:end -->`));
 for (const page of pages) {
   const file = filename(page.path);
   await mkdir(dirname(file), { recursive: true });
