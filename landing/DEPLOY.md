@@ -168,7 +168,7 @@ online submission publicly.
 - [ ] Public pages have one canonical URL on `https://www.inrsettle.com`
 - [ ] `/app` and `/app/workspace.js` carry `X-Robots-Tag: noindex` even when the access code is unset
 - [ ] The Open Graph PNG URL returns 200 without authentication
-- [ ] Hero ribbon motion works; Pause and reduced-motion preferences are respected
+- [ ] Hero ribbon motion follows the image, respects reduced motion and stops outside the viewport
 - [ ] Inquiry validation, retry and failure states preserve visitor input
 - [ ] A controlled inquiry arrives in the owner's Telegram chat (or email for email mode), including all fields and selected workflow
 
