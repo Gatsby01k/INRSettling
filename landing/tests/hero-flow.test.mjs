@@ -79,20 +79,34 @@ async function rendererHarness({ reduced = false } = {}) {
   const trace = [];
   const media = { matches: reduced, addEventListener: (_name, fn) => { handlers.media = fn; } };
   const ctx = canvasContext(trace);
-  const canvas = { dataset: {}, getContext: () => ctx, getBoundingClientRect: () => ({ width: 1000, height: 600 }) };
+  const sceneStyleWrites = [];
+  const sheen = { style: {} };
+  const visual = { querySelector: () => sheen, style: {
+    setProperty: (name, value) => sceneStyleWrites.push([name, value]),
+    removeProperty: name => sceneStyleWrites.push([name, null]),
+  } };
+  const shell = {
+    addEventListener: (name, fn) => { handlers[name] = fn; },
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 1000, height: 600 }),
+  };
+  const canvas = { dataset: {}, parentElement: visual, closest: () => shell,
+    getContext: () => ctx, getBoundingClientRect: () => ({ width: 1000, height: 600 }) };
   let nextImage = 1;
   const document = { hidden: false, querySelector: () => canvas,
     createElement: () => { const spriteContext = canvasContext(); return { id: nextImage++, getContext: () => spriteContext }; },
     addEventListener: (name, fn) => { handlers[name] = fn; } };
   let nextFrame = 1;
-  const sandbox = { document, window: { matchMedia: () => media, devicePixelRatio: 2, IntersectionObserver: true },
+  const sandbox = { document, window: {
+    matchMedia: query => query.includes('prefers-reduced-motion') ? media : { matches: true },
+    devicePixelRatio: 2, IntersectionObserver: true,
+  },
     requestAnimationFrame: fn => { const id = nextFrame++; frames.set(id, fn); return id; },
     cancelAnimationFrame: id => frames.delete(id),
     ResizeObserver: class { constructor(fn) { handlers.resize = fn; } observe() {} },
     IntersectionObserver: class { constructor(fn) { handlers.intersection = fn; } observe() {} },
   };
   vm.runInNewContext(source, sandbox);
-  return { frames, handlers, media, canvas, document, trace,
+  return { frames, handlers, media, canvas, document, trace, sheen, sceneStyleWrites,
     tick(time) {
       assert.equal(frames.size, 1, 'exactly one animation frame must be pending');
       const [id, fn] = [...frames][0];
@@ -161,6 +175,20 @@ test('hidden time does not advance the visible scene and resize never creates an
   handlers.intersection([{ isIntersecting: true }]);
   handlers.intersection([{ isIntersecting: true }]);
   assert.deepEqual(tick(125000), next, 'time outside the viewport must also leave the scene in place');
+});
+
+test('pointer movement leaves the artwork stationary while trails and the emblem sheen keep moving', async () => {
+  const { handlers, tick, sheen, sceneStyleWrites } = await rendererHarness();
+  const opening = tick(1000);
+  const openingSheen = sheen.style.backgroundPosition;
+  handlers.pointermove?.({ clientX: 1000, clientY: 600 });
+  const moving = tick(1017);
+  assert.deepEqual(sceneStyleWrites, [], 'the cursor must not translate the hero artwork');
+  assert.notDeepEqual(moving, opening, 'light trails must continue animating on the stationary artwork');
+  assert.notEqual(sheen.style.backgroundPosition, openingSheen, 'the emblem sheen must continue animating');
+  handlers.pointerleave?.();
+  tick(1034);
+  assert.deepEqual(sceneStyleWrites, [], 'leaving the hero must not introduce a scene translation');
 });
 
 function colorful(value) {
