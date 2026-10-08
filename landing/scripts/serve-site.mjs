@@ -1,19 +1,36 @@
-// Local preview with the real inquiry handler. Without mail credentials the UI
-// uses the email fallback. This never pretends to be the product API or edge gate.
+// Local preview with the same inquiry handler and workspace access middleware.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { dirname, resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import contact from '../../api/contact.js';
+import middleware from '../../middleware.js';
+import { Readable } from 'node:stream';
 import { legacyRedirects } from '../content/pages.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../public');
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.ico': 'image/x-icon', '.otf': 'font/otf', '.xml': 'application/xml', '.txt': 'text/plain', '.md': 'text/plain; charset=utf-8' };
+const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.ico': 'image/x-icon', '.otf': 'font/otf', '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain', '.md': 'text/plain; charset=utf-8' };
 const server = createServer(async (req, res) => {
   let path;
   try { path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); } catch { res.writeHead(400).end(); return; }
   if (path.startsWith('/api/')) res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   if (path === '/api/contact') return contact(req, res);
-  if (path === '/app' || path.startsWith('/app/')) res.setHeader('X-Robots-Tag', 'noindex, nofollow, nosnippet');
+  if (path === '/app' || path.startsWith('/app/')) {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow, nosnippet');
+    const hasBody = !['GET', 'HEAD'].includes(req.method);
+    const request = new Request(new URL(req.url, 'http://' + req.headers.host), {
+      method: req.method, headers: req.headers,
+      ...(hasBody ? { body: Readable.toWeb(req), duplex: 'half' } : {}),
+    });
+    const response = await middleware(request);
+    if (response) {
+      response.headers.forEach((value, name) => { if (name !== 'set-cookie') res.setHeader(name, value); });
+      const cookies = response.headers.getSetCookie();
+      if (cookies.length) res.setHeader('Set-Cookie', cookies);
+      res.writeHead(response.status);
+      res.end(req.method === 'HEAD' ? undefined : Buffer.from(await response.arrayBuffer()));
+      return;
+    }
+  }
   if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405).end(); return; }
   const legacyTarget = legacyRedirects[path.replace(/\.html$/, '')];
   if (legacyTarget) {

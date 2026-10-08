@@ -8,15 +8,16 @@
   <meta name="description" content="The INRSettle workspace. Create settlements, manage beneficiaries and batches, and follow each settlement through to finality. An interactive product demo.">
   <title>Overview · INRSettle</title>
   <link rel="icon" href="/assets/brand-favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="/assets/regular.otf" as="font" type="font/otf" crossorigin>
-  <link rel="preload" href="/assets/bold.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="/assets/fonts/sora-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/instrument-sans-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/typography.css?v=20261003">
   <link rel="stylesheet" href="/app/workspace.css">
   <link rel="stylesheet" href="/app/components.css">
   <link rel="stylesheet" href="/app/experience.css">
   <link rel="stylesheet" href="/app/receipt.css">
   <script type="module" src="/app/workspace.js"></script>
 </head>
-<body>
+<body class="workspace-page">
   <a class="skip-link" href="#workspace">Skip to workspace</a>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
@@ -31,8 +32,8 @@
       <div class="header-art" aria-hidden="true"><img class="header-map" src="/assets/flow.webp" width="2151" height="731" alt=""><img class="header-city" src="/assets/city.webp" width="2001" height="786" alt=""><p>Settlements<br>that land<br>where you said</p></div>
       <header class="topbar">
         <button class="icon-button mobile-menu" data-action="menu" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button>
-        <button class="global-search" data-action="search"><span data-icon="search"></span><span>Search settlements, beneficiaries, batches…</span><kbd>⌘ K</kbd></button>
-        <div class="topbar-account"><button class="notification-button icon-button" data-action="notifications" aria-label="Notifications, 3 unread"><span data-icon="bell"></span><i></i></button><span class="account-divider"></span><button class="account-button" data-action="account" aria-haspopup="dialog"><span class="avatar">RM</span><span class="account-copy"><strong>Rohit Mehta</strong><small>Acme Global Pvt Ltd</small></span><span data-icon="chevron-down"></span></button></div>
+        <button class="global-search" data-action="search" aria-label="Search settlements, beneficiaries and batches"><span data-icon="search"></span><span>Search settlements, beneficiaries, batches…</span><kbd>⌘ K</kbd></button>
+        <div class="topbar-account"><span class="preview-access-badge">Private preview</span><button class="notification-button icon-button" data-action="notifications" aria-label="Notifications, 3 unread"><span data-icon="bell"></span><i></i></button><span class="account-divider"></span><button class="account-button" data-action="account" aria-haspopup="dialog" aria-label="Sample profile menu for Rohit Mehta"><span class="avatar">RM</span><span class="account-copy"><strong>Rohit Mehta</strong><small>Acme Global Pvt Ltd</small></span><span data-icon="chevron-down"></span></button></div>
       </header>
       <main id="workspace" tabindex="-1"><div class="initial-load">Opening your workspace…</div></main>
     </div>

@@ -123,7 +123,7 @@ function routeFromHash(){const key=location.hash.replace(/^#\/?/,'').split('?')[
 function render(){closeSelects();state.route=routeFromHash();const renderer={overview,settlements,liquidity,beneficiaries,batches,reconciliation,developers,settings}[state.route];$('#main-nav').innerHTML=routes.map(([id,title,ico])=>`<a class="nav-link ${state.route===id?'active':''}" href="#/${id}" title="${title}" ${state.route===id?'aria-current="page"':''}>${icon(ico)}<span class="nav-label">${title}</span></a>`).join('');$('#workspace').className=state.route+'-page screen-enter';$('#workspace').innerHTML=renderer();document.title=allRoutes.find(r=>r[0]===state.route)[1]+' · INRSettle';updateAccount();syncSelection();enhanceSelects($('#workspace'));state.updatedRecords.forEach(highlightRecord);state.updatedRecords.clear();}
 function navigate(route){closeDialog();closeMenu();if(state.route===route){render();$('#workspace').focus({preventScroll:true});openSelectedDrawer();return;}location.hash='/'+route;}
 function updateResults(){const el=$('#settlement-results');if(!el)return;const active=document.activeElement;let restore=null;if(active?.classList.contains('row-checkbox'))restore='.row-checkbox[data-id="'+active.dataset.id+'"]';else if(active?.id==='select-all')restore='#select-all';else if(active?.classList.contains('sort-button'))restore='.sort-button';el.innerHTML=settlementResults();syncSelection();if(restore)$(restore,el)?.focus({preventScroll:true});}
-function updateAccount(){$('.account-copy strong').textContent=state.profile.name;$('.account-copy small').textContent=state.profile.company;$('.account-button .avatar').textContent=initials(state.profile.name);$('.account-button').setAttribute('aria-label',`Account menu for ${state.profile.name}`);}
+function updateAccount(){$('.account-copy strong').textContent=state.profile.name;$('.account-copy small').textContent=state.profile.company;$('.account-button .avatar').textContent=initials(state.profile.name);$('.account-button').setAttribute('aria-label',`Sample profile menu for ${state.profile.name}`);}
 const detailInDrawer=()=>window.matchMedia('(max-width:1559px)').matches;
 function syncSelection(){
   const rows=filteredRows().slice((state.page-1)*PAGE_SIZE,state.page*PAGE_SIZE);
@@ -230,7 +230,55 @@ function showDateRange(){openDialog(`<h2 id="dialog-title">Settlement Period</h2
 function showSearch(){openDialog(`<h2 id="dialog-title" class="visually-hidden">Search workspace</h2><div class="command-heading">${icon('search')}<input id="command-search" autocomplete="off" placeholder="Search your workspace…" aria-label="Search workspace" autofocus></div><div class="command-results" id="command-results">${commandResults('')}</div><p class="command-hint">↑ ↓ to navigate &nbsp;·&nbsp; Enter to open &nbsp;·&nbsp; Esc to close</p>`,'command-dialog');}
 function commandResults(query){const q=query.toLowerCase().trim();const r=routes.filter(v=>v[1].toLowerCase().includes(q));const s=state.settlements.filter(s=>[s.id,s.name,s.from,s.to,s.reference].join(' ').toLowerCase().includes(q)).slice(0,5);const c=q?state.beneficiaries.filter(c=>[c.name,c.country].join(' ').toLowerCase().includes(q)).slice(0,3):[];let html='';if(r.length)html+=`<p class="command-label">Workspace</p>${r.map(([id,title,ico])=>`<button class="command-result" data-action="navigate" data-route="${id}">${icon(ico)}<strong>${title}</strong><span>Open ${icon('arrow')}</span></button>`).join('')}`;if(s.length)html+=`<p class="command-label">Settlements</p>${s.map(s=>`<button class="command-result" data-action="search-settlement" data-id="${s.id}">${icon('wallet-cards')}<span><strong>${s.id}</strong><small>${esc(s.name)} · ${s.from} → ${s.to}</small></span><span>${money(s.send,s.from)}</span></button>`).join('')}`;if(c.length)html+=`<p class="command-label">Beneficiaries</p>${c.map(c=>`<button class="command-result" data-action="beneficiary" data-id="${c.id}">${icon('users')}<span><strong>${esc(c.name)}</strong><small>${esc(c.country)}</small></span><span>${c.currency}</span></button>`).join('')}`;return html||`<div class="empty-state">${icon('search')}<strong>No results found</strong><p>Search a settlement ID, company, currency or workspace section.</p></div>`;}
 function showNotifications(){openDialog(`<h2 id="dialog-title">Notifications</h2><p class="dialog-description">Your latest settlement activity.</p>${[['check-circle','Settlement completed','STL-784521 · ₹ 25,00,000 delivered to TechFlow Inc.','12 minutes ago'],['info','Beneficiary needs attention','Al Noor Trading is waiting for a verification review.','1 hour ago'],['check-circle','Available to settle updated','More is available to settle right now.','2 hours ago']].map(([ico,title,description,time])=>`<div class="notification-item"><span class="metric-icon">${icon(ico)}</span><div><strong>${title}</strong><p>${description}</p><small>${time}</small></div></div>`).join('')}<div class="form-actions">${btn('Mark All as Read','mark-read','check','primary')}</div>`);}
-function showAccount(){openDialog(`<h2 id="dialog-title" class="visually-hidden">Your workspace</h2><div class="account-menu"><div class="profile-intro"><span class="avatar">${esc(initials(state.profile.name))}</span><div><strong>${esc(state.profile.name)}</strong><small>${esc(state.profile.email)}</small></div></div><button data-action="navigate" data-route="settings">${icon('user')}My Profile</button><button data-action="organisation">${icon('building')}${esc(state.profile.company)}</button><a href="/">${icon('arrow-left')}Back to INRSettle website</a></div><p class="dialog-note">Interactive demo workspace · Sample data</p>`);}
+function showAccount(){openDialog(`<h2 id="dialog-title">Preview access</h2><p class="dialog-description">You’re exploring a workspace with sample data.</p><div class="account-menu"><div class="profile-intro"><span class="avatar">${esc(initials(state.profile.name))}</span><div><p class="sample-profile-label">Sample profile</p><strong>${esc(state.profile.name)}</strong><small>${esc(state.profile.email)}</small></div></div><button data-action="navigate" data-route="settings">${icon('user')}Sample profile</button><button data-action="organisation">${icon('building')}${esc(state.profile.company)}</button><a href="/">${icon('arrow-left')}Back to INRSettle website</a><button data-action="close-preview" class="close-preview-button">${icon('lock')}<span class="preview-close-label">Close preview access</span></button></div><p class="dialog-note">Closing access locks this preview on this browser.</p>`);}
+
+async function closePreviewAccess(button) {
+  if (button.disabled) return;
+  const label = $('.preview-close-label', button);
+  button.disabled = true;
+  button.setAttribute('aria-busy', 'true');
+  if (label) label.textContent = 'Closing access…';
+  let navigating = false;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch('/app/session', {
+      cache: 'no-store', credentials: 'same-origin', headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    if (response.status === 401) {
+      navigating = true;
+      location.assign('/app/sign-in');
+      return;
+    }
+    if (!response.ok) throw new Error('Preview access unavailable');
+    const session = await response.json();
+    if (typeof session.csrf !== 'string' || !session.csrf || session.csrf.length > 2048)
+      throw new Error('Preview access could not be confirmed');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/app/sign-out';
+    form.hidden = true;
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrf';
+    csrf.value = session.csrf;
+    form.append(csrf);
+    document.body.append(form);
+    navigating = true;
+    HTMLFormElement.prototype.submit.call(form);
+  } catch {
+    closeDialog();
+    toast('Could not close preview access. Please try again.');
+  } finally {
+    clearTimeout(timeout);
+    if (!navigating) {
+      button.disabled = false;
+      button.removeAttribute('aria-busy');
+      if (label) label.textContent = 'Close preview access';
+    }
+  }
+}
 function showTrack(){openDialog(`<h2 id="dialog-title">Track Finality</h2><p class="dialog-description">Find a settlement and follow its complete timeline.</p><form id="track-form"><label class="field">Settlement ID<input name="id" placeholder="STL-784521" value="${state.selected||''}" list="settlement-ids" required autofocus maxlength="30"></label><datalist id="settlement-ids">${state.settlements.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</datalist><p class="form-error" id="track-error" role="alert"></p><div class="form-actions">${btn('Track Settlement','submit-form','activity','primary','type="submit"')}</div></form>`);}
 function showTransaction(id){const s=state.settlements.find(s=>s.id===id);if(!s)return;openDialog(`<h2 id="dialog-title">Transaction Record</h2><p class="dialog-description">A unified view of the settlement’s execution and finality.</p><ul class="key-value-list"><li><span>Settlement</span><strong>${s.id}</strong></li><li><span>Network</span><strong>${settlementNetwork(s).name}</strong></li><li><span>Route</span><strong>${s.from} → ${s.to}</strong></li><li><span>Amount</span><strong>${money(s.receive,s.to)} ${s.to}</strong></li><li><span>Execution status</span>${status(s.status)}</li><li><span>Reference</span><strong>${esc(s.reference)}</strong></li></ul><div class="note-panel">${icon('info')}<span>This is a sample transaction. No blockchain transaction was broadcast and no external explorer record exists.</span></div><div class="form-actions">${btn(s.status==='Settled'?'View Receipt':'View Report','download-report','file','primary',`data-id="${s.id}"`)}</div>`);}
 function showCorridors(){openDialog(`<h2 id="dialog-title">Connected Corridors</h2><p class="dialog-description">Explore the routes featured in this workspace.</p><ul class="key-value-list">${[['USDC','United States · Multi-chain'],['USDT','Singapore · Multi-chain'],['EURC','Europe · Ethereum'],['AED','United Arab Emirates · Bank payout']].map(([currency,country])=>`<li><span>${pair({from:'INR',to:currency})}<small>${country}</small></span><button class="small-button" data-action="corridor-create" data-currency="${currency}">Create ${icon('arrow')}</button></li>`).join('')}</ul><p class="dialog-note">Sample routes and timing for this visual demo.</p>`);}
@@ -261,6 +309,7 @@ document.addEventListener('click',event=>{const target=event.target.closest('but
   if(action==='search')return showSearch();
   if(action==='notifications')return showNotifications();
   if(action==='account')return showAccount();
+  if(action==='close-preview')return closePreviewAccess(target);
   if(action==='support')return showSupport();
   if(action==='create')return startWizard();
   if(action==='preflight')return startWizard(null,true);
@@ -343,6 +392,7 @@ $('#app-dialog').addEventListener('close',()=>{if($('#app-dialog').open)return;c
 $('#app-dialog').addEventListener('click',event=>{if(event.target===$('#app-dialog')){const r=event.target.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog();}});
 window.addEventListener('hashchange',()=>{render();window.scrollTo({top:0,behavior:'instant'});$('#workspace').focus({preventScroll:true});openSelectedDrawer();});
 window.matchMedia('(min-width:561px)').addEventListener('change',e=>{if(e.matches)closeMenu();});
+window.addEventListener('pageshow',()=>{const button=$('[data-action="close-preview"]');if(button){button.disabled=false;button.removeAttribute('aria-busy');const label=$('.preview-close-label',button);if(label)label.textContent='Close preview access';}});
 try{const prefs=JSON.parse(localStorage.getItem('inrsettle-demo-notifications')||'null');if(prefs&&typeof prefs==='object')Object.keys(state.preferences).forEach(k=>{if(typeof prefs[k]==='boolean')state.preferences[k]=prefs[k];});}catch{}
 $$('[data-icon]').forEach(el=>el.outerHTML=icon(el.dataset.icon));
 $('.sidebar-close').innerHTML=icon('x');

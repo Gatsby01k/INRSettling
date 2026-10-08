@@ -1,0 +1,78 @@
+/* Workspace entry: the landing's type and artwork, with room for one clear action. */
+.access-page { --access-ink: #14283d; --access-muted: #586f80; --access-accent: #137f77; min-width: 0; min-height: 100svh; margin: 0; display: flex; flex-direction: column; background: radial-gradient(ellipse at 78% 42%, #dcefeb66, transparent 58%), #f1f7fb; color: var(--access-ink); font-family: var(--font-body); }
+.access-page *, .access-page *::before, .access-page *::after { box-sizing: border-box; }
+.access-page a { color: inherit; text-decoration: none; }
+.access-page button, .access-page input { font: inherit; }
+.access-page button { cursor: pointer; }
+.access-page button:disabled { cursor: default; }
+.access-page svg { width: 20px; height: 20px; display: block; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.access-page [hidden] { display: none !important; }
+.access-page :focus-visible { outline: 3px solid #147f77; outline-offset: 5px; }
+.access-skip { position: fixed; z-index: 20; top: 10px; left: 16px; padding: 12px 18px; background: white; border: 1px solid #bddcd5; border-radius: 10px; transform: translateY(-160%); }
+.access-skip:focus { transform: none; }
+.access-header, .access-footer { width: min(1280px, calc(100% - 96px)); margin-inline: auto; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.access-header { padding-top: 32px; }
+.access-brand { display: block; flex-shrink: 0; }
+.access-brand img { display: block; width: 228px; max-width: 100%; height: auto; }
+.access-back { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; color: var(--access-muted) !important; }
+.access-back svg { width: 17px; height: 17px; rotate: 180deg; }
+.access-back:hover { color: var(--access-accent) !important; }
+.access-main { width: min(1180px, calc(100% - 96px)); margin-inline: auto; flex: 1; display: flex; align-items: center; padding-block: 44px; outline: none; }
+.access-layout { width: 100%; display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 68px; align-items: center; }
+.access-panel { width: 100%; max-width: 440px; padding: 4px 0 20px; position: relative; z-index: 1; }
+.access-overline { display: flex; align-items: center; gap: 9px; margin: 0 0 20px; color: #376d68; font-size: 11px; font-weight: 600; line-height: 1.6; letter-spacing: .13em; text-transform: uppercase; }
+.access-overline svg { width: 17px; height: 17px; color: #349f8e; }
+.access-panel h1 { margin: 0 0 18px; font-family: var(--font-display); font-size: clamp(35px, 3.15vw, 44px); font-weight: 560; letter-spacing: -.055em; line-height: 1.12; max-width: 13ch; text-wrap: balance; }
+.access-description { font-size: 16px; line-height: 1.6; color: var(--access-muted); max-width: 34ch; margin: 0 0 34px; }
+.access-form { margin: 0; }
+.access-field { margin-bottom: 24px; }
+.access-field label { display: block; margin-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; }
+.access-input-shell { min-width: 0; position: relative; border: 1px solid #c4d9df; border-radius: 15px; background: #ffffffc7; box-shadow: inset 0 1px 1px white, 0 5px 20px #47696f04; transition: border-color .18s, box-shadow .18s; }
+.access-input-shell:focus-within { border-color: #339c8b; box-shadow: 0 0 0 4px #8ed9c926; }
+.access-field input { display: block; min-width: 0; width: 100%; min-height: 58px; border: 0; border-radius: inherit; background: transparent; padding: 15px 18px; font-size: 17px; line-height: 1.5; color: var(--access-ink); outline: none; }
+.access-field input::placeholder { color: #748891; opacity: 1; }
+.access-field input[aria-invalid="true"] { outline: 1px solid #be5b49; outline-offset: -1px; }
+.access-secret-shell input { padding-right: 98px; }
+.access-reveal { position: absolute; top: 6px; right: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 78px; min-height: 44px; padding: 8px; border: 0; border-radius: 10px; background: transparent; color: #507b77; font-size: 12px !important; font-weight: 500 !important; }
+.access-reveal svg { width: 17px; height: 17px; }
+.access-reveal:hover { background: #e5f4ef; color: #126d63; }
+.access-field-hint { margin: 10px 0 0; font-size: 12px; line-height: 1.6; color: #627c89; }
+.access-submit { width: 100%; min-height: 54px; display: inline-flex; align-items: center; justify-content: center; gap: 13px; padding: 14px 20px; border: 1px solid #7bd8c7; border-radius: 15px; background: linear-gradient(110deg, #168d81, #147f7b); box-shadow: 0 7px 24px #208e7b17, inset 0 1px 1px #a9e4d040; color: white; font-size: 15px !important; font-weight: 600 !important; letter-spacing: -.015em; transition: background .18s, box-shadow .18s, transform .18s; }
+.access-submit:hover:not(:disabled) { background: linear-gradient(110deg, #117f74, #0d706c); box-shadow: 0 8px 26px #208e7b24; transform: translateY(-1px); }
+.access-submit:disabled { background: #d7e4e6; border-color: #cedfe0; color: #58717b; box-shadow: none; }
+.access-submit.is-pending { background: #147f7b; border-color: #7bd8c7; color: white; }
+.access-submit.is-pending > svg { display: none; }
+.access-spinner { width: 17px; height: 17px; border: 2px solid #ffffff5c; border-top-color: white; border-radius: 50%; animation: access-spin .75s linear infinite; }
+.access-pending { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--access-muted); }
+.access-help { margin: 26px 0 0; color: var(--access-muted); font-size: 14px; line-height: 1.7; }
+.access-help a { display: inline-flex; align-items: center; gap: 6px; color: #147b72; font-weight: 600; margin-left: 4px; text-decoration: underline; text-decoration-color: #a5c9c0; text-underline-offset: 4px; }
+.access-help a svg { width: 15px; height: 15px; }
+.access-help a:hover { text-decoration-color: currentColor; }
+.access-preview-note { margin: 26px 0 0; padding-top: 19px; border-top: 1px solid #c6dbe080; font-size: 12px; line-height: 1.6; color: #627986; }
+.access-notice { margin: -10px 0 24px; padding: 12px 0 12px 14px; border-left: 2px solid #63ac9c; font-size: 14px; line-height: 1.6; color: #36675f; }
+.access-notice-error { border-color: #bd624d; color: #9e3a2c; }
+.access-scene { min-width: 0; position: relative; min-height: 580px; align-self: stretch; display: flex; align-items: flex-end; justify-content: center; isolation: isolate; }
+.access-art-frame { position: absolute; inset: 0 -90px 72px -30px; overflow: hidden; z-index: -1; mask-image: linear-gradient(180deg, transparent, #000 12%, #000 78%, transparent 99%); }
+.access-art-frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #f1f7fb 0%, #f1f7fb00 18%, #f1f7fb00 80%, #f1f7fb 100%); }
+.access-illustration { position: absolute; width: 185%; left: -78%; top: -52px; }
+.access-artwork { display: block; width: 100%; max-width: none; height: auto; }
+.access-emblem { position: absolute; left: 60.2%; top: 38.15%; width: 13.1%; height: auto; transform: rotate(-3deg); filter: drop-shadow(2px 3px 2px #253f4925); }
+.access-scene-copy { position: relative; text-align: center; padding: 0 0 18px; width: 100%; }
+.access-scene-copy > p { margin: 0 0 13px; font-size: 10px; font-weight: 600; line-height: 1.6; letter-spacing: .18em; text-transform: uppercase; color: #46776e; }
+.access-scene-copy h2 { margin: 0; font-family: var(--font-display); font-size: 28px; line-height: 1.3; letter-spacing: -.045em; font-weight: 500; color: #2b5260; }
+.access-corridor { display: flex; justify-content: center; align-items: center; gap: 11px; max-width: 285px; margin: 23px auto 0; font-size: 11px; line-height: 1.5; color: #577b7e; }
+.access-corridor > span:first-child { color: #ab8237; font-weight: 600; }
+.access-corridor-line { flex: 1; height: 1px; min-width: 25px; background: linear-gradient(90deg, #d8af67, #77b7a8); }
+.access-corridor svg { width: 15px; height: 15px; color: #408e7f; }
+.access-footer { padding-block: 14px 24px; color: #627986; font-size: 12px; line-height: 1.6; }
+.access-footer p { margin: 0; }
+.access-footer nav { display: flex; gap: 24px; }
+.access-footer a { display: inline-flex; align-items: center; min-height: 44px; }
+.access-footer a:hover { color: var(--access-accent); }
+@keyframes access-spin { to { transform: rotate(360deg); } }
+@media (max-width: 1000px) { .access-layout { gap: 34px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .access-art-frame { right: -40px; left: -20px; } .access-scene-copy h2 { font-size: 26px; } .access-panel h1 { font-size: 36px; } }
+@media (max-width: 820px) { .access-header, .access-footer, .access-main { width: min(520px, calc(100% - 48px)); } .access-header { padding-top: 24px; } .access-brand img { width: 190px; } .access-main { padding-block: 50px; align-items: flex-start; } .access-layout { display: block; } .access-panel { max-width: none; padding-bottom: 0; } .access-scene { display: none; } .access-panel h1 { max-width: 16ch; font-size: 38px; } .access-description { margin-bottom: 30px; } .access-footer { padding-bottom: 16px; } }
+@media (max-width: 520px) { .access-header, .access-footer, .access-main { width: calc(100% - 42px); } .access-header { padding-top: 20px; gap: 12px; } .access-brand img { width: 162px; } .access-back { font-size: 12px; gap: 6px; } .access-back svg { width: 15px; height: 15px; } .access-main { padding-block: 38px 34px; } .access-panel h1 { font-size: 34px; max-width: 15ch; margin-bottom: 16px; } .access-overline { margin-bottom: 17px; font-size: 10px; } .access-description { font-size: 15px; line-height: 1.65; margin-bottom: 28px; } .access-field input { font-size: 16px; min-height: 56px; } .access-field { margin-bottom: 22px; } .access-field-hint { font-size: 12px; } .access-help { font-size: 13px; margin-top: 23px; } .access-preview-note { margin-top: 23px; padding-top: 17px; font-size: 11px; } .access-footer { font-size: 11px; gap: 12px; padding-block: 8px 14px; } .access-footer nav { gap: 20px; } }
+@media (max-width: 374px) { .access-header, .access-footer, .access-main { width: calc(100% - 36px); } .access-brand img { width: 139px; } .access-back { font-size: 11px; gap: 5px; } .access-main { padding-top: 28px; } .access-panel h1 { font-size: 31px; } .access-help a { margin-left: 0; } .access-footer nav { gap: 16px; } }
+@media (prefers-reduced-motion: reduce) { .access-page *, .access-page *::before, .access-page *::after { animation: none !important; transition: none !important; } }
+@media (prefers-contrast: more) { .access-page { --access-muted: #354f60; } .access-input-shell { border-color: #617f87; background: white; } .access-field-hint, .access-preview-note, .access-footer { color: #3c5b6b; } }

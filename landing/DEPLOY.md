@@ -43,7 +43,9 @@ Deploy, then check the `*.vercel.app` URL before touching DNS.
 
 For an existing project, check for dashboard overrides to the root configuration.
 The marketing site needs no monorepo build. Confirm `/api/contact` responds with
-JSON and `/app` is gated when `APP_ACCESS_CODE` is set.
+JSON and `/app` is gated; missing `APP_ACCESS_CODE` must return unavailable, not
+an open workspace. Use the repository root: a `landing`-only deployment omits
+the access middleware and is not suitable for serving this workspace.
 
 ## 3. Domain
 
@@ -77,17 +79,26 @@ One setting turns it on — Vercel project → Settings → Environment Variable
 `APP_ACCESS_CODE`, for Production (and Preview, if you want previews closed too).
 Redeploy after setting it.
 
-- **Unset** — the gate does nothing and `/app` is open. That is the default, so
-  deploying the file changes nothing until you decide.
-- **Set** — `/app` asks for the code and remembers a correct answer for 30 days
-  in a signed, HttpOnly cookie scoped to `/app`.
+- **Unset** — workspace requests fail closed with a branded unavailable page
+  and HTTP 503; no app files are served.
+- **Set** — `/app` redirects to `/app/sign-in`. A correct code grants up to
+  12 hours of preview access, using signed Secure/HttpOnly host cookies bound
+  to a separate random browser cookie. Choose a long, randomly generated code.
 
 The code is also the signing key. **To revoke everyone, change the variable and
 redeploy** — every cookie issued under the old code stops verifying. There is no
 list to clean up.
 
-The gate logs one line per entry to the function log, with the email if the
-visitor typed one, so you can see who came in. It never logs the code.
+The form collects only the access code; no code, email or ticket is logged.
+CSRF proofs use an independent random per-browser key, never the access code.
+POST requires the exact request origin, a valid proof and a bounded form body.
+`/app/session` issues a CSRF proof for closing preview access; the account menu
+submits it to `/app/sign-out`. GET requests cannot log a visitor out.
+Workspace and entry responses use `Cache-Control: private, no-store`.
+The rollout invalidates the old 30-day ticket; existing visitors enter their
+code once again. Closing access clears the current browser's cookies. A copied
+ticket and browser cookie cannot be individually revoked without a server-side
+store. Configure durable throttling/WAF before admitting untrusted audiences.
 
 What it is not: this is not the product's authentication. `SECURITY.md § 3.1`
 fixes that — email identity with a mandatory second factor, TOTP at minimum and
@@ -98,10 +109,11 @@ and no copy on it suggests an account or a sign-in.
 
 ## 5. The workspace
 
-The v6 demo workspace ships inside the site at `landing/public/app/` — four static
-files, hash routing, no network calls, sharing `/assets/` with the site. It needs
-no subdomain, no second Vercel project and no rewrite rules. Explore App points
-at `/app/`; Contact and Talk to Our Team open a business inquiry.
+The demo workspace ships inside the site at `landing/public/app/` — static
+files and hash routing, sharing `/assets/` with the site. Financial interactions
+use sample data; the only server calls from the workspace close preview access.
+It needs no subdomain, no second Vercel project and no rewrite rules. Workspace
+and Explore App point at `/app`; Contact and Talk to Our Team open an inquiry.
 
 `landing/scripts/set-app-url.mjs` stays for the day the real product frontend gets
 its own deployment: it moves the Explore App link to an absolute URL and back,
@@ -155,12 +167,13 @@ online submission publicly.
 ## 6. End-to-end check
 
 - [ ] `www.inrsettle.com` serves over HTTPS; `inrsettle.com` redirects to `www`, preserving path and query
-- [ ] Favicon in the tab; fonts load (page is in Nimbus Sans, not Arial)
+- [ ] Favicon in the tab; local Sora and Instrument Sans load
 - [ ] All three background renders appear: hero plate, city, flow
-- [ ] Contact / Talk to Our Team open the inquiry dialog; Explore App opens `/app/`
+- [ ] Contact / Talk to Our Team open the inquiry dialog; Workspace / Explore App opens `/app`
 - [ ] LinkedIn, X and Telegram footer links point to the official profiles on every public page
 - [ ] The workspace's brand link in the sidebar returns to the site
 - [ ] With `APP_ACCESS_CODE` set, `/app` asks for it and `/app/workspace.js` is not served without it
+- [ ] Missing access configuration returns a branded 503; closing preview access blocks the workspace on that browser
 - [ ] Lighthouse mobile run on both `/` and `/app/`
 - [ ] `/robots.txt` and `/sitemap.xml` return 200 with text and XML content types
 - [ ] `/developers`, `/docs`, `/docs/integration`, `/docs/reconciliation`, `/security` and `/privacy` return 200

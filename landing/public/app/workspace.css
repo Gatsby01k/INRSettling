@@ -258,3 +258,19 @@ button:disabled{opacity:.45}
 .preflight-summary.review-required>.icon{color:#b98938}
 .preflight-summary.review-required p{color:#9d824e}
 @media(max-width:1260px){.settlement-table{min-width:748px}}
+
+/* The preview shares the site's licensed type and keeps its access context visible. */
+body.workspace-page{min-width:320px;font-family:var(--font-body);line-height:1.45}
+.workspace-page kbd{font-family:var(--font-body)}
+h1,h2,h3{font-family:var(--font-display);font-weight:600}
+h2{font-size:24px;line-height:1.25;letter-spacing:-.025em;text-wrap:initial}
+h3{font-size:18px;line-height:1.3;letter-spacing:-.025em}
+.global-search{min-width:0}
+.balance-legend{flex-wrap:wrap;row-gap:8px}
+.topbar-account{flex-shrink:0}
+.preview-access-badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:5px 10px;border:1px solid #b9dfd4;border-radius:999px;background:#ecfaf4;color:#276d61;font-size:11px;font-weight:600;line-height:1.4;white-space:nowrap;letter-spacing:.01em}
+.account-menu .sample-profile-label{margin:0 0 5px;font-family:var(--font-body);font-size:10px;font-weight:600;line-height:1.5;letter-spacing:.1em;text-transform:uppercase;color:#50776d}
+.account-menu .close-preview-button{margin-top:9px;border-color:#c9ded8;background:#f3faf7;color:#286d60}
+.account-menu .close-preview-button[aria-busy=true]{opacity:.75}
+@media(max-width:560px){.preview-access-badge{font-size:10px;padding:5px 8px}.account-button{min-height:44px}}
+@media(max-width:420px){.global-search{flex:0 0 44px;width:44px;height:44px;min-height:44px;justify-content:center;padding:0}.global-search>span,.global-search kbd{display:none}.topbar-account{gap:7px}.preview-access-badge{font-size:9px;padding:5px 7px}.mobile-menu{width:44px;height:44px}.topbar-account .notification-button{width:44px;height:44px}.account-button{width:44px;justify-content:center}}

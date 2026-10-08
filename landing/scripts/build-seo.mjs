@@ -74,7 +74,7 @@ function footer(current) {
   return `<footer class="site-footer">
     <div class="site-footer-grid">
       <div class="site-footer-brand"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt=""></a><p>People. Payments. Progress.</p></div>
-      <nav class="site-footer-column site-footer-platform" aria-label="Footer platform"><h2>Platform</h2>${link('Product', section('#product'))}${link('Solutions', section('#solutions'))}${link('Corridors', section('#corridors'))}</nav>
+      <nav class="site-footer-column site-footer-platform" aria-label="Footer platform"><h2>Platform</h2>${link('Product', section('#product'))}${link('Solutions', section('#solutions'))}${link('Corridors', section('#corridors'))}${link('Workspace', '/app')}</nav>
       <nav class="site-footer-column site-footer-resources" aria-label="Footer resources"><h2>Resources</h2>${link('Developers', '/developers')}${link('Documentation', '/docs')}${link('Security', '/security')}</nav>
       <div class="site-footer-connect"><h2>Connect</h2><a class="site-footer-email" href="mailto:info@inrsettle.com">info@inrsettle.com</a>${socialNavigation()}</div>
     </div>
