@@ -12,7 +12,7 @@ const documents = new Map();
 
 before(async () => {
   preview = spawn(process.execPath, ['landing/scripts/serve-site.mjs'], {
-    cwd: repo, env: { ...process.env, PORT: '0' }, stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: repo, env: { ...process.env, APP_ACCESS_CODE: '', PORT: '0' }, stdio: ['ignore', 'pipe', 'pipe'],
   });
   base = await new Promise((resolve, reject) => {
     let output = '';
@@ -122,10 +122,10 @@ test('social previews reference a publicly readable 1200 × 630 PNG', async () =
   }
 });
 
-test('demo responses stay noindex when the preview access code is unset', async () => {
+test('unconfigured workspace fails closed and stays noindex', async () => {
   for (const path of ['/app', '/app/workspace.js']) {
     const response = await fetch(base + path);
-    assert.equal(response.status, 200);
+    assert.equal(response.status, 503);
     assert.match(response.headers.get('x-robots-tag'), /noindex/);
     if (path === '/app') assert.match(await response.text(), /name="robots" content="noindex, nofollow, nosnippet"/);
   }
@@ -141,7 +141,9 @@ test('resource links and their fragments resolve to real pages', async () => {
       if (destination) {
         if (link.hash) assert.ok(destination.includes(`id="${link.hash.slice(1)}"`), `${path} → ${href}`);
       } else {
-        assert.equal((await fetch(base + link.pathname)).status, 200, `${path} → ${href}`);
+        const response = await fetch(base + link.pathname);
+        assert.equal(response.status, link.pathname === '/app' ? 503 : 200, `${path} → ${href}`);
+        if (link.pathname === '/app') assert.match(response.headers.get('x-robots-tag'), /noindex/);
       }
     }
   }

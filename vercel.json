@@ -26,11 +26,17 @@
   "headers": [
     {
       "source": "/app",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, nosnippet" }]
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, nosnippet" },
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0" }
+      ]
     },
     {
       "source": "/app/(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, nosnippet" }]
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, nosnippet" },
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0" }
+      ]
     },
     {
       "source": "/api/(.*)",

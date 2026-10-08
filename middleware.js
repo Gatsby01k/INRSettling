@@ -1,53 +1,32 @@
 /**
- * A gate in front of `/app/`, enforced at the edge.
- *
- * The workspace is a demo — no provider, no authorization, no money — but its
- * files sit on a public CDN, so anything that checks access inside
- * `workspace.js` is theatre: open `/app/workspace.js` directly and you have
- * read the check and skipped it. The only place a gate can actually hold is in
- * front of the request, which is what this is.
- *
- * What this is NOT: it is not the product's authentication. `SECURITY.md § 3.1`
- * fixes that — email identity with a mandatory second factor, TOTP at minimum
- * and WebAuthn preferred, sessions short and device-bound — and none of it can
- * exist until the API has an HTTP host and a database it can reach. This is a
- * shared access code on a preview. It keeps the page off search engines and out
- * of the hands of whoever finds the link. It does not identify anybody, and no
- * copy on the gate page suggests otherwise.
- *
- * One environment variable, `APP_ACCESS_CODE`, set in the Vercel project:
- *
- *   - unset  → the gate does nothing and `/app/` stays open, so deploying this
- *              file changes nothing until you decide to turn it on;
- *   - set    → `/app/*` asks for the code, and remembers a correct answer for
- *              30 days in a signed, HttpOnly cookie.
- *
- * The code is also the signing key, so changing it in Vercel invalidates every
- * cookie that was issued under the old one. That is how you revoke access: edit
- * the variable and redeploy.
- *
- * No dependencies. `@vercel/functions` exports a `next()` helper for continuing
- * the chain, but a middleware that returns nothing continues anyway, and a
- * gate worth trusting is one you can read end to end without installing
- * something first.
+ * Server-enforced access to the illustrative workspace. This is a shared-code
+ * preview, not customer identity or authorization to execute payments.
+ * Real accounts require the IdP + database-backed session host described by
+ * SECURITY.md §3.1; no client form can substitute for that boundary.
  */
+import { renderAccessPage } from './landing/lib/access-page.mjs'
 
-export const config = {
-  // Only `/app`. The site itself, its assets and the currency icons are public
-  // and must stay that way — the gate is for the workspace, not the pitch.
-  matcher: ['/app', '/app/:path*'],
+export const config = { matcher: ['/app', '/app/:path*'] }
+
+const TICKET = '__Host-inr_preview'
+const DEVICE = '__Host-inr_device'
+const FORM = '__Host-inr_form'
+const MAX_AGE = 12 * 60 * 60
+const CSRF_AGE = 20 * 60
+const VIEWS = new Set(['overview', 'settlements', 'liquidity', 'beneficiaries', 'batches', 'reconciliation', 'developers', 'settings'])
+const encoder = new TextEncoder()
+const secureHeaders = {
+  'cache-control': 'private, no-store, max-age=0',
+  'x-robots-tag': 'noindex, nofollow, nosnippet',
+  'x-content-type-options': 'nosniff',
+  'referrer-policy': 'same-origin',
+  'content-security-policy': "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
 }
 
-const COOKIE = 'inrsettle_preview'
-const MAX_AGE_SECONDS = 30 * 24 * 60 * 60
-
-const encoder = new TextEncoder()
-
-/** Constant-time comparison, so a wrong code leaks nothing through timing. */
 function equals(a, b) {
   if (a.length !== b.length) return false
   let diff = 0
-  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
   return diff === 0
 }
 
@@ -57,143 +36,152 @@ function base64url(bytes) {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
+function random() { return base64url(crypto.getRandomValues(new Uint8Array(32))) }
+
 async function sign(payload, secret) {
-  const key = await crypto.subtle.importKey(
-    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
-  )
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
   return base64url(await crypto.subtle.sign('HMAC', key, encoder.encode(payload)))
 }
 
-/**
- * A ticket is `expiry.signature`, and nothing else.
- *
- * Deliberately not a session: it carries no identity, grants no capability and
- * is checked against one shared secret. Whoever holds it has the code.
- */
-async function issue(secret) {
-  const expiry = String(Date.now() + MAX_AGE_SECONDS * 1000)
-  return `${expiry}.${await sign(expiry, secret)}`
-}
-
-async function valid(ticket, secret) {
-  if (typeof ticket !== 'string') return false
-  const dot = ticket.indexOf('.')
-  if (dot < 1) return false
-  const expiry = ticket.slice(0, dot)
-  const signature = ticket.slice(dot + 1)
-  if (!/^\d+$/.test(expiry) || Number(expiry) < Date.now()) return false
-  return equals(signature, await sign(expiry, secret))
-}
-
 function readCookie(request, name) {
-  const header = request.headers.get('cookie')
-  if (!header) return null
-  for (const part of header.split(';')) {
-    const eq = part.indexOf('=')
-    if (eq > 0 && part.slice(0, eq).trim() === name) return part.slice(eq + 1).trim()
-  }
-  return null
+  const matches = (request.headers.get('cookie') ?? '').split(';')
+    .map(part => part.trim()).filter(part => part.startsWith(name + '='))
+  return matches.length === 1 ? matches[0].slice(name.length + 1) : null
 }
 
-/**
- * The gate page.
- *
- * Borrows the site's own stylesheet by link — `/styles.css` is public and the
- * matcher does not cover it — so this reads as part of the site rather than as
- * a server error page. The copy says what this is: a private preview with
- * demonstration data, not an account you are signing in to.
- */
-function gate(message) {
-  return new Response(
-    `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
-<title>Private preview · INRSettle</title>
-<link rel="icon" type="image/svg+xml" href="/assets/brand-favicon.svg">
-<link rel="stylesheet" href="/styles.css">
-<style>
-  .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .gate-card{width:100%;max-width:400px}
-  .gate-card img{height:34px;width:auto;margin-bottom:28px}
-  .gate-card h1{font-size:24px;margin:0 0 10px}
-  .gate-card p{margin:0 0 22px;opacity:.72;line-height:1.5}
-  .gate-card label{display:block;font-size:13px;margin-bottom:7px}
-  .gate-card input{width:100%;padding:12px 14px;margin-bottom:14px;font:inherit;
-    border:1px solid rgba(0,0,0,.16);border-radius:9px;background:#fff}
-  .gate-card button{width:100%;padding:12px 14px;font:inherit;cursor:pointer}
-  .gate-note{font-size:12px;margin:20px 0 0;opacity:.55}
-  .gate-error{font-size:13px;color:#b42318;margin:0 0 14px}
-</style>
-</head>
-<body>
-<main class="gate">
-  <form class="gate-card" method="POST" action="/app">
-    <a href="/"><img src="/assets/brand-lockup.svg" alt="INRSettle"></a>
-    <h1>Private preview</h1>
-    <p>The workspace is not open yet. Enter the access code you were given and it
-       will stay unlocked on this device for 30 days.</p>
-    ${message ? `<p class="gate-error">${message}</p>` : ''}
-    <label for="email">Email <span style="opacity:.55">(optional)</span></label>
-    <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com">
-    <label for="code">Access code</label>
-    <input id="code" name="code" type="password" autocomplete="off" autofocus required>
-    <button class="button primary" type="submit">Open the workspace</button>
-    <p class="gate-note">This preview runs on demonstration data. No provider,
-       no authorization and no payment is connected, and nothing here moves
-       money. It is not an account and this is not a sign-in.</p>
-  </form>
-</main>
-</body>
-</html>`,
-    { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'x-robots-tag': 'noindex' } },
-  )
+function cookie(name, value, age = MAX_AGE) {
+  return `${name}=${value}; Path=/; Max-Age=${age}; HttpOnly; Secure; SameSite=Lax`
+}
+
+async function issueTicket(secret, device) {
+  const expiry = String(Date.now() + MAX_AGE * 1000)
+  return `${expiry}.${await sign(`preview:v2:${expiry}:${device}`, secret)}`
+}
+
+async function validTicket(ticket, secret, device) {
+  if (!device || !/^[A-Za-z0-9_-]{43}$/.test(device) || !/^\d{13}\.[A-Za-z0-9_-]{43}$/.test(ticket ?? '')) return false
+  const [expiry, signature] = ticket.split('.')
+  if (Number(expiry) <= Date.now() || Number(expiry) > Date.now() + MAX_AGE * 1000) return false
+  return equals(signature, await sign(`preview:v2:${expiry}:${device}`, secret))
+}
+
+async function issueCsrf(formKey, device) {
+  const payload = `${Date.now() + CSRF_AGE * 1000}.${random()}`
+  // A random per-browser key keeps a public form from becoming an offline
+  // guessing oracle for the shared access code.
+  return `${payload}.${await sign(`csrf:${payload}:${device}`, formKey)}`
+}
+
+async function validCsrf(token, formKey, device) {
+  if (!device || !/^[A-Za-z0-9_-]{43}$/.test(formKey ?? '') || !/^\d{13}\.[A-Za-z0-9_-]{43}\.[A-Za-z0-9_-]{43}$/.test(token ?? '')) return false
+  const [expiry, nonce, signature] = token.split('.')
+  if (Number(expiry) <= Date.now() || Number(expiry) > Date.now() + CSRF_AGE * 1000) return false
+  return equals(signature, await sign(`csrf:${expiry}.${nonce}:${device}`, formKey))
+}
+
+function sameOrigin(request) {
+  const origin = request.headers.get('origin')
+  const site = request.headers.get('sec-fetch-site')
+  return origin === new URL(request.url).origin && (!site || site === 'same-origin')
+}
+
+async function readForm(request) {
+  if (request.headers.get('content-type')?.split(';')[0].trim() !== 'application/x-www-form-urlencoded') return null
+  if (Number(request.headers.get('content-length') ?? 0) > 4096) return null
+  const reader = request.body?.getReader()
+  if (!reader) return null
+  let length = 0
+  const chunks = []
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    length += value.byteLength
+    if (length > 4096) { await reader.cancel(); return null }
+    chunks.push(value)
+  }
+  const bytes = new Uint8Array(length)
+  let offset = 0
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength }
+  return new URLSearchParams(new TextDecoder().decode(bytes))
+}
+
+function redirect(location, status = 303) {
+  return new Response(null, { status, headers: { ...secureHeaders, location } })
+}
+
+async function page(request, secret, options = {}, status = 200) {
+  const previous = readCookie(request, DEVICE)
+  const device = /^[A-Za-z0-9_-]{43}$/.test(previous ?? '') ? previous : random()
+  const previousKey = readCookie(request, FORM)
+  const formKey = /^[A-Za-z0-9_-]{43}$/.test(previousKey ?? '') ? previousKey : random()
+  const response = new Response(renderAccessPage({
+    action: '/app/sign-in', csrfToken: secret ? await issueCsrf(formKey, device) : '', ...options,
+  }), { status, headers: { ...secureHeaders, 'content-type': 'text/html; charset=utf-8' } })
+  if (secret && device !== previous) response.headers.append('set-cookie', cookie(DEVICE, device))
+  if (secret && formKey !== previousKey) response.headers.append('set-cookie', cookie(FORM, formKey))
+  return response
 }
 
 export default async function middleware(request) {
+  const path = new URL(request.url).pathname.replace(/\/$/, '')
   const secret = process.env.APP_ACCESS_CODE
+  const device = readCookie(request, DEVICE)
+  const formKey = readCookie(request, FORM)
+  const authenticated = secret && await validTicket(readCookie(request, TICKET), secret, device)
 
-  // Not configured: stay out of the way entirely. Shipping this file must not
-  // be able to take the workspace down on its own.
-  if (!secret) return
-
-  if (await valid(readCookie(request, COOKIE), secret)) return
+  if (!['GET', 'HEAD', 'POST'].includes(request.method))
+    return new Response(null, { status: 405, headers: { ...secureHeaders, allow: 'GET, HEAD, POST' } })
 
   if (request.method === 'POST') {
+    if (!['/app', '/app/sign-in', '/app/sign-out'].includes(path))
+      return new Response(null, { status: 405, headers: secureHeaders })
+    if (!secret) return page(request, null, { state: 'unavailable' }, 503)
     let form
-    try {
-      form = await request.formData()
-    } catch {
-      return gate('That did not come through. Try again.')
-    }
-    const code = String(form.get('code') ?? '')
-    if (!equals(code, secret)) {
-      // Logged without the code itself, so the function log never becomes a
-      // place the code can be read back out of.
-      console.warn('preview gate: wrong code', { email: String(form.get('email') ?? '') || null })
-      return gate('That code is not right.')
+    try { form = sameOrigin(request) ? await readForm(request) : null } catch { form = null }
+    if (!form || form.getAll('csrf').length !== 1 || !await validCsrf(form.get('csrf'), formKey, device))
+      return page(request, secret, { message: 'This form has expired. Please try again.' }, 403)
+
+    if (path === '/app/sign-out') {
+      const response = redirect('/app/sign-in?status=signed-out')
+      response.headers.append('set-cookie', cookie(TICKET, '', 0))
+      response.headers.append('set-cookie', cookie(DEVICE, '', 0))
+      response.headers.append('set-cookie', cookie(FORM, '', 0))
+      response.headers.append('set-cookie', 'inrsettle_preview=; Path=/app; Max-Age=0; HttpOnly; Secure; SameSite=Lax')
+      return response
     }
 
-    const email = String(form.get('email') ?? '').trim()
-    // The only record that anyone came in. Vercel's function logs are enough
-    // at this stage; when it stops being enough, this is the line to change.
-    console.log('preview gate: opened', { email: email || null })
+    const view = form.getAll('view').length === 1 && VIEWS.has(form.get('view')) ? form.get('view') : ''
+    if (form.getAll('code').length !== 1 || !equals(form.get('code'), secret))
+      return page(request, secret, { view, message: 'That access code doesn’t match. Check it and try again.' }, 401)
 
-    return new Response(null, {
-      status: 303,
-      headers: {
-        // A literal path, never one derived from the request: the destination
-        // of a redirect this function issues is not the caller's to choose.
-        // `/app` without the slash, because `vercel.json` sets
-        // `trailingSlash: false` and would otherwise redirect once more.
-        location: '/app',
-        'set-cookie': `${COOKIE}=${await issue(secret)}; Path=/app; Max-Age=${MAX_AGE_SECONDS}; `
-          + 'HttpOnly; Secure; SameSite=Lax',
-      },
-    })
+    const response = redirect(view ? `/app#/${view}` : '/app')
+    response.headers.append('set-cookie', cookie(TICKET, await issueTicket(secret, device)))
+    response.headers.append('set-cookie', cookie(DEVICE, device))
+    response.headers.append('set-cookie', cookie(FORM, formKey))
+    response.headers.append('set-cookie', 'inrsettle_preview=; Path=/app; Max-Age=0; HttpOnly; Secure; SameSite=Lax')
+    return response
   }
 
-  return gate(null)
+  if (path === '/app/session') {
+    if (!authenticated) return new Response(null, { status: secret ? 401 : 503, headers: secureHeaders })
+    const key = /^[A-Za-z0-9_-]{43}$/.test(formKey ?? '') ? formKey : random()
+    const response = new Response(JSON.stringify({ mode: 'preview', csrf: await issueCsrf(key, device) }), {
+      headers: { ...secureHeaders, 'content-type': 'application/json; charset=utf-8' },
+    })
+    if (key !== formKey) response.headers.append('set-cookie', cookie(FORM, key))
+    return response
+  }
+
+  if (path === '/app/sign-in' || path === '/app/sign-out') {
+    if (authenticated) return redirect('/app')
+    const message = new URL(request.url).searchParams.get('status') === 'signed-out'
+      ? 'Preview access closed on this browser.'
+      : readCookie(request, TICKET) ? 'Your preview access has expired. Enter your code to continue.' : ''
+    return page(request, secret, { state: secret ? 'preview' : 'unavailable', message, messageKind: 'status' }, secret ? 200 : 503)
+  }
+
+  if (authenticated) return
+  if (!secret) return page(request, null, { state: 'unavailable' }, 503)
+  if (path === '/app' || !path.split('/').pop().includes('.')) return redirect('/app/sign-in')
+  return new Response('Workspace access required.', { status: 401, headers: { ...secureHeaders, 'content-type': 'text/plain; charset=utf-8' } })
 }
