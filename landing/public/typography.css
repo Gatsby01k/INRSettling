@@ -49,6 +49,11 @@ p { text-wrap: pretty; }
 .nav-glass { width: 71%; }
 .brand-lockup { width: clamp(164px, 17vw, 260px); }
 .nav-cta { font-size: 14px; }
+@media (min-width: 1101px) {
+  .topbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; }
+  .nav-glass { width: 100%; max-width: 1120px; min-width: 0; gap: 24px; }
+  .desktop-nav { margin-left: auto; flex: 0 0 auto; gap: clamp(16px, 1.65vw, 28px); }
+}
 
 /* Give the display type room beside the original animated scene. */
 .hero-shell { padding-top: clamp(110px, 9vw, 150px); }

@@ -1,5 +1,5 @@
 // Saturated energy pulses follow the artwork; the lens and base catch the light.
-// Arc-length sampling keeps every bend smooth; all artwork moves together.
+// Arc-length sampling keeps every bend smooth on the stationary artwork.
 const ART_WIDTH = 1659;
 const ART_HEIGHT = 948;
 
@@ -195,19 +195,6 @@ function animate(canvas, context) {
   }
   const visual = canvas.parentElement;
   const sheen = visual?.querySelector('.hero-emblem-sheen');
-  const shell = canvas.closest?.('.hero-shell');
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-  let targetX = 0;
-  let targetY = 0;
-  let shiftX = 0;
-  let shiftY = 0;
-  shell?.addEventListener('pointermove', event => {
-    if (!finePointer.matches || reducedMotion.matches) return;
-    const rect = shell.getBoundingClientRect();
-    targetX = Math.max(-1, Math.min(1, (event.clientX - rect.left) / rect.width * 2 - 1)) * 7;
-    targetY = Math.max(-1, Math.min(1, (event.clientY - rect.top) / rect.height * 2 - 1)) * 4;
-  }, { passive: true });
-  shell?.addEventListener('pointerleave', () => { targetX = targetY = 0; });
   let clock = 0;
   let previousTime = 0;
   let lastPaint = 0;
@@ -226,12 +213,6 @@ function animate(canvas, context) {
     if (sheen) {
       const phase = (clock / CYCLE + .2) % 1;
       sheen.style.backgroundPosition = `${180 - phase * 360}% 50%`;
-    }
-    if (visual && finePointer.matches && (Math.abs(targetX - shiftX) > .02 || Math.abs(targetY - shiftY) > .02)) {
-      shiftX += (targetX - shiftX) * .08;
-      shiftY += (targetY - shiftY) * .08;
-      visual.style.setProperty('--hero-shift-x', `${shiftX.toFixed(2)}px`);
-      visual.style.setProperty('--hero-shift-y', `${shiftY.toFixed(2)}px`);
     }
   }
   function resize() {
@@ -258,11 +239,6 @@ function animate(canvas, context) {
       frame = 0;
       previousTime = 0;
       lastPaint = 0;
-      if (reducedMotion.matches && visual) {
-        targetX = targetY = shiftX = shiftY = 0;
-        visual.style.removeProperty('--hero-shift-x');
-        visual.style.removeProperty('--hero-shift-y');
-      }
     } else if (!frame) {
       frame = requestAnimationFrame(tick);
     }
