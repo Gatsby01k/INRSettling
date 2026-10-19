@@ -174,10 +174,16 @@ describe('durable sandbox operation journal', () => {
     expect(await readFile(path, 'utf8')).not.toContain('5010012340000')
   })
   it('reserves one operation across concurrent callers before sending', async () => {
-    const submit = vi.fn(async () => { await new Promise(resolve => setTimeout(resolve, 40)); return { id: TX } })
+    let enter!: () => void, release!: () => void
+    const entered = new Promise<void>(resolve => { enter = resolve })
+    const released = new Promise<void>(resolve => { release = resolve })
+    const submit = vi.fn(async () => { enter(); await released; return { id: TX } })
     const journal = createSaberFileJournal(directory, credentials.clientId)
-    const results = await Promise.allSettled([journal.execute('concurrent', 'same', submit), journal.execute('concurrent', 'same', submit)])
-    expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1)
+    const first = journal.execute('concurrent', 'same', submit)
+    await entered
+    try { await expect(journal.execute('concurrent', 'same', submit)).rejects.toBeInstanceOf(SaberUncertainOperation) }
+    finally { release() }
+    expect(await first).toEqual({ id: TX })
     expect(submit).toHaveBeenCalledTimes(1)
   })
   it('refuses corrupt journal entries instead of recreating a submission', async () => {
