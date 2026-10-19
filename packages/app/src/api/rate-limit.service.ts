@@ -59,6 +59,13 @@ export function createRateLimiter(db: Db, config: RateLimitConfig): RateLimiter 
     async consume(scope, args) {
       const policy = config[args.bucket]
       return withTenant(db, scope, async (tx) => {
+        // FOR UPDATE cannot lock a row that does not exist. Establish it first
+        // so concurrent first requests serialize on the same counter too.
+        await tx.execute(sql`
+          INSERT INTO api_rate_limits(workspace_id, environment, api_key_id, bucket, window_start, count)
+          VALUES (${scope.workspaceId}, ${scope.environment}::environment, ${args.apiKeyId},
+            ${args.bucket}, to_timestamp(${args.nowSeconds}), 0)
+          ON CONFLICT (workspace_id, environment, api_key_id, bucket) DO NOTHING`)
         // The row lock is taken and released inside this transaction alone.
         const rows = (await tx.execute(sql`
           SELECT extract(epoch FROM window_start)::bigint AS window_start, count

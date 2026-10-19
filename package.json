@@ -27,7 +27,17 @@
     "check:alex-test": "node scripts/check-alex-test.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "build:seo": "node landing/scripts/build-seo.mjs",
-    "test:workspace": "node --test \"landing/tests/*.test.mjs\""
+    "test:workspace": "node --test \"landing/tests/*.test.mjs\"",
+    "sandbox:configure": "node --import tsx apps/runtime/src/cli.ts configure",
+    "sandbox:db": "docker compose --env-file .env.sandbox -f compose.sandbox.yaml up -d --wait",
+    "sandbox:migrate": "node --import tsx apps/runtime/src/cli.ts migrate",
+    "sandbox:provision": "node --import tsx apps/runtime/src/cli.ts provision",
+    "sandbox:api": "node --import tsx apps/runtime/src/cli.ts api",
+    "sandbox:worker": "node --import tsx apps/runtime/src/cli.ts worker",
+    "sandbox": "node --import tsx apps/runtime/src/cli.ts dev",
+    "build:openapi": "node --import tsx apps/runtime/src/openapi.ts",
+    "test:runtime": "vitest run apps/runtime",
+    "sandbox:smoke": "node scripts/sandbox-smoke.mjs"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.6.18",
@@ -49,6 +59,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "storybook": "^8.6.18",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "vite": "^5.4.21",

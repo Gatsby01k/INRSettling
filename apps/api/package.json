@@ -12,7 +12,8 @@
     "@inrsettle/domain": "workspace:*",
     "@inrsettle/ids": "workspace:*",
     "@inrsettle/money": "workspace:*",
-    "drizzle-orm": "^0.38.2"
+    "drizzle-orm": "^0.38.2",
+    "@inrsettle/jobs": "workspace:*"
   },
   "devDependencies": {
     "graphile-worker": "^0.16.6",

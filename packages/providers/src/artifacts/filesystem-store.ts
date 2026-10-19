@@ -6,19 +6,17 @@
  * **"a key that has been written cannot be written again"**, and this adapter
  * has to demonstrate that property or it proves nothing about the real one.
  *
- * The mechanism is `open(path, 'wx')` — create-exclusive. The kernel decides,
- * atomically, whether this call is the one that created the file; a losing
- * caller gets `EEXIST` and no bytes are written. That is a real guarantee under
- * concurrency, which a `existsSync` check followed by a write is not: between
- * the check and the write another worker can create the file, and both callers
- * then believe they wrote it.
+ * Bytes are written and synced to a private temporary file, then published
+ * with an atomic hard link. A losing writer gets EEXIST. Readers never see a
+ * partial PDF, including when a worker stops while writing it.
  *
  * In a real deployment the same shape holds with S3 conditional writes
  * (`If-None-Match: *`) plus a bucket policy denying `s3:PutObject` overwrite and
  * `s3:DeleteObject` on the `receipts/` prefix. The port's shape is what makes
  * both implementable without an overwrite path existing anywhere in the code.
  */
-import { mkdir, open, readFile } from 'node:fs/promises'
+import { mkdir, open, readFile, link, unlink } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
 import { dirname, join, normalize, resolve, sep } from 'node:path'
 import type { ArtifactStore, PutResult, StoredObject } from '@inrsettle/domain'
 import { ARTIFACT_PREFIX } from '@inrsettle/domain'
@@ -77,23 +75,19 @@ export function createFilesystemArtifactStore(
       const path = pathFor(object.key)
       await mkdir(dirname(path), { recursive: true })
 
-      let handle
+      const temporary = `${path}.${randomUUID()}.tmp`
+      const handle = await open(temporary, 'wx', 0o600)
       try {
-        // 'wx' — create, and fail if it exists. The atomicity is the kernel's,
-        // which is the only place it can honestly live.
-        handle = await open(path, 'wx')
+        await handle.writeFile(object.bytes)
+        await handle.sync()
+        await handle.close()
+        await link(temporary, path)
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
-        // Already written, and the first write wins. Not an error: at-least-once
-        // job delivery plus a write-once artifact means a retry will land here,
-        // and discarding the second rendering is what write-once means.
         return { ok: false, reason: 'already_exists' }
-      }
-
-      try {
-        await handle.write(object.bytes)
       } finally {
-        await handle.close()
+        await handle.close().catch(() => {})
+        await unlink(temporary).catch(() => {})
       }
       written.set(object.key, object.contentType)
       return { ok: true, key: object.key, bytes: object.bytes.byteLength }
