@@ -342,6 +342,10 @@ describe('INV-22 — cancellation compensates according to where the money got t
       compensateCancellation(tx, scope, { settlementId, actor: creator }),
     )
     expect(compensation).toMatchObject({ ok: true, compensation: 'repayment_requested' })
+    // A worker can stop after recording the repayment and before honoring the
+    // cancellation. Redelivery must recover that same repayment.
+    expect(await live(tx => compensateCancellation(tx, scope, { settlementId, actor: creator })))
+      .toEqual(compensation)
 
     // INV-46 in the place it matters most: the customer has cancelled, a
     // repayment exists, and availability has not moved a unit.
@@ -353,6 +357,7 @@ describe('INV-22 — cancellation compensates according to where the money got t
       SELECT status, source FROM repayments WHERE settlement_id = ${settlementId}`))) as unknown as
       { status: string; source: string }[]
     expect(repayments[0]).toMatchObject({ status: 'REQUESTED', source: 'CANCELLATION_AFTER_DRAWDOWN' })
+    expect(repayments).toHaveLength(1)
   })
 
   it('owes nothing when there was never a reservation', async () => {

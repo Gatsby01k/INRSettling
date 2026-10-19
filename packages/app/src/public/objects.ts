@@ -54,8 +54,10 @@ export function moneyJson(m: Money, format: NumberFormat = 'international'): Rec
 }
 
 /** `§ 3.3` — RFC 3339, always UTC, always `Z`. */
-export function timestamp(d: Date | null | undefined): string | null {
-  return d ? d.toISOString().replace(/\.\d{3}Z$/, 'Z') : null
+export function timestamp(d: Date | string | null | undefined): string | null {
+  // Typed Drizzle reads return Date; raw SQL observations return the driver's
+  // timestamp string. Both are used by artifact and event serializers.
+  return d ? (d instanceof Date ? d : new Date(d)).toISOString().replace(/\.\d{3}Z$/, 'Z') : null
 }
 
 /* ── Beneficiary — § 7.1 ────────────────────────────────────────────────── */

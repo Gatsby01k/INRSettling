@@ -1,0 +1,20 @@
+{
+  "name": "@inrsettle/runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@inrsettle/api": "workspace:*",
+    "@inrsettle/app-services": "workspace:*",
+    "@inrsettle/db": "workspace:*",
+    "@inrsettle/domain": "workspace:*",
+    "@inrsettle/jobs": "workspace:*",
+    "@inrsettle/providers": "workspace:*",
+    "@inrsettle/money": "workspace:*",
+    "drizzle-orm": "^0.38.2",
+    "graphile-worker": "^0.16.6",
+    "postgres": "^3.4.5",
+    "playwright-core": "1.49.1"
+  }
+}

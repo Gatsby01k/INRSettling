@@ -10,6 +10,7 @@ export default defineConfig({
     // depends on @inrsettle/db, and db's tests use the harness, which would be
     // a dependency cycle if it were expressed in package.json.
     alias: {
+      '@inrsettle/api': fileURLToPath(new URL('./apps/api/src/index.ts', import.meta.url)),
       '@inrsettle/money': pkg('money'),
       '@inrsettle/ids': pkg('ids'),
       '@inrsettle/contracts': pkg('contracts'),

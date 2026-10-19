@@ -50,3 +50,7 @@ Claude outputs/
 # `pnpm run verify`.
 __pycache__/
 *.pyc
+
+# Local sandbox keys, database/artifacts, and test credentials
+.env.sandbox
+.sandbox/
