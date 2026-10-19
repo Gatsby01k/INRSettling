@@ -1,5 +1,8 @@
 # Partner sandbox
 
+For the separate Saber-issued sandbox connection and test workflow, see
+[Saber Money integration](SABER_SANDBOX.md).
+
 This runtime connects the existing public API, PostgreSQL, Graphile Worker,
 verification, funding, payout, reconciliation, receipts and customer webhooks.
 The browser workspace at `/workspace` uses the same HTTP API as a partner.

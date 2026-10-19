@@ -37,7 +37,12 @@
     "sandbox": "node --import tsx apps/runtime/src/cli.ts dev",
     "build:openapi": "node --import tsx apps/runtime/src/openapi.ts",
     "test:runtime": "vitest run apps/runtime",
-    "sandbox:smoke": "node scripts/sandbox-smoke.mjs"
+    "sandbox:smoke": "node scripts/sandbox-smoke.mjs",
+    "saber": "node --import tsx apps/runtime/src/saber-cli.ts",
+    "saber:configure": "pnpm saber configure",
+    "saber:status": "pnpm saber status",
+    "saber:check": "pnpm saber check",
+    "test:saber": "vitest run packages/providers/src/__tests__/saber.test.ts apps/runtime/src/saber.test.ts"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.6.18",

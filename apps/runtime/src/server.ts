@@ -100,6 +100,14 @@ export async function startApi(config: RuntimeConfig) {
     if (req.headers['authorization']?.startsWith('Bearer sk_live_')) { error(res, 403, 'sandbox_only', 'This service accepts sandbox credentials only.'); return }
     const headers: Record<string, string> = {}
     for (const [key, value] of Object.entries(req.headers)) if (value !== undefined) headers[key] = Array.isArray(value) ? value.join(',') : value
+    if (target.pathname === '/workspace/saber' && req.method === 'GET') {
+      const authorization = await handle({ method: 'GET', path: '/v1/beneficiaries', headers }, options)
+      if (authorization.status !== 200) { send(res, authorization.status, authorization.body, { ...authorization.headers }); return }
+      const resolved = await resolveApiKey(client.db, (headers['authorization'] ?? '').replace(/^Bearer /i, ''))
+      if (!resolved.ok || resolved.key.workspaceId !== config.workspaceId) { error(res, 403, 'forbidden', 'Provider setup belongs to another workspace.'); return }
+      send(res, 200, JSON.stringify(config.saberStatus))
+      return
+    }
     if (target.pathname === '/workspace/receipt' && req.method === 'GET') {
       const settlementId = target.searchParams.get('settlement_id') ?? ''
       const authorization = await handle({ method: 'GET', path: `/v1/settlements/${encodeURIComponent(settlementId)}/receipt`, headers }, options)

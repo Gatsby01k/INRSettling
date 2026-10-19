@@ -13,6 +13,7 @@ try {
     console.log('Created .env.sandbox with random local credentials. Existing configuration is never overwritten.')
   } else {
     if (existsSync('.env.sandbox')) process.loadEnvFile('.env.sandbox')
+    if (existsSync('.env.saber')) process.loadEnvFile('.env.saber')
     if (command === 'migrate') { await migrateSandbox(process.env); console.log('Sandbox migrations and reference data are current.') }
     else if (command === 'provision') {
       const created = await provisionSandbox(process.env)

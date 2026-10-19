@@ -3,6 +3,11 @@
 Candidate flow: USDT → INR bank payout. Proposed counterparty: Saber Money.
 This record is a checklist for joint validation, not a claim of partnership.
 
+The [Saber sandbox connector](../../SABER_SANDBOX.md) implements the published
+protocol and an operator test workflow, separately from financial execution.
+Public documentation is available; merchant access and joint contract
+verification remain outstanding.
+
 | Decision | Evidence needed | Status |
 |---|---|---|
 | Legal entity, permitted business recipients and third-party payouts | Written operating model; responsibilities for KYB, KYC/EDD, AML, purpose codes, retention and reporting | External confirmation required |

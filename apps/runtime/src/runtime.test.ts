@@ -85,6 +85,12 @@ describe('partner sandbox across HTTP, database and durable worker', () => {
     expect((await fetch(base + '/v1/settlements')).status).toBe(401)
     expect((await request('GET', '/v1/settlements', undefined, undefined, 'sk_live_not-a-real-credential')).response.status).toBe(403)
     expect((await fetch(base + '/openapi.json')).status).toBe(200)
+    expect((await fetch(base + '/workspace/saber')).status).toBe(401)
+    const setup = await request('GET', '/workspace/saber')
+    expect(setup.response.status).toBe(200)
+    expect(setup.json.state).toBe('credentials_missing')
+    expect(setup.json.execution_provider).toBe('simulator')
+    expect(setup.json).not.toHaveProperty('clientSecret')
     expect(JSON.parse(await readFile(new URL('../../../reference/api/openapi.json', import.meta.url), 'utf8'))).toEqual(openApiDocument())
     expect(() => sandboxOnly({ INRSETTLE_ENVIRONMENT: 'live' })).toThrow('sandbox')
     expect(() => loadConfig({ ...env, INRSETTLE_DATABASE_URL: env['INRSETTLE_ADMIN_DATABASE_URL'] })).toThrow('inrsettle_app')
@@ -186,6 +192,7 @@ describe('partner sandbox across HTTP, database and durable worker', () => {
 
   it('keeps tenant objects private and rejects malformed transport inputs', async () => {
     const other = await provisionSandbox({ ...env, INRSETTLE_WORKSPACE_ID: `${workspaceId}_other` })
+    expect((await request('GET', '/workspace/saber', undefined, undefined, other.apiKey)).response.status).toBe(403)
     expect((await request('GET', `/v1/settlements/${settlementId}`, undefined, undefined, other.apiKey)).response.status).toBe(404)
     expect((await request('GET', '/v1/settlements?limit=1&limit=2')).response.status).toBe(400)
     const invalid = await fetch(base + '/v1/quotes', { method: 'POST', headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'text/plain' }, body: '{}' })
@@ -203,6 +210,7 @@ describe('partner sandbox across HTTP, database and durable worker', () => {
       await page.locator('#api-key').fill(key)
       await page.locator('#connect-form button').click()
       await page.locator('#workspace:not([hidden])').waitFor()
+      expect(await page.locator('#saber-status').innerText()).toContain('Awaiting Saber sandbox access')
       expect(await page.locator('#settlements').innerText()).toContain('Settled')
       await page.locator(`[data-view="${settlementId}"]`).click()
       await page.locator('[data-receipt]').waitFor()

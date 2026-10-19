@@ -27,6 +27,10 @@ async function refresh() {
   polling = true;
   try {
     const [people, settlements] = await Promise.all([api('/beneficiaries'), api('/settlements')]);
+    const setupResponse = await fetch('/workspace/saber', {headers:{Authorization:'Bearer '+apiKey},credentials:'omit',cache:'no-store'});
+    if (!setupResponse.ok) throw new Error('Could not load provider connection setup.');
+    const setup = await setupResponse.json();
+    $('#saber-status').textContent = setup.state === 'configured_untested' ? 'Credentials configured. Run the authenticated Saber check before testing a payout.' : setup.state === 'configuration_invalid' ? 'Saber configuration needs correction. Only sandbox credentials are supported.' : 'Awaiting Saber sandbox access. Save the Saber Client ID and Client Secret in the server’s .env.saber file.';
     beneficiaries = people.data;
     const previous = $('#beneficiary').value;
     $('#beneficiary').innerHTML = '<option value="">Choose a verified beneficiary</option>' + beneficiaries.filter(b => b.destination?.verification_status === 'verified').map(b => `<option value="${esc(b.id)}">${esc(b.display_name)} · ${esc(b.destination.account_number_last4)}</option>`).join('');

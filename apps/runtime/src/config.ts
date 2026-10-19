@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { saberSetupStatus } from './saber-config.js'
 
 export interface RuntimeConfig {
   appUrl: string
@@ -11,6 +12,7 @@ export interface RuntimeConfig {
   fingerprintKey: Buffer
   artifactRoot: string
   workspaceId: string
+  saberStatus: ReturnType<typeof saberSetupStatus>
 }
 
 export function sandboxOnly(env: NodeJS.ProcessEnv): void {
@@ -48,5 +50,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): RuntimeConfig 
     fingerprintKey: secretKey(env, 'INRSETTLE_FINGERPRINT_KEY'),
     artifactRoot: resolve(env['INRSETTLE_ARTIFACT_ROOT'] ?? '.sandbox/artifacts'),
     workspaceId: env['INRSETTLE_WORKSPACE_ID'] ?? 'ws_partner_sandbox',
+    saberStatus: saberSetupStatus(env),
   }
 }
