@@ -13,6 +13,7 @@
  */
 import { and, desc, eq, gte, inArray, isNotNull, lte, lt, sql, type SQL } from 'drizzle-orm'
 import { schema } from '@inrsettle/db'
+import { enqueue } from '@inrsettle/jobs'
 import { money, type CurrencyCode } from '@inrsettle/money'
 import {
   ApiError, notFound,
@@ -148,7 +149,7 @@ async function requirementsFor(
     ...(row.destinationId === null ? {} : { destinationId: row.destinationId }),
     amount: { currency: 'INR', minorUnits: row.recipientAmountMinor },
     purposeCode: row.purposeCode,
-    hasActiveLiquidityFacility: ctx.deps.hasActiveLiquidityFacility,
+    hasActiveLiquidityFacility: await ctx.deps.activeLiquidityFacilityFor?.(ctx.scope, ctx.tx) ?? ctx.deps.hasActiveLiquidityFacility,
   })
   if (!preflight.ok) return []
 
@@ -361,10 +362,14 @@ export const authorizeSettlementHandler: Handler = async (ctx) => {
     // own say-so. The roles here are the key's scopes, not a person's.
     actorRoles: ['approver'],
     ruleSet: ctx.deps.ruleSet,
-    hasActiveLiquidityFacility: ctx.deps.hasActiveLiquidityFacility,
+    hasActiveLiquidityFacility: await ctx.deps.activeLiquidityFacilityFor?.(ctx.scope, ctx.tx) ?? ctx.deps.hasActiveLiquidityFacility,
   })
 
   if (!result.ok) throw transitionRefusal(result.reason, result.detail)
+
+  await enqueue(ctx.tx, 'settlement.execute', {
+    settlementId: id, workspaceId: ctx.scope.workspaceId, environment: ctx.scope.environment,
+  }, { jobKey: `settlement.execute:${id}` })
 
   return { status: 200, body: await serialize(ctx, await load(ctx, id)), subjectId: id }
 }
@@ -409,6 +414,10 @@ export const cancelSettlementHandler: Handler = async (ctx) => {
     }
     throw transitionRefusal(result.reason, 'detail' in result ? result.detail : undefined)
   }
+
+  if (!preAuthorization) await enqueue(ctx.tx, 'settlement.execute', {
+    settlementId: id, workspaceId: ctx.scope.workspaceId, environment: ctx.scope.environment,
+  }, { jobKey: `settlement.execute:${id}` })
 
   return {
     status: preAuthorization ? 200 : 202,

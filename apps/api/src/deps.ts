@@ -80,6 +80,9 @@ export interface ApiDeps {
   readonly verificationMethod: VerificationMethod
   /** Whether the workspace has a live facility — a preflight input. */
   readonly hasActiveLiquidityFacility: boolean
+  /** Runtime lookup under the authenticated tenant; fixtures may supply the
+   * fixed boolean above. Never infer another workspace's facility. */
+  readonly activeLiquidityFacilityFor?: (scope: import('@inrsettle/domain').TenantScope, tx: import('@inrsettle/db').Db) => Promise<boolean>
   readonly now?: () => Date
   /**
    * Where an unexpected throw goes. The customer gets `500` and a `request_id`;

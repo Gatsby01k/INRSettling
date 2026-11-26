@@ -39,6 +39,9 @@
     },
     {
       "path": "apps/ops"
+    },
+    {
+      "path": "apps/runtime"
     }
   ]
 }

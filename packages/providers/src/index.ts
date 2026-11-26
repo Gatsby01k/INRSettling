@@ -14,3 +14,8 @@ export * from './payouts/mock-india.js'
 /* Stage 6 — write-once artifact storage and deterministic PDF rendering. */
 export * from './artifacts/filesystem-store.js'
 export * from './artifacts/pdf.js'
+
+/* Saber API v2 sandbox protocol; not wired to financial execution. */
+export * from './saber/client.js'
+export * from './saber/journal.js'
+export * from './saber/status.js'

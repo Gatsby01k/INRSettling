@@ -8,6 +8,12 @@ INR ↔ STABLECOINS • GLOBAL SETTLEMENTS
 
 ## What this repository is right now
 
+**Partner sandbox runtime:** a runnable HTTP API, durable worker and connected
+workspace are now available. Start with [SANDBOX_RUNTIME.md](SANDBOX_RUNTIME.md).
+It uses simulated counterparties and funds, and does not close the real-provider
+or production gates. The [partner acceptance record](reference/partner/README.md)
+lists the external decisions still required.
+
 **Stages 0–3 are closed. Stage 4's engineering is complete and Stage 5 is
 built; Stage 4's formal gate stays open on one founder criterion.** See
 [Status](#status) below for what each stage delivered.

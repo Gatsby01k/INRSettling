@@ -24,7 +24,7 @@
  * the connection pool rather than a transaction, and a caller who passes a
  * transaction gets a type error instead of a runtime invariant violation.
  */
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import type { Db } from '@inrsettle/db'
 import { schema, withTenant } from '@inrsettle/db'
 import { newId } from '@inrsettle/ids'
@@ -182,7 +182,7 @@ async function beginReservation(
 }
 
 /** T10 or T11 — take the reservation, then say which way it went. */
-async function completeReservation(
+export async function completeReservation(
   tx: Db,
   scope: TenantScope,
   input: {
@@ -193,6 +193,9 @@ async function completeReservation(
     actor: PrincipalRef
   },
 ): Promise<FundingResult> {
+  const settlement = await lockSettlement(tx, input.settlementId)
+  if (!settlement) return { ok: false, reason: 'settlement_not_found' }
+  if (settlement.status !== 'LIQUIDITY_RESERVING') return { ok: false, reason: 'invalid_transition' }
   const facility = await readFacility(tx, input.facilityId)
   if (!facility) return { ok: false, reason: 'facility_not_found' }
 
@@ -542,6 +545,10 @@ export async function compensateCancellation(
   }
 
   if (reservation.status === 'CONSUMED') {
+    const [existing] = await tx.select({ id: schema.repayments.id }).from(schema.repayments)
+      .where(and(eq(schema.repayments.settlementId, input.settlementId), eq(schema.repayments.source, 'CANCELLATION_AFTER_DRAWDOWN')))
+      .limit(1)
+    if (existing) return { ok: true, compensation: 'repayment_requested', repaymentId: existing.id }
     const amount = money(
       reservation.amount_currency as CurrencyCode,
       BigInt(reservation.amount_minor),

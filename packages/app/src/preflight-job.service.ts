@@ -77,6 +77,14 @@ export async function runPreflightJob(
   // Already past preflight. A redelivered job must not re-run a machine that
   // has moved on — it asserts its expected pre-state and abandons (`§ 7`).
   if (settlement.status !== 'DRAFT' && settlement.status !== 'PREFLIGHTING') {
+    // A worker may have committed READY and stopped before attaching the
+    // requested quote. Resume that last step on redelivery.
+    if (settlement.status === 'READY' && input.quoteId !== undefined) {
+      const attached = await withTenant(db, scope, tx => attachQuote(tx, scope, {
+        settlementId: input.settlementId, quoteId: input.quoteId!, actor: deps.actor,
+      }))
+      return { ok: true, status: 'READY', quoteAttached: attached.ok }
+    }
     return {
       ok: true,
       status: settlement.status === 'ACTION_REQUIRED' ? 'ACTION_REQUIRED' : 'READY',
