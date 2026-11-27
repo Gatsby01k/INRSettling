@@ -39,11 +39,12 @@
   <link rel="stylesheet" href="/footer.css">
   <link rel="stylesheet" href="/hero.css?v=20261008-static-scene">
   <link rel="stylesheet" href="/typography.css?v=20261008-nav">
-  <script src="/app.js?v=20261003-type" defer></script>
-  <script type="module" src="/market.js"></script>
+  <link rel="stylesheet" href="/corridor-design.css">
+  <script src="/app.js?v=corridor-design" defer></script>
+  <script type="module" src="/market.js?v=corridor-design"></script>
   <script type="module" src="/hero-flow.js?v=20261008-static-scene"></script>
 </head>
-<body>
+<body class="settlement-home">
   <a class="skip-link" href="#main">Skip to content</a>
   <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-5-5 5 5-5 5"/></symbol>
@@ -83,32 +84,94 @@
 
   <main id="main">
     <section class="hero-shell" aria-labelledby="hero-heading">
-      <div class="hero-art" aria-hidden="true">
-        <div class="hero-visual">
-          <img class="hero-scene" src="/assets/hero-plate.webp" width="1659" height="948" alt="" fetchpriority="high">
-          <canvas class="hero-streams" id="hero-streams" width="1659" height="948" aria-hidden="true"></canvas>
-          <img class="hero-emblem" src="/assets/brand-symbol.svg" width="833" height="676" alt="">
-          <div class="hero-emblem-sheen"></div>
+      <div class="hero-stage">
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-visual">
+            <img class="hero-scene" src="/assets/hero-plate.webp" width="1659" height="948" alt="" fetchpriority="high">
+            <canvas class="hero-streams" id="hero-streams" width="1659" height="948" aria-hidden="true"></canvas>
+            <img class="hero-emblem" src="/assets/brand-symbol.svg" width="833" height="676" alt="">
+            <div class="hero-emblem-sheen"></div>
+          </div>
+        </div>
+        <div class="hero content">
+          <div class="hero-copy">
+            <p class="eyebrow hero-kicker">INR settlement infrastructure</p>
+            <h1 id="hero-heading">Cross-border<br>settlement.<br><span>Built for India.</span></h1>
+            <p class="hero-description">Connect global fiat and stablecoin rails to INR liquidity. Follow each payment from funding to reconciliation.</p>
+            <div class="actions">
+              <a class="button primary" href="#corridors">Plan a corridor</a>
+              <button class="hero-tour" type="button" data-tour><span aria-hidden="true">▷</span> See the workflow</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="hero content">
-        <div class="hero-copy">
-          <p class="eyebrow">Global settlements. A stronger India.</p>
-          <h1 id="hero-heading"><span class="hero-title-line">Cross-border settlement</span> <span class="hero-title-line">infrastructure</span> <span class="hero-title-line teal-text">for India</span></h1>
-          <p class="hero-description">Move INR and stablecoins across global corridors with liquidity, routing, compliance, and reconciliation — built for the next generation of financial infrastructure.</p>
-          <div class="actions"><a class="button primary" href="mailto:info@inrsettle.com" data-open="contact">Talk to Our Team <svg class="icon"><use href="#i-arrow"/></svg></a></div>
-          <div class="trust-row"><span><svg class="icon"><use href="#i-check"/></svg>India-focused</span><span><svg class="icon"><use href="#i-check"/></svg>Fiat &amp; stablecoin rails</span><span><svg class="icon"><use href="#i-check"/></svg>End-to-end records</span></div>
+      <section class="route-preview content" aria-labelledby="route-preview-heading">
+        <div class="route-preview-controls">
+          <h2 id="route-preview-heading">Follow the settlement.</h2>
+          <p>Choose an example corridor.</p>
+          <div class="preview-pairs" role="group" aria-label="Example currency pairs">
+            <button type="button" aria-pressed="true" data-preview-direction="to-india" data-preview-currency="USDC">USDC → INR</button>
+            <button type="button" aria-pressed="false" data-preview-direction="to-india" data-preview-currency="USD">USD → INR</button>
+            <button type="button" aria-pressed="false" data-preview-direction="from-india" data-preview-currency="AED">INR → AED</button>
+          </div>
         </div>
-      </div>
-      <div class="hero-rail content" aria-label="Connected settlement workflow">
-        <p class="rail-caption"><span>One connected settlement layer</span><span>INR · Fiat · Stablecoins</span></p>
-        <ol class="settlement-rail">
-          <li class="rail-step"><span class="rail-index" aria-hidden="true">01</span><div><strong>Liquidity</strong><p>INR, fiat &amp; digital funding</p></div></li>
-          <li class="rail-step"><span class="rail-index" aria-hidden="true">02</span><div><strong>Integration</strong><p>API-first workflows</p></div></li>
-          <li class="rail-step"><span class="rail-index" aria-hidden="true">03</span><div><strong>Preflight</strong><p>Requirements &amp; readiness</p></div></li>
-          <li class="rail-step"><span class="rail-index" aria-hidden="true">04</span><div><strong>Settlement</strong><p>Routing &amp; status</p></div></li>
-          <li class="rail-step"><span class="rail-index" aria-hidden="true">05</span><div><strong>Reconciliation</strong><p>References &amp; evidence</p></div></li>
-        </ol>
+        <div class="route-preview-detail">
+          <ol class="preview-trace" aria-label="Indicative settlement stages">
+            <li class="preview-stop">
+              <span class="preview-stop-label">Funding</span>
+              <strong><img id="preview-funding-icon" src="/assets/currencies/usdc.svg" width="24" height="24" alt=""><span id="preview-funding">USDC</span></strong>
+            </li>
+            <li class="preview-stop preview-core">
+              <span class="preview-stop-label">Settlement</span>
+              <strong><img src="/assets/brand-symbol.svg" width="24" height="24" alt="">INRSettle</strong>
+            </li>
+            <li class="preview-stop">
+              <span class="preview-stop-label">Delivery</span>
+              <strong><img id="preview-delivery-icon" src="/assets/currencies/inr-mark.svg" width="24" height="24" alt=""><span id="preview-delivery">INR</span></strong>
+            </li>
+          </ol>
+          <div class="preview-footer">
+            <p id="preview-description" aria-live="polite">Digital currency funding · Indian bank destination</p>
+            <a class="preview-plan-link" id="preview-plan-link" href="#corridors">Plan this route</a>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="corridor-discovery content" id="corridors" aria-labelledby="planner-heading">
+      <div class="section-intro"><div><p class="eyebrow">India ↔ World</p><h2 id="planner-heading">Plan your<br><span class="teal-text">India corridor.</span></h2></div><p>Choose a direction, currency and use case. See the funding, destination and operating details to discuss with our team.</p></div>
+      <div class="corridor-planner glass" id="corridor-planner">
+        <div class="planner-config">
+          <p class="planner-overline">Scope your workflow</p>
+          <div class="direction-switch" id="plan-direction" role="group" aria-label="Settlement direction"><button type="button" data-direction="to-india" aria-pressed="true">World <span aria-hidden="true">→</span> India</button><button type="button" data-direction="from-india" aria-pressed="false">India <span aria-hidden="true">→</span> World</button></div>
+          <div class="planner-picker picker-currency" data-columns="3">
+            <span class="picker-label" id="plan-currency-label">Funding currency</span>
+            <input type="hidden" id="plan-currency" value="USDC">
+            <button class="picker-trigger" id="plan-currency-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-currency-options" aria-labelledby="plan-currency-label plan-currency-value"><span class="picker-value" id="plan-currency-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
+            <div class="picker-panel" id="plan-currency-options" role="dialog" hidden></div>
+          </div>
+          <div class="planner-picker picker-purpose" data-columns="2">
+            <span class="picker-label" id="plan-purpose-label">Business use</span>
+            <input type="hidden" id="plan-purpose" value="supplier-payments">
+            <button class="picker-trigger" id="plan-purpose-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-purpose-options" aria-labelledby="plan-purpose-label plan-purpose-value"><span class="picker-value" id="plan-purpose-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
+            <div class="picker-panel" id="plan-purpose-options" role="dialog" hidden></div>
+          </div>
+          <div class="planner-picker picker-volume" data-columns="2">
+            <span class="picker-label" id="plan-volume-label">Indicative monthly volume</span>
+            <input type="hidden" id="plan-volume" value="evaluating">
+            <button class="picker-trigger" id="plan-volume-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-volume-options" aria-labelledby="plan-volume-label plan-volume-value"><span class="picker-value" id="plan-volume-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
+            <div class="picker-panel" id="plan-volume-options" role="dialog" hidden></div>
+          </div>
+          <p class="planner-help">Prepare your currencies, use case and volume for a focused conversation with our team.</p>
+        </div>
+        <div class="planner-result">
+          <div class="planner-result-heading"><div><p class="planner-overline">Your proposed flow</p><h3 id="plan-title">USDC → INR</h3></div><span class="planner-purpose" id="plan-purpose-result">Supplier &amp; service payments</span></div>
+          <div class="planner-journey" aria-label="Funding, orchestration and delivery"><div><span class="journey-coin" id="plan-source"><img src="/assets/currencies/usdc.svg" width="32" height="32" alt="USD Coin"></span><strong class="journey-code" id="plan-source-code">USDC</strong><p id="plan-source-label">Digital currency funding</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin journey-brand"><img src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></span><p>Route &amp; settlement controls</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin" id="plan-destination"><img src="/assets/currencies/inr-mark.svg" width="64" height="64" alt="Indian rupee"></span><strong class="journey-code" id="plan-destination-code">INR</strong><p id="plan-destination-label">Indian bank destination</p></div></div>
+          <ul class="plan-checks" id="plan-checks"></ul>
+          <div class="planner-actions"><button class="button primary" id="plan-contact" type="button">Discuss this route <svg class="icon"><use href="#i-arrow"/></svg></button><button class="text-button" id="plan-download" type="button">Download route brief <svg class="icon"><use href="#i-download"/></svg></button></div>
+          <p class="planner-note" id="plan-note">Route availability and execution terms are confirmed during onboarding.</p>
+          <p class="sr-only" role="status" id="plan-announcement"></p>
+        </div>
       </div>
     </section>
 
@@ -145,7 +208,7 @@
       </div>
     </section>
 
-    <section class="flow-section reveal" id="corridors" aria-labelledby="flow-heading">
+    <section class="flow-section reveal" id="settlement-flow" aria-labelledby="flow-heading">
       <img class="flow-background" src="/assets/flow.webp" alt="" width="2151" height="731" loading="lazy" aria-hidden="true">
       <div class="content section-grid flow-layout">
         <div class="section-copy"><p class="eyebrow">From INR to a borderless world</p><h2 id="flow-heading">INR. Digital rails.<br>Global <span class="teal-text">settlement.</span></h2><p>Connect INR liquidity and stablecoin rails through one layer for funding, routing, settlement controls and reconciliation.</p><button class="button small secondary" data-open="corridors">Explore Corridors <svg class="icon"><use href="#i-arrow"/></svg></button></div>
@@ -159,43 +222,6 @@
           <svg class="icon flow-arrow"><use href="#i-arrow"/></svg>
           <button class="flow-node global" data-flow="global" aria-pressed="false"><span class="flow-coin"><img class="flow-settlement-icon" src="/assets/settlement-network.svg" width="64" height="64" alt=""></span><strong>Global Settlements</strong><span>Cross-border Workflows<br>&amp; Global Connectivity</span></button>
           <div class="flow-detail" aria-live="polite"><span class="flow-detail-line"></span><span id="flow-detail-text">A single starting point for local INR liquidity.</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="corridor-discovery content reveal" aria-labelledby="planner-heading">
-      <div class="section-intro"><div><p class="eyebrow">India ↔ World</p><h2 id="planner-heading">Map your next<br><span class="teal-text">India settlement.</span></h2></div><p>Choose a direction, currency and use case. See the funding, destination and operating details to discuss with our team.</p></div>
-      <div class="corridor-planner glass" id="corridor-planner">
-        <div class="planner-config">
-          <p class="planner-overline">Scope your workflow</p>
-          <div class="direction-switch" id="plan-direction" role="group" aria-label="Settlement direction"><button type="button" data-direction="to-india" aria-pressed="true">World <span aria-hidden="true">→</span> India</button><button type="button" data-direction="from-india" aria-pressed="false">India <span aria-hidden="true">→</span> World</button></div>
-          <div class="planner-picker picker-currency" data-columns="3">
-            <span class="picker-label" id="plan-currency-label">Funding currency</span>
-            <input type="hidden" id="plan-currency" value="USDC">
-            <button class="picker-trigger" id="plan-currency-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-currency-options" aria-labelledby="plan-currency-label plan-currency-value"><span class="picker-value" id="plan-currency-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
-            <div class="picker-panel" id="plan-currency-options" role="dialog" hidden></div>
-          </div>
-          <div class="planner-picker picker-purpose" data-columns="2">
-            <span class="picker-label" id="plan-purpose-label">Business use</span>
-            <input type="hidden" id="plan-purpose" value="supplier-payments">
-            <button class="picker-trigger" id="plan-purpose-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-purpose-options" aria-labelledby="plan-purpose-label plan-purpose-value"><span class="picker-value" id="plan-purpose-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
-            <div class="picker-panel" id="plan-purpose-options" role="dialog" hidden></div>
-          </div>
-          <div class="planner-picker picker-volume" data-columns="2">
-            <span class="picker-label" id="plan-volume-label">Indicative monthly volume</span>
-            <input type="hidden" id="plan-volume" value="evaluating">
-            <button class="picker-trigger" id="plan-volume-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="plan-volume-options" aria-labelledby="plan-volume-label plan-volume-value"><span class="picker-value" id="plan-volume-value"></span><svg class="picker-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg></button>
-            <div class="picker-panel" id="plan-volume-options" role="dialog" hidden></div>
-          </div>
-          <p class="planner-help">Prepare your currencies, use case and volume for a focused conversation with our team.</p>
-        </div>
-        <div class="planner-result">
-          <div class="planner-result-heading"><div><p class="planner-overline">Your proposed flow</p><h3 id="plan-title">USDC → INR</h3></div><span class="planner-purpose" id="plan-purpose-result">Supplier &amp; service payments</span></div>
-          <div class="planner-journey" aria-label="Funding, orchestration and delivery"><div><span class="journey-coin" id="plan-source"><img src="/assets/currencies/usdc.svg" width="32" height="32" alt="USD Coin"></span><strong class="journey-code" id="plan-source-code">USDC</strong><p id="plan-source-label">Digital currency funding</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin journey-brand"><img src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></span><p>Route &amp; settlement controls</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin" id="plan-destination"><img src="/assets/currencies/inr-mark.svg" width="64" height="64" alt="Indian rupee"></span><strong class="journey-code" id="plan-destination-code">INR</strong><p id="plan-destination-label">Indian bank destination</p></div></div>
-          <ul class="plan-checks" id="plan-checks"></ul>
-          <div class="planner-actions"><button class="button primary" id="plan-contact" type="button">Discuss this route <svg class="icon"><use href="#i-arrow"/></svg></button><button class="text-button" id="plan-download" type="button">Download route brief <svg class="icon"><use href="#i-download"/></svg></button></div>
-          <p class="planner-note" id="plan-note">Route availability and execution terms are confirmed during onboarding.</p>
-          <p class="sr-only" role="status" id="plan-announcement"></p>
         </div>
       </div>
     </section>

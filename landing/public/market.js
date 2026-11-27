@@ -72,10 +72,19 @@ mountPicker($('.picker-volume'), [
   { value: '100k-1m', label: '$100k–$1m', note: 'Per month', art: icon('chart') },
   { value: 'over-1m', label: 'Over $1m', note: 'Per month', art: icon('chart') }
 ]);
+const directionControl = $('#plan-direction');
+const currencyInput = $('#plan-currency');
 let direction = 'to-india';
 let currentPlan;
+
+function setDirection(next) {
+  direction = next;
+  directionControl.querySelectorAll('[data-direction]').forEach(option => {
+    option.setAttribute('aria-pressed', String(option.dataset.direction === next));
+  });
+}
 function renderPlan() {
-  currentPlan = buildPlan({ direction, currency: $('#plan-currency').value, purpose: $('#plan-purpose').value, volume: $('#plan-volume').value });
+  currentPlan = buildPlan({ direction, currency: currencyInput.value, purpose: $('#plan-purpose').value, volume: $('#plan-volume').value });
   $('#plan-currency-label').textContent = direction === 'to-india' ? 'Funding currency' : 'Settlement currency';
   $('#plan-title').textContent = currentPlan.title;
   $('#plan-purpose-result').textContent = currentPlan.purposeLabel;
@@ -92,13 +101,46 @@ function renderPlan() {
   $('#plan-announcement').textContent = `${currentPlan.directionLabel}. ${currentPlan.title}. ${currentPlan.purposeLabel}.`;
 }
 planner.addEventListener('change', renderPlan);
-$('#plan-direction').addEventListener('click', event => {
+directionControl.addEventListener('click', event => {
   const button = event.target.closest('[data-direction]');
   if (!button) return;
-  direction = button.dataset.direction;
-  document.querySelectorAll('[data-direction]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+  setDirection(button.dataset.direction);
   renderPlan();
 });
+const routePreview = $('.route-preview');
+let preview = routePreview.querySelector('[data-preview-currency][aria-pressed="true"]');
+routePreview.addEventListener('click', event => {
+  const option = event.target.closest('[data-preview-currency]');
+  if (!option || option === preview) return;
+  preview.setAttribute('aria-pressed', 'false');
+  preview = option;
+  preview.setAttribute('aria-pressed', 'true');
+
+  const example = buildPlan({
+    direction: preview.dataset.previewDirection,
+    currency: preview.dataset.previewCurrency,
+    purpose: $('#plan-purpose').value,
+    volume: $('#plan-volume').value
+  });
+  for (const [stage, code] of [['funding', example.funding], ['delivery', example.delivery]]) {
+    $(`#preview-${stage}`).textContent = code;
+    $(`#preview-${stage}-icon`).src = `/assets/currencies/${currencyAssets[code][1]}`;
+  }
+  $('#preview-description').textContent = `${example.fundingLabel} · ${example.deliveryLabel}`;
+
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const trace = $('.preview-trace');
+    trace.getAnimations().forEach(animation => animation.cancel());
+    trace.animate([{ opacity: .55 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+  }
+});
+$('#preview-plan-link').addEventListener('click', event => {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  setDirection(preview.dataset.previewDirection);
+  currencyInput.value = preview.dataset.previewCurrency;
+  currencyInput.dispatchEvent(new Event('change', { bubbles: true }));
+});
+
 $('#plan-contact').addEventListener('click', () => {
   document.dispatchEvent(new CustomEvent('inrsettle:inquiry', { detail: { interest: 'settlements', volume: currentPlan.volume, context: planBrief(currentPlan), contextLabel: `${currentPlan.title} · ${currentPlan.purposeLabel} · ${currentPlan.volumeLabel}` } }));
 });
