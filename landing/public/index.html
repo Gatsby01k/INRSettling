@@ -39,9 +39,9 @@
   <link rel="stylesheet" href="/footer.css">
   <link rel="stylesheet" href="/hero.css?v=20261008-static-scene">
   <link rel="stylesheet" href="/typography.css?v=20261008-nav">
-  <link rel="stylesheet" href="/corridor-design.css?v=glass">
-  <script src="/app.js?v=glass-corridors" defer></script>
-  <script type="module" src="/market.js?v=glass-corridors"></script>
+  <link rel="stylesheet" href="/corridor-design.css?v=settlement-record">
+  <script src="/app.js?v=settlement-record" defer></script>
+  <script type="module" src="/market.js?v=settlement-record"></script>
   <script type="module" src="/hero-flow.js?v=20261008-static-scene"></script>
 </head>
 <body class="settlement-home">
@@ -138,7 +138,7 @@
         </div>
         <div class="planner-result">
           <div class="planner-result-heading"><div><h3 id="plan-title">USDC → INR</h3></div><span class="planner-purpose" id="plan-purpose-result">Supplier &amp; service payments</span></div>
-          <div class="planner-journey" aria-label="Funding, orchestration and delivery"><div><span class="journey-coin" id="plan-source"><img src="/assets/currencies/usdc.svg" width="32" height="32" alt="USD Coin"></span><strong class="journey-code" id="plan-source-code">USDC</strong><p id="plan-source-label">Digital currency funding</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin journey-brand"><img src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></span><p>Route &amp; settlement controls</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin" id="plan-destination"><img src="/assets/currencies/inr-mark.svg" width="64" height="64" alt="Indian rupee"></span><strong class="journey-code" id="plan-destination-code">INR</strong><p id="plan-destination-label">Indian bank destination</p></div></div>
+          <div class="planner-journey" aria-label="Funding, orchestration and delivery"><span class="journey-signal" aria-hidden="true"></span><div><span class="journey-coin" id="plan-source"><img src="/assets/currencies/usdc.svg" width="32" height="32" alt="USD Coin"></span><strong class="journey-code" id="plan-source-code">USDC</strong><p id="plan-source-label">Digital currency funding</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin journey-brand"><img src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></span><p>Route &amp; settlement controls</p></div><svg class="icon journey-arrow"><use href="#i-arrow"/></svg><div><span class="journey-coin" id="plan-destination"><img src="/assets/currencies/inr-mark.svg" width="64" height="64" alt="Indian rupee"></span><strong class="journey-code" id="plan-destination-code">INR</strong><p id="plan-destination-label">Indian bank destination</p></div></div>
           <div class="planner-requirements">
             <h4>What to confirm</h4>
             <ul class="plan-checks" id="plan-checks"></ul>
@@ -153,12 +153,12 @@
     <section class="product-section reveal" id="product" aria-labelledby="product-heading">
       <div class="content product-layout">
         <div class="section-copy">
-          <div><h2 id="product-heading">Settlement workspace</h2><p>Inspect sample payments and reconciliation records.</p></div>
+          <div><h2 id="product-heading">Trace a settlement.</h2><p>Select a sample payment to see its route and record.</p></div>
           <a class="button small secondary" href="/app">Open workspace</a>
         </div>
         <div class="dashboard-stage">
           <div class="dashboard" aria-label="Interactive product preview" data-nosnippet>
-            <aside class="dashboard-sidebar"><div class="dashboard-brand"><img class="dashboard-wordmark" src="/assets/brand-wordmark.svg" width="934" height="95" alt="INRSettle"><img class="dashboard-mark" src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></div><nav aria-label="Product preview views"><button class="app-nav active" data-view="overview" aria-pressed="true"><svg class="icon"><use href="#i-home"/></svg><span>Overview</span></button><button class="app-nav" data-view="settlements" aria-pressed="false"><svg class="icon"><use href="#i-route"/></svg><span>Settlements</span></button><button class="app-nav" data-view="liquidity" aria-pressed="false"><svg class="icon"><use href="#i-bank"/></svg><span>Liquidity</span></button><button class="app-nav" data-view="counterparties" aria-pressed="false"><svg class="icon"><use href="#i-users"/></svg><span>Counterparties</span></button><button class="app-nav" data-view="corridors" aria-pressed="false"><svg class="icon"><use href="#i-globe"/></svg><span>Corridors</span></button><button class="app-nav" data-view="reports" aria-pressed="false"><svg class="icon"><use href="#i-file"/></svg><span>Reports</span></button><button class="app-nav" data-open="developers"><svg class="icon"><use href="#i-code"/></svg><span>Developers</span></button></nav><span class="workspace-caption"><svg class="icon"><use href="#i-lock"/></svg>Product preview</span></aside>
+            <aside class="dashboard-sidebar"><div class="dashboard-brand"><img class="dashboard-wordmark" src="/assets/brand-wordmark.svg" width="934" height="95" alt="INRSettle"><img class="dashboard-mark" src="/assets/brand-symbol.svg" width="833" height="676" alt="INRSettle"></div><nav aria-label="Product preview views"><button class="app-nav" data-view="overview" aria-pressed="false"><svg class="icon"><use href="#i-home"/></svg><span>Overview</span></button><button class="app-nav active" data-view="settlements" aria-pressed="true"><svg class="icon"><use href="#i-route"/></svg><span>Settlements</span></button><button class="app-nav" data-view="liquidity" aria-pressed="false"><svg class="icon"><use href="#i-bank"/></svg><span>Liquidity</span></button><button class="app-nav" data-view="counterparties" aria-pressed="false"><svg class="icon"><use href="#i-users"/></svg><span>Counterparties</span></button><button class="app-nav" data-view="corridors" aria-pressed="false"><svg class="icon"><use href="#i-globe"/></svg><span>Corridors</span></button><button class="app-nav" data-view="reports" aria-pressed="false"><svg class="icon"><use href="#i-file"/></svg><span>Reports</span></button><button class="app-nav" data-open="developers"><svg class="icon"><use href="#i-code"/></svg><span>Developers</span></button></nav><span class="workspace-caption"><svg class="icon"><use href="#i-lock"/></svg>Product preview</span></aside>
             <div class="dashboard-main"><div class="app-toolbar"><span class="toolbar-mark">↖</span><label class="app-search"><svg class="icon"><use href="#i-search"/></svg><input id="app-search" type="search" aria-label="Search sample settlements" placeholder="Search settlements, counterparts…"></label><span class="app-avatar" aria-label="Preview workspace">IN</span></div><div id="app-view" aria-live="polite"></div></div>
           </div>
         </div>
@@ -190,12 +190,17 @@
     </section>
 
     <section class="operating-controls content reveal" aria-labelledby="controls-heading">
-      <div class="section-intro"><h2 id="controls-heading">Before settlement</h2></div>
-      <div class="control-grid">
-        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-users"/></svg></span><h3>Entity &amp; recipient</h3><p>Business identity, beneficiary details and counterparties aligned with the proposed payment flow.</p><span class="control-detail">KYB · Beneficiary · IFSC</span></article>
-        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-file"/></svg></span><h3>Purpose &amp; documents</h3><p>Link the instruction to its commercial purpose, invoice or supporting business evidence.</p><span class="control-detail">Purpose · Invoice · Reference</span></article>
-        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-route"/></svg></span><h3>Execution terms</h3><p>Confirm the funding method, route, FX, fees, limits and operating windows before execution.</p><span class="control-detail">Funding · Route · Terms</span></article>
-        <article class="control-card glass"><span class="round-icon"><svg class="icon"><use href="#i-check"/></svg></span><h3>Records that reconcile</h3><p>Connect the instruction, provider references and delivery evidence to the reconciliation record.</p><span class="control-detail">Status · Evidence · Match</span></article>
+      <div class="controls-editorial">
+        <img class="controls-art" src="/assets/settlement-evidence.jpg" width="980" height="1224" alt="" loading="lazy">
+        <div class="controls-copy">
+          <h2 id="controls-heading">From preflight<br>to reconciliation.</h2>
+          <dl class="controls-record">
+            <div><dt>Entity &amp; recipient</dt><dd>Verify the business and beneficiary details, including IFSC for the India leg where required.</dd></div>
+            <div><dt>Purpose &amp; documents</dt><dd>Link the payment to its purpose and supporting invoice or business records.</dd></div>
+            <div><dt>Execution terms</dt><dd>Confirm funding, route, FX, fees, limits and delivery windows.</dd></div>
+            <div><dt>Settlement evidence</dt><dd>Match the instruction and provider references to proof of delivery.</dd></div>
+          </dl>
+        </div>
       </div>
       <div class="integration-path glass"><div><h3>Partner integration</h3><div class="actions"><button class="button small secondary" type="button" data-inquiry-interest="integration">Discuss integration <svg class="icon"><use href="#i-arrow"/></svg></button><button class="text-button" type="button" data-inquiry-interest="partnership">Become a partner</button></div></div><ol><li><span>01</span><div><h4>Scope the flow</h4><p>Entities, directions, currencies, use case and expected volumes.</p></div></li><li><span>02</span><div><h4>Confirm the operating model</h4><p>Route availability, eligibility, responsibilities and commercial terms.</p></div></li><li><span>03</span><div><h4>Connect &amp; validate</h4><p>API workflow, status updates, reconciliation and acceptance criteria.</p></div></li></ol></div>
     </section>

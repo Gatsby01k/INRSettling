@@ -25,7 +25,8 @@
   ];
   const monthly = [22.4, 28.1, 32.6, 42.2, 35.8, 47.3, 40.0];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-  let activeView = 'overview';
+  let activeView = 'settlements';
+  let selectedSettlement = settlements[0].id;
   let activeChart = 'inr';
   let selectedMonth = 3;
   let tourStep = 0;
@@ -165,11 +166,55 @@
     const multiplier = activeChart === 'inr' ? 1 : .67;
     return `${appTitle('Global Settlement Overview')}<div class="dashboard-kpis">${kpi('Sample INR volume', '₹ 69.85L')}${kpi('Sample settlements', '5')}${kpi('Final records', '4')}${kpi('Sample corridors', '5')}</div><div class="app-overview-bottom"><div class="chart-panel"><div class="panel-heading"><h4>Settlement Volume</h4><div class="chart-switch" role="group" aria-label="Chart funding currency"><button class="${activeChart === 'inr' ? 'active' : ''}" data-chart="inr" aria-pressed="${activeChart === 'inr'}">INR</button><button class="${activeChart === 'stablecoins' ? 'active' : ''}" data-chart="stablecoins" aria-pressed="${activeChart === 'stablecoins'}">Stablecoins</button></div></div><div class="chart" aria-label="Illustrative monthly settlement volume in millions of US dollars"><div class="chart-scale" aria-hidden="true"><span>50</span><span>25</span><span>0</span></div>${monthly.map((value, i) => `<div class="bar-wrap" style="--bar-height:${(value * multiplier / 55 * 100).toFixed(1)}%"><button class="chart-bar ${i === selectedMonth ? 'selected' : ''}" data-month="${i}" style="--delay:${i * .04}s" aria-label="${months[i]}: $${(value * multiplier).toFixed(1)} million" aria-pressed="${i === selectedMonth}"></button><span class="bar-label">${months[i]}</span>${i === selectedMonth ? `<span class="bar-tooltip">$${(value * multiplier).toFixed(1)}M</span>` : ''}</div>`).join('')}</div></div><div class="corridor-panel"><div class="panel-heading"><h4>Corridors</h4></div>${corridors.map(c => `<div class="corridor-row"><span class="currency-flag flag-${c.flag}">${c.symbol}</span><span>${c.name}</span><span class="status">Example</span></div>`).join('')}</div></div>`;
   }
+  const receiptCurrencyArt = {
+    INR: 'inr-mark.svg',
+    USDC: 'usdc.svg',
+    USDT: 'usdt.svg'
+  };
+
+  function renderSettlementRecord(record) {
+    const [funding, delivery] = record.corridor.split(' → ');
+    const currencies = [funding, delivery].map(currency =>
+      `<span><img src="/assets/currencies/${receiptCurrencyArt[currency]}" width="24" height="24" alt="">${currency}</span>`
+    );
+    return `
+      <div class="record-topline">
+        <h4>${record.id}</h4>
+        <span class="record-status${record.status === 'In progress' ? ' pending' : ''}">${record.status}</span>
+      </div>
+      <div class="record-amount">
+        <span>Settlement amount</span>
+        <strong>${record.amount}</strong>
+      </div>
+      <div class="record-corridor" aria-label="Currency route">
+        ${currencies.join('<span class="record-track"><span class="sr-only">to</span></span>')}
+      </div>
+      <dl class="record-fields">
+        <div><dt>Recipient</dt><dd>${record.name}</dd></div>
+        <div><dt>Record date</dt><dd>${record.date}</dd></div>
+      </dl>`;
+  }
+
   function renderSettlements() {
     const query = $('#app-search').value.trim().toLowerCase();
     const rows = settlements.filter(row => `${row.id} ${row.name} ${row.amount} ${row.corridor} ${row.status}`.toLowerCase().includes(query));
-    return `${appTitle('Settlements')}<div class="dashboard-kpis">${kpi('Completed', '4')}${kpi('In progress', '1')}${kpi('INR delivered', '₹ 45.85L')}${kpi('Currencies', '2')}</div><div class="app-table-wrap"><table class="app-table"><thead><tr><th>Settlement</th><th>Recipient</th><th>INR amount</th><th>Status</th></tr></thead><tbody>${rows.map(row => `<tr><td>${row.id}</td><td>${row.name}</td><td class="amount">${row.amount}</td><td><span class="status-pill ${row.status === 'In progress' ? 'pending' : ''}">${row.status}</span></td></tr>`).join('')}</tbody></table>${!rows.length ? '<p class="app-empty">No matching sample settlements.</p>' : ''}</div>`;
+    const record = rows.find(row => row.id === selectedSettlement) ?? rows[0];
+    if (!record) return `${appTitle('Settlements')}<p class="app-empty">No matching sample settlements.</p>`;
+    selectedSettlement = record.id;
+    return `${appTitle('Settlements')}
+      <div class="settlement-workbench">
+        <ul class="settlement-register" aria-label="Sample payments">
+          ${rows.map(row => `<li>
+            <button type="button" class="settlement-select" data-settlement-record="${row.id}" aria-pressed="${row.id === record.id}">
+              <span><strong>${row.name}</strong><small>${row.id}</small></span>
+              <span><strong>${row.amount}</strong><small>${row.status}</small></span>
+            </button>
+          </li>`).join('')}
+        </ul>
+        <div class="settlement-record" id="sample-record" aria-live="polite">${renderSettlementRecord(record)}</div>
+      </div>`;
   }
+
   function renderLiquidity() {
     return `${appTitle('Liquidity Overview')}<div class="liquidity-grid"><div class="balance-card"><span class="round-icon orange-text">₹</span><span>INR · Available</span><strong>₹ 4.82 Cr</strong><div class="balance-line" style="--balance:78%"><i></i></div><small>78% available · 22% allocated</small></div><div class="balance-card"><span class="round-icon">₮</span><span>USDT · Available</span><strong>$ 842.5K</strong><div class="balance-line" style="--balance:86%"><i></i></div><small>86% available · 14% allocated</small></div><div class="balance-card"><span class="round-icon">$</span><span>USDC · Available</span><strong>$ 624.8K</strong><div class="balance-line" style="--balance:69%"><i></i></div><small>69% available · 31% allocated</small></div></div><p class="app-footnote">A consolidated view of sample currency balances and allocations.</p>`;
   }
@@ -398,6 +443,14 @@
       activeView = target.dataset.view;
       $('#app-search').value = '';
       return renderApp();
+    }
+    if (target.dataset.settlementRecord) {
+      const record = settlements.find(row => row.id === target.dataset.settlementRecord);
+      if (!record || record.id === selectedSettlement) return;
+      selectedSettlement = record.id;
+      $$('[data-settlement-record]').forEach(button => button.setAttribute('aria-pressed', String(button === target)));
+      $('#sample-record').innerHTML = renderSettlementRecord(record);
+      return;
     }
     if (target.dataset.chart) {
       activeChart = target.dataset.chart;

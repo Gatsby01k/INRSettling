@@ -74,6 +74,7 @@ mountPicker($('.picker-volume'), [
 let direction = 'to-india';
 let currentPlan;
 function renderPlan() {
+  const previousRoute = currentPlan?.title;
   currentPlan = buildPlan({ direction, currency: $('#plan-currency').value, purpose: $('#plan-purpose').value, volume: $('#plan-volume').value });
   $('#plan-currency-label').textContent = direction === 'to-india' ? 'Funding currency' : 'Settlement currency';
   $('#plan-title').textContent = currentPlan.title;
@@ -89,6 +90,14 @@ function renderPlan() {
   $('#plan-checks').innerHTML = currentPlan.checks.map(check => `<li>${icon('check')}<div><strong>${check.title}</strong><p>${check.text}</p></div></li>`).join('');
   $('#plan-note').textContent = currentPlan.note;
   $('#plan-announcement').textContent = `${currentPlan.directionLabel}. ${currentPlan.title}. ${currentPlan.purposeLabel}.`;
+  if (previousRoute && previousRoute !== currentPlan.title && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const signal = $('.journey-signal');
+    signal.getAnimations().forEach(animation => animation.cancel());
+    signal.animate(
+      [{ left: '16%', opacity: 0 }, { opacity: 1, offset: .18 }, { left: '84%', opacity: 0 }],
+      { duration: 385, easing: 'ease-in-out' }
+    );
+  }
 }
 planner.addEventListener('change', renderPlan);
 $('#plan-direction').addEventListener('click', event => {
