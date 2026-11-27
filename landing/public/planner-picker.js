@@ -38,7 +38,7 @@ export function mountPicker(root, options) {
     const button = event.target.closest('[data-picker-option]');
     if (!button) return;
     input.value = button.dataset.value;
-    close(true);
+    render(); close(true);
     input.dispatchEvent(new Event('change', { bubbles: true }));
   });
   panel.addEventListener('keydown', event => {
@@ -58,6 +58,5 @@ export function mountPicker(root, options) {
   });
   document.addEventListener('inrsettle:picker-open', event => { if (event.detail !== root) close(); });
   panel.setAttribute('aria-labelledby', label.id);
-  input.addEventListener('change', render);
   render();
 }

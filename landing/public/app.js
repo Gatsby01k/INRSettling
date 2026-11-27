@@ -83,13 +83,6 @@
     });
   });
 
-  const roleDescriptions = {
-    psps: 'Bring funding, settlement instructions and reconciliation into one connected cross-border payment workflow.',
-    merchants: 'Connect collections to settlement across currencies and markets, with a clear view of amounts, requirements and results.',
-    otc: 'Coordinate fiat and stablecoin liquidity, counterparties and settlement evidence across your trading operations.',
-    operators: 'Manage every settlement from preflight to reconciliation, with a clear view of what needs attention.',
-    banks: 'Connect institutional workflows with digital liquidity and consistent settlement controls.'
-  };
   function setRole(button, focus = false) {
     $$('.role-tab').forEach(tab => {
       const active = tab === button;
@@ -98,7 +91,6 @@
       tab.tabIndex = active ? 0 : -1;
     });
     $('#role-panel').setAttribute('aria-labelledby', button.id);
-    $('#role-description').textContent = roleDescriptions[button.dataset.role];
     document.dispatchEvent(new CustomEvent('inrsettle:role-change', { detail: { role: button.dataset.role } }));
     if (focus) button.focus();
   }
@@ -116,17 +108,6 @@
       setRole(tabs[next], true);
     }
   });
-
-  const flowDetails = {
-    inr: 'A single starting point for local INR liquidity.',
-    engine: 'Preflight, routing and reconciliation in one coordinated workflow.',
-    stable: 'Connect approved stablecoin funding to your settlement workflow.',
-    global: 'Track the destination, delivery and evidence behind every settlement.'
-  };
-  function setFlow(button) {
-    $$('.flow-node').forEach(node => node.setAttribute('aria-pressed', String(node === button)));
-    $('#flow-detail-text').textContent = flowDetails[button.dataset.flow];
-  }
 
   const details = {
     overview: {
@@ -170,11 +151,6 @@
   const codeExample = `POST /v1/settlements\nAuthorization: Bearer YOUR_API_KEY\nIdempotency-Key: unique-request-id\nContent-Type: application/json\n\n{\n  "beneficiary_id": "ben_7Ld2ZxKp0Wq4",\n  "recipient_amount": {\n    "currency": "INR",\n    "minor_units": "125000000"\n  },\n  "funding_currency": "USDT",\n  "purpose_code": "SOFTWARE_SERVICES",\n  "quote_id": "qt_9Xm4Bv7NsLt2",\n  "external_reference": "INVOICE-2026-0142"\n}`;
   function showDevelopers() {
     $('#detail-content').innerHTML = `<span class="round-icon detail-icon">${icon('code')}</span><p class="eyebrow">Built for your stack</p><h2 id="detail-title">One integration.<br><span class="teal-text">Connected operations.</span></h2><p class="detail-description">Express your settlement intent, check readiness and follow status changes through a consistent API workflow.</p><pre class="code-block"><code>${escapeHtml(codeExample)}</code></pre><p class="code-caption">Example INR settlement request. Credentials, valid quotes and endpoint availability are confirmed during technical onboarding.</p><div class="actions"><button class="button primary" data-copy-api>${icon('copy')}Copy Example</button><a class="button secondary" href="https://github.com/Gatsby01k/INRSettling/blob/main/reference/api/README.md" target="_blank" rel="noopener">API Reference</a><button class="text-button" data-detail-contact>Discuss Integration</button></div>`;
-    $('#detail-dialog').setAttribute('aria-labelledby', 'detail-title');
-    openDialog($('#detail-dialog'));
-  }
-  function showCorridors() {
-    $('#detail-content').innerHTML = `<p class="eyebrow">India and the global economy</p><h2 id="detail-title">A more connected<br><span class="teal-text">world.</span></h2><p class="detail-description">Explore sample corridor workflows across fiat and digital currencies. Discuss supported routes, funding, limits and delivery requirements for your business with our team.</p><div class="corridor-modal-list">${corridors.map(c => `<div class="corridor-option"><span class="round-icon"><span class="currency-flag flag-${c.flag}">${c.symbol}</span></span><div><strong>${c.name}</strong><p>${c.detail}</p></div><span>Preview route</span></div>`).join('')}</div><button class="button primary" data-detail-contact>Discuss Your Corridor ${icon('arrow')}</button>`;
     $('#detail-dialog').setAttribute('aria-labelledby', 'detail-title');
     openDialog($('#detail-dialog'));
   }
@@ -414,9 +390,7 @@
     if (target.dataset.open === 'contact') { event.preventDefault(); void checkInquiryDelivery(); return openDialog($('#contact-dialog')); }
     if (target.dataset.open === 'privacy') return showInquiryPrivacy();
     if (target.dataset.open === 'developers') return showDevelopers();
-    if (target.dataset.open === 'corridors') return showCorridors();
     if (target.dataset.role) return setRole(target);
-    if (target.dataset.flow) return setFlow(target);
     if (target.dataset.feature) return showFeature(target.dataset.feature);
     if (target.hasAttribute('data-copy-api')) return copyText(codeExample, 'Integration example copied.');
     if (target.dataset.view) {
@@ -466,7 +440,7 @@
   let scrollPending = false;
   let activeSection = null;
   const sectionAnchors = $$('.desktop-nav a[href^="#"], .site-footer-column a[href^="#"]');
-  const sectionElements = ['corridors', 'solutions', 'product', 'company'].map(id => document.getElementById(id));
+  const sectionElements = ['corridors', 'product', 'solutions', 'company'].map(id => document.getElementById(id));
   function updateScroll() {
     $('#topbar').classList.toggle('is-scrolled', window.scrollY > 100);
     let nextSection = null;
@@ -504,11 +478,6 @@
       glassFrame = 0;
     });
   }, { passive: true });
-  document.addEventListener('visibilitychange', () => {
-    const state = document.hidden ? 'paused' : 'running';
-    document.documentElement.classList.toggle('page-inactive', document.hidden);
-    $$('.flow-track span').forEach(element => element.style.animationPlayState = state);
-  });
   renderApp();
   updateScroll();
   // Public resource pages link directly to the inquiry dialog.
