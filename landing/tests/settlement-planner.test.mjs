@@ -26,6 +26,8 @@ test('every selectable brief contains its route, purpose, volume and contact wit
     const plan = buildPlan({ direction, currency, purpose, volume });
     const brief = planBrief(plan);
     for (const value of [plan.title, plan.directionLabel, plan.purposeLabel, plan.volumeLabel, plan.note, 'info@inrsettle.com']) assert.ok(brief.includes(value));
+    assert.ok(brief.includes(`Funding: ${plan.funding} · ${plan.fundingLabel}`));
+    assert.ok(brief.includes(`Delivery: ${plan.delivery} · ${plan.deliveryLabel}`));
     assert.ok(brief.length <= 2000, 'Brief must fit the inquiry context field');
     assert.match(brief, /eligibility and commercial terms are confirmed/);
   }

@@ -42,3 +42,17 @@ info@inrsettle.com. Online delivery needs configured server credentials; otherwi
 the dialog explicitly prepares a draft in the visitor's email app. The product
 preview stays labelled as illustrative, since no production payment integration
 was provided for this work.
+
+## Homepage interaction review, 28 November 2026
+
+- Give visitors one prominent first action. The header keeps a quiet contact
+  link, and the hero starts a corridor plan. Remove Company from the header
+  because it led to the contact section. [GOV.UK button guidance](https://design-system.service.gov.uk/components/button/)
+- Make the illustration lead to something visitors can try. The hero offers a
+  stablecoin-funded route into India and a fiat route out of India. The selected
+  example fills in the planner, which sits directly below the opening section.
+  [Wise Platform coverage guide](https://wise.com/platform/coverage/) · [BVNK payment flows](https://www.bvnk.com/)
+- Show the points an operations team needs to review. The planner labels
+  funding, routing and delivery, then lists the requirements and lets visitors
+  download or discuss the route brief. The examples describe proposed flows.
+  [Airwallex payouts and beneficiary requirements](https://www.airwallex.com/en-us/platform-api-and-embedded-finance/payouts)

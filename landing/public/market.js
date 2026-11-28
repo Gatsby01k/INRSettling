@@ -1,8 +1,6 @@
 import { buildPlan, planBrief } from './settlement-planner.js';
-import { mountPicker } from './planner-picker.js';
 
 const $ = selector => document.querySelector(selector);
-const icon = name => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 const scenarios = {
   psps: {
     label: 'For payment service providers', title: 'Embed India settlement into your payment product.',
@@ -54,51 +52,60 @@ $('#scenario-contact').addEventListener('click', () => {
 renderScenario(activeRole);
 
 const planner = $('#corridor-planner');
-const currencyAssets = {
-  INR: ['Indian rupee', 'inr-mark.svg'], USDC: ['USD Coin', 'usdc.svg'], USDT: ['Tether USD', 'usdt.svg'],
-  USD: ['US dollar', 'usd.svg'], EUR: ['Euro', 'eur-mark.svg'], AED: ['UAE dirham', 'aed.svg'], SGD: ['Singapore dollar', 'sgd.svg']
-};
-const currencyArt = code => `<img class="picker-currency-icon" src="/assets/currencies/${currencyAssets[code][1]}" width="32" height="32" alt="">`;
-mountPicker($('.picker-currency'), ['USDC', 'USDT', 'USD', 'EUR', 'AED', 'SGD'].map(value => ({ value, label: value, note: currencyAssets[value][0], art: currencyArt(value) })));
-mountPicker($('.picker-purpose'), [
-  { value: 'supplier-payments', label: 'Supplier payments', note: 'Goods & services', art: icon('file') },
-  { value: 'merchant-settlement', label: 'Merchant settlement', note: 'Customer receipts', art: icon('cart') },
-  { value: 'platform-payouts', label: 'Platform payouts', note: 'Marketplace payees', art: icon('users') },
-  { value: 'treasury-liquidity', label: 'Treasury & liquidity', note: 'Business funding', art: icon('bank') }
-]);
-mountPicker($('.picker-volume'), [
-  { value: 'evaluating', label: 'Still evaluating', note: 'Explore the fit', art: icon('search') },
-  { value: 'under-100k', label: 'Under $100k', note: 'Per month', art: icon('chart') },
-  { value: '100k-1m', label: '$100k–$1m', note: 'Per month', art: icon('chart') },
-  { value: 'over-1m', label: 'Over $1m', note: 'Per month', art: icon('chart') }
-]);
+const currency = $('#plan-currency');
+const directions = $('#plan-direction');
 let direction = 'to-india';
 let currentPlan;
+const routeSignal = $('.journey-signal');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let routeAnimation;
+
 function renderPlan() {
-  currentPlan = buildPlan({ direction, currency: $('#plan-currency').value, purpose: $('#plan-purpose').value, volume: $('#plan-volume').value });
-  $('#plan-currency-label').textContent = direction === 'to-india' ? 'Funding currency' : 'Settlement currency';
+  const previousRoute = currentPlan?.title;
+  currentPlan = buildPlan({ direction, currency: currency.value, purpose: $('#plan-purpose').value, volume: $('#plan-volume').value });
+  $('#plan-currency-label').textContent = direction === 'to-india' ? 'Funding currency' : 'Delivery currency';
   $('#plan-title').textContent = currentPlan.title;
   $('#plan-purpose-result').textContent = currentPlan.purposeLabel;
-  for (const [side, code] of [['source', currentPlan.funding], ['destination', currentPlan.delivery]]) {
-    $(`#plan-${side}`).innerHTML = currencyArt(code);
-    $(`#plan-${side}`).setAttribute('role', 'img');
-    $(`#plan-${side}`).setAttribute('aria-label', currencyAssets[code][0]);
-    $(`#plan-${side}-code`).textContent = code;
-  }
+  $('#plan-volume-result').textContent = currentPlan.volumeLabel;
+  $('#plan-source-code').textContent = currentPlan.funding;
+  $('#plan-destination-code').textContent = currentPlan.delivery;
   $('#plan-source-label').textContent = currentPlan.fundingLabel;
   $('#plan-destination-label').textContent = currentPlan.deliveryLabel;
-  $('#plan-checks').innerHTML = currentPlan.checks.map(check => `<li>${icon('check')}<div><strong>${check.title}</strong><p>${check.text}</p></div></li>`).join('');
+  $('#plan-checks').innerHTML = currentPlan.checks.map(check => `<li><strong>${check.title}</strong><p>${check.text}</p></li>`).join('');
   $('#plan-note').textContent = currentPlan.note;
-  $('#plan-announcement').textContent = `${currentPlan.directionLabel}. ${currentPlan.title}. ${currentPlan.purposeLabel}.`;
+  $('#plan-announcement').textContent = `${currentPlan.directionLabel}. ${currentPlan.title}. ${currentPlan.purposeLabel}. ${currentPlan.volumeLabel}.`;
+  if (previousRoute && previousRoute !== currentPlan.title && !reducedMotion.matches) {
+    routeAnimation?.cancel();
+    routeAnimation = routeSignal.animate(
+      [{ transform: 'translateX(-100%)', opacity: 0 }, { opacity: 1, offset: .2 },
+        { opacity: 1, offset: .75 }, { transform: 'translateX(330%)', opacity: 0 }],
+      { duration: 720, easing: 'cubic-bezier(.2,.65,.25,1)' }
+    );
+  }
 }
 planner.addEventListener('change', renderPlan);
-$('#plan-direction').addEventListener('click', event => {
+function setDirection(next) {
+  direction = next;
+  directions.querySelectorAll('[data-direction]').forEach(button =>
+    button.setAttribute('aria-pressed', String(button.dataset.direction === direction)));
+}
+
+directions.addEventListener('click', event => {
   const button = event.target.closest('[data-direction]');
   if (!button) return;
-  direction = button.dataset.direction;
-  document.querySelectorAll('[data-direction]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+  setDirection(button.dataset.direction);
   renderPlan();
 });
+
+const routeExamples = $('#hero-route-examples');
+$('#hero-plan').addEventListener('click', event => {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const selected = routeExamples.querySelector('input:checked');
+  setDirection(selected.dataset.direction);
+  currency.value = selected.value;
+  currency.dispatchEvent(new Event('change', { bubbles: true }));
+});
+routeExamples.hidden = false;
 $('#plan-contact').addEventListener('click', () => {
   document.dispatchEvent(new CustomEvent('inrsettle:inquiry', { detail: { interest: 'settlements', volume: currentPlan.volume, context: planBrief(currentPlan), contextLabel: `${currentPlan.title} · ${currentPlan.purposeLabel} · ${currentPlan.volumeLabel}` } }));
 });

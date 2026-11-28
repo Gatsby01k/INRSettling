@@ -84,6 +84,12 @@ function footer(current) {
 
 function document(page) {
   const breadcrumb = `<a href="/">Home</a>${page.parent ? `<span aria-hidden="true">/</span><a href="${page.parent}">Documentation</a>` : ''}<span aria-hidden="true">/</span><span aria-current="page">${page.label}</span>`;
+  const contents = [...page.body.matchAll(/<section id="([a-z-]+)"><h2>([^<]+)<\/h2>/g)];
+  const library = pages.map(item =>
+    `<a href="${item.path}"${item.path === page.path ? ' aria-current="page"' : ''}>${escape(item.label)}</a>`).join('');
+  const privacy = page.path === '/privacy';
+  const resourceCTA = privacy ? '<a class="resource-link" href="mailto:info@inrsettle.com">Email our team about your inquiry</a>'
+    : '<aside class="resource-cta"><div><h2>Discuss your settlement workflow.</h2><p>Bring your currencies, business use and operating requirements.</p></div><a class="resource-button" href="/#contact-dialog">Talk to our team</a></aside>';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -94,17 +100,35 @@ ${metadata(page)}
   <link rel="icon" type="image/svg+xml" href="/assets/brand-favicon.svg">
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" sizes="16x16 32x32 48x48">
   <link rel="apple-touch-icon" href="/assets/icon-180.png">
+  <link rel="stylesheet" href="/brand.css">
+  <link rel="stylesheet" href="/typography.css?v=20261008-nav">
   <link rel="stylesheet" href="/resources.css">
   <link rel="stylesheet" href="/footer.css">
 </head>
-<body>
+<body class="resource-page">
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="resource-header"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Main navigation">${navigation(page.path)}</nav><a class="resource-button" href="/#contact-dialog">Talk to our team <span aria-hidden="true">→</span></a></header>
+  <header class="resource-header"><a href="/" aria-label="INRSettle home"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Main navigation">${navigation(page.path)}</nav><a class="resource-button" href="/#contact-dialog">Contact</a></header>
   <main id="main" class="resource-main">
     <nav class="breadcrumbs" aria-label="Breadcrumb">${breadcrumb}</nav>
-    <div class="resource-intro"><p class="resource-eyebrow">${page.eyebrow}</p><h1>${page.heading}</h1><p>${page.intro}</p></div>
-    ${page.body}
-    <aside class="resource-cta"><p class="resource-eyebrow">From scope to integration</p><h2>Let’s define your India<br>settlement workflow.</h2><p>Bring your currencies, business use and operating requirements to a focused conversation with our team.</p><a class="resource-button" href="/#contact-dialog">Discuss your workflow <span aria-hidden="true">→</span></a></aside>
+    <div class="resource-intro">
+      <div><p class="resource-eyebrow">${page.eyebrow}</p><h1>${page.heading}</h1><p>${page.intro}</p></div>
+    </div>
+    <div class="resource-layout">
+      <aside class="resource-rail">
+        <nav class="resource-contents" aria-labelledby="contents-label">
+          <strong id="contents-label">On this page</strong>
+          ${contents.map(([, id, heading]) => `<a href="#${id}">${heading}</a>`).join('')}
+        </nav>
+        <details class="resource-library">
+          <summary>Resource library</summary>
+          <nav aria-label="Resource library">${library}</nav>
+        </details>
+      </aside>
+      <article class="resource-article">
+        ${page.body}
+        ${resourceCTA}
+      </article>
+    </div>
   </main>
   ${footer(page.path)}
 </body>

@@ -450,23 +450,10 @@
 
   // Ribbon visibility and reduced motion are handled by hero-flow.js.
 
-  // Reveal transitions have a reduced-motion path.
-  if ('IntersectionObserver' in window && !prefersReducedMotion.matches) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: .08, rootMargin: '0px 0px 25px 0px' });
-    $$('.reveal').forEach(element => observer.observe(element));
-    document.documentElement.classList.add('js-motion');
-  }
   let scrollPending = false;
   let activeSection = null;
   const sectionAnchors = $$('.desktop-nav a[href^="#"], .site-footer-column a[href^="#"]');
-  const sectionElements = ['solutions', 'corridors', 'product', 'company'].map(id => document.getElementById(id));
+  const sectionElements = $$('main :is(#solutions, #corridors, #product, #company)');
   function updateScroll() {
     $('#topbar').classList.toggle('is-scrolled', window.scrollY > 100);
     let nextSection = null;
@@ -485,6 +472,7 @@
   window.addEventListener('scroll', () => {
     if (!scrollPending) { scrollPending = true; requestAnimationFrame(updateScroll); }
   }, { passive: true });
+  updateScroll();
   let glassFrame = 0;
   let glassTarget = null;
   let glassPointerX = 0;

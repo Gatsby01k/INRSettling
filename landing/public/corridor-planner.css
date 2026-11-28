@@ -1,0 +1,244 @@
+#corridor-planning {
+  padding-block: clamp(24px, 4.4vw, 70px) var(--brand-space);
+}
+
+#corridor-planning:focus { outline: none; }
+#corridor-planning .section-intro { align-items: end; margin-bottom: clamp(18px, 2.4vw, 32px); }
+#planner-heading {
+  margin: 0;
+  font-size: clamp(2.25rem, 4.35vw, 4.75rem);
+  font-weight: 620;
+  letter-spacing: -.065em;
+}
+#planner-heading span { color: var(--brand-teal); }
+
+.public-home .corridor-planner {
+  --planner-edge: clamp(18px, 2.7vw, 38px);
+  display: grid;
+  grid-template-columns: minmax(250px, .91fr) minmax(0, 2.4fr);
+  align-items: stretch;
+  border: 1px solid #c5d8df;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fcfeff;
+  box-shadow: 0 22px 54px -40px #214f6d75;
+}
+
+.public-home .planner-config {
+  min-width: 0;
+  gap: clamp(14px, 1.6vw, 22px);
+  padding: var(--planner-edge);
+  border: 0;
+  border-radius: 0;
+  background: #fbfdfe;
+}
+.planner-inputs { display: grid; gap: 16px; }
+.planner-direction-field .planner-label,
+.public-home .planner-config .planner-field label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--brand-muted);
+  font-size: .875rem;
+  font-weight: 600;
+}
+
+.public-home .planner-config .direction-switch {
+  max-width: none;
+  padding: 0;
+  gap: 11px;
+  border: 0;
+  border-bottom: 1px solid #cad9e0;
+  border-radius: 0;
+  background: none;
+}
+.public-home .planner-config .direction-switch button {
+  min-height: 43px;
+  padding: 6px 3px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: #536976;
+  box-shadow: none;
+  font-size: .875rem;
+}
+.public-home .planner-config .direction-switch button:is(:hover, [aria-pressed="true"]) { color: var(--brand-teal); }
+.public-home .planner-config .direction-switch button[aria-pressed="true"] { border-bottom-color: var(--brand-teal); font-weight: 700; }
+
+.planner-select { position: relative; min-inline-size: 0; }
+.planner-select::after {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 5px) 12px auto auto;
+  width: 7px;
+  height: 7px;
+  border: solid #4f6975;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.public-home .planner-config select {
+  appearance: none;
+  width: 100%;
+  min-height: 43px;
+  border: 1px solid #cbdce2;
+  border-radius: 7px;
+  padding: 7px 28px 7px 10px;
+  background: #fff;
+  color: var(--brand-ink);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.public-home .planner-config select:hover { border-color: #7ca6a8; }
+
+.planner-route-board {
+  display: grid;
+  align-content: space-between;
+  gap: clamp(17px, 2.65vw, 38px);
+  position: relative;
+  min-width: 0;
+  isolation: isolate;
+  padding: var(--planner-edge);
+  border-inline-start: 1px solid #d6e5ea;
+  background: #edf6fb;
+}
+.planner-route-board::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, #f6fbff99 0%, #f6fbff22 56%, #edf6fbe8 91%),
+    url('/assets/corridor-rail-light.jpg') 50% 57% / cover no-repeat;
+  pointer-events: none;
+}
+.public-home .planner-overline { color: #375d64; font-size: .75rem; letter-spacing: .115em; font-weight: 700; }
+
+.public-home .planner-journey {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(64px, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(5px, 1.65vw, 24px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+}
+.journey-stop { min-width: 0; align-self: start; }
+.journey-delivery { text-align: end; }
+.journey-phase { display: block; color: #3f5d6b; font-size: .875rem; font-weight: 650; }
+.public-home .journey-code {
+  display: block;
+  margin: 2px 0 6px;
+  color: var(--brand-ink);
+  font: 620 clamp(2.5rem, 6vw, 5.65rem)/.99 var(--font-display);
+  letter-spacing: -.065em;
+}
+.public-home .journey-delivery .journey-code { color: #105d59; }
+.public-home .planner-journey p {
+  max-width: none;
+  margin: 0;
+  color: #344f5f;
+  font-size: .875rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.journey-routing { min-width: 0; text-align: center; }
+.journey-rail {
+  display: block;
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  margin: 8px 0;
+  background: var(--brand-route);
+  box-shadow: 0 1px 0 #fff;
+}
+.journey-signal {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 28%;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, #fff 58%, transparent);
+}
+.journey-routing-detail { display: block; color: #455f6c; font-size: .8125rem; line-height: 1.25; }
+
+.planner-route-context {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px clamp(9px, 3.15vw, 46px);
+  margin: 0;
+  padding-top: 11px;
+  border-top: 1px solid #86a5b273;
+}
+.planner-route-context dt { color: #3e5968; font-size: .8125rem; }
+.planner-route-context dd { margin: 2px 0 0; color: var(--brand-ink); font-size: .875rem; font-weight: 650; line-height: 1.35; }
+
+.planner-brief {
+  grid-column: 1 / -1;
+  padding: clamp(15px, 2vw, 28px) var(--planner-edge);
+  border-top: 1px solid #cbdce2;
+}
+.plan-checks-heading { margin: 0 0 12px; font-size: clamp(1rem, 1.65vw, 1.25rem); font-weight: 650; }
+.public-home .plan-checks {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: clamp(12px, 2vw, 30px);
+  row-gap: 0;
+  border-block: 1px solid #dce7eb;
+}
+.public-home .plan-checks li { display: block; padding: 12px 0; }
+.public-home .plan-checks strong { margin-bottom: 3px; font-size: .875rem; line-height: 1.35; color: var(--brand-ink); }
+.public-home .plan-checks p { color: var(--brand-muted); font-size: .875rem; line-height: 1.45; }
+.planner-brief-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 11px;
+}
+.public-home .planner-note { flex: 1 1 270px; max-width: 58ch; margin: 0; color: var(--brand-muted); font-size: .8125rem; }
+.public-home .planner-actions { gap: 3px 15px; margin: 0; }
+.public-home .planner-actions .button { min-height: 44px; padding-inline: 16px; font-size: .875rem; }
+.public-home .planner-actions .text-button { font-size: .875rem; text-decoration: underline; text-underline-offset: 4px; }
+
+@media (max-width: 900px) {
+  .public-home .corridor-planner { grid-template-columns: minmax(0, 1fr); }
+  .planner-inputs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .planner-route-board { border-inline-start: 0; border-top: 1px solid #d6e5ea; }
+  .public-home .plan-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .public-home .plan-checks li:nth-child(n + 3) { border-top: 1px solid #dce7eb; }
+}
+
+@media (max-width: 650px) {
+  #corridor-planning .section-intro { display: block; }
+  #corridor-planning .section-intro > p { margin-top: 10px; }
+  .public-home .planner-config { gap: 11px; }
+  .planner-inputs { grid-template-columns: 1fr; gap: 7px; }
+  .planner-field {
+    display: grid;
+    grid-template-columns: minmax(70px, .73fr) minmax(0, 1.45fr);
+    gap: 7px;
+    align-items: center;
+  }
+  .public-home .planner-config .planner-field label { margin: 0; line-height: 1.24; }
+  .public-home .journey-code { font-size: clamp(1.85rem, 8.4vw, 3.5rem); }
+  .planner-route-board::before { background-size: 100% 100%, 155% auto; background-position: center, center 65%; }
+  .planner-brief-footer { gap: 12px; }
+}
+
+@media (max-width: 400px) {
+  .public-home .corridor-planner { --planner-edge: 13px; }
+  .journey-phase,
+  .public-home .planner-journey p,
+  .journey-routing-detail { font-size: .75rem; }
+  .public-home .planner-journey { grid-template-columns: minmax(0, 1fr) minmax(54px, .77fr) minmax(0, 1fr); }
+  .public-home .plan-checks { grid-template-columns: 1fr; }
+  .public-home .plan-checks li + li { border-top: 1px solid #dce7eb; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-signal { display: none; }
+}
+@media (forced-colors: active) {
+  .journey-rail { background: CanvasText; }
+  .public-home .planner-config .direction-switch button[aria-pressed="true"] { border-color: Highlight; }
+}

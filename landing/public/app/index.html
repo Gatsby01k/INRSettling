@@ -11,10 +11,12 @@
   <link rel="preload" href="/assets/fonts/sora-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/instrument-sans-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/typography.css?v=20261003">
+  <link rel="stylesheet" href="/brand.css">
   <link rel="stylesheet" href="/app/workspace.css">
   <link rel="stylesheet" href="/app/components.css">
   <link rel="stylesheet" href="/app/experience.css">
   <link rel="stylesheet" href="/app/receipt.css">
+  <link rel="stylesheet" href="/app/workspace-polish.css">
   <script type="module" src="/app/workspace.js"></script>
 </head>
 <body class="workspace-page">
@@ -24,12 +26,12 @@
       <a class="sidebar-brand" href="/" aria-label="INRSettle website"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a>
       <button class="icon-button sidebar-close" data-action="menu-close" aria-label="Close navigation"></button>
       <nav id="main-nav" aria-label="Main navigation"></nav>
-      <div class="sidebar-art" aria-hidden="true"><img class="sidebar-map" src="/assets/flow.webp" alt="" width="2151" height="731"><img class="sidebar-city" src="/assets/city.webp" alt="" width="2001" height="786"><p>India<br>to the world.<br>Faster. Safer.<br>Together.</p></div>
+      <div class="sidebar-art" aria-hidden="true"><img class="sidebar-map" src="/assets/flow.webp" alt="" width="2151" height="731"><img class="sidebar-city" src="/assets/city.webp" alt="" width="2001" height="786"></div>
       <button class="help-card" data-action="support"><span data-icon="headphones"></span><span>Need help?<small>Talk to our team</small></span><span data-icon="chevron-right"></span></button>
     </aside>
     <button class="sidebar-scrim" data-action="menu-close" aria-label="Close navigation" hidden></button>
     <div class="main-column">
-      <div class="header-art" aria-hidden="true"><img class="header-map" src="/assets/flow.webp" width="2151" height="731" alt=""><img class="header-city" src="/assets/city.webp" width="2001" height="786" alt=""><p>Settlements<br>that land<br>where you said</p></div>
+      <div class="header-art" aria-hidden="true"><img class="header-map" src="/assets/flow.webp" width="2151" height="731" alt=""><img class="header-city" src="/assets/city.webp" width="2001" height="786" alt=""></div>
       <header class="topbar">
         <button class="icon-button mobile-menu" data-action="menu" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><span data-icon="menu"></span></button>
         <button class="global-search" data-action="search" aria-label="Search settlements, beneficiaries and batches"><span data-icon="search"></span><span>Search settlements, beneficiaries, batches…</span><kbd>⌘ K</kbd></button>
@@ -38,7 +40,7 @@
       <main id="workspace" tabindex="-1"><div class="initial-load">Opening your workspace…</div></main>
     </div>
   </div>
-  <footer class="app-footer"><a href="/" aria-label="INRSettle website"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Footer"><a href="/">Product</a><button data-action="support">Support</button><button data-action="system-status">Status</button><span class="demo-caption">Demo workspace</span></nav><p>People. Payments. Progress.</p></footer>
+  <footer class="app-footer"><a href="/" aria-label="INRSettle website"><img src="/assets/brand-lockup.svg" width="934" height="152" alt="INRSettle"></a><nav aria-label="Footer"><a href="/">Product</a><button data-action="support">Support</button><button data-action="system-status">Status</button><span class="demo-caption">Demo workspace</span></nav></footer>
   <dialog class="dialog" id="app-dialog" aria-labelledby="dialog-title"><button class="icon-button dialog-close" data-action="dialog-close" aria-label="Close dialog"><span data-icon="x"></span></button><div id="dialog-content"></div></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <noscript><p class="noscript">Please enable JavaScript to use the INRSettle workspace.</p></noscript>

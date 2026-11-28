@@ -76,3 +76,40 @@
 @media (max-width: 374px) { .access-header, .access-footer, .access-main { width: calc(100% - 36px); } .access-brand img { width: 139px; } .access-back { font-size: 11px; gap: 5px; } .access-main { padding-top: 28px; } .access-panel h1 { font-size: 31px; } .access-help a { margin-left: 0; } .access-footer nav { gap: 16px; } }
 @media (prefers-reduced-motion: reduce) { .access-page *, .access-page *::before, .access-page *::after { animation: none !important; transition: none !important; } }
 @media (prefers-contrast: more) { .access-page { --access-muted: #354f60; } .access-input-shell { border-color: #617f87; background: white; } .access-field-hint, .access-preview-note, .access-footer { color: #3c5b6b; } }
+
+/* A compact entry panel with the same original glass globe as the homepage. */
+.access-page {
+  --access-ink: var(--brand-ink);
+  --access-muted: var(--brand-muted);
+  --access-accent: var(--brand-teal);
+  background: radial-gradient(ellipse at 85% 5%, #e5f2f4, transparent 62%), var(--brand-paper);
+}
+.access-panel {
+  max-width: 475px;
+  padding: clamp(20px, 3.5vw, 42px);
+  border: 1px solid var(--brand-line);
+  border-radius: var(--brand-radius);
+  background: var(--brand-glass);
+  box-shadow: var(--brand-shadow);
+}
+.access-overline,
+.access-overline svg { color: var(--brand-teal); }
+.access-panel h1 { font-size: clamp(2rem, 3.27vw, 2.8rem); font-weight: 620; }
+.access-input-shell { border-color: #a9c6cb; background: #fff; }
+.access-field-hint,
+.access-preview-note { color: var(--brand-muted); font-size: .8125rem; }
+.access-submit:not(:disabled) { background: var(--brand-primary); border-color: #34786d; }
+.access-submit:hover:not(:disabled) { background: #175d58; }
+.access-scene { min-height: 440px; }
+.access-art-frame { inset: 0 -55px 38px -42px; }
+.access-art-frame::after {
+  background: linear-gradient(90deg, #eff6fa 0%, transparent 18%, transparent 80%, #eaf3f6 100%);
+}
+.access-scene-copy { padding-bottom: 0; }
+@media (max-width: 820px) {
+  .access-main { padding-block: 28px; }
+  .access-panel { max-width: none; }
+}
+@media (max-width: 374px) {
+  .access-panel { padding-inline: 16px; }
+}

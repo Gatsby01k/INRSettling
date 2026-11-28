@@ -193,3 +193,47 @@ dd {
   * {
   scroll-behavior:auto}
 }
+
+/* Match the public glass treatment without making the sandbox rely on another host. */
+:root {
+  color: #10233a;
+  background: #f2f7fb;
+  font-size: 16px;
+}
+body { background: radial-gradient(ellipse at 90% 0, #e0f1f0, transparent 36rem); }
+header { background: #ffffffd9; border-color: #c9dce4; }
+header a:not(.brand) { font-size: .875rem; text-underline-offset: 4px; }
+.intro {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(20px, 4.4vw, 48px);
+  border: 1px solid #c9dce4;
+  border-radius: 20px;
+  background: linear-gradient(132deg, #fff, #ebf6f7);
+}
+.intro::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #cf8c43, #b4aa71 48%, #3e9b90);
+}
+.eyebrow { color: #1d6e68; font-size: .8125rem; }
+.intro p:last-child { max-width: 52ch; color: #475e70; }
+section { border-color: #c9dce4; box-shadow: 0 16px 44px -33px #315f7780; }
+label { font-size: .875rem; }
+button { min-height: 42px; background: #246b64; border-color: #246b64; }
+button:hover { background: #175d58; }
+.secondary { background: #fff; color: #154c49; border-color: #adcac9; }
+.secondary:hover { background: #eaf6f4; }
+.table-scroll { border: 1px solid #c9dce4; border-radius: 12px; }
+th { background: #eaf4f6; font-size: .75rem; }
+td { border-color: #d9e6ec; }
+td button { min-height: 38px; }
+pre { border: 1px solid #c9dce4; border-radius: 9px; background: #eaf3f6; }
+@media (max-width: 540px) {
+  .section-header { flex-wrap: wrap; }
+  .section-header h2 { width: 100%; }
+  #connect-form { flex-wrap: wrap; }
+  #connect-form label { flex: 1 0 100%; }
+}

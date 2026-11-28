@@ -60,3 +60,28 @@
   .site-footer-socials { margin-top: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { .site-footer a { transition: none; } }
+
+/* The public pages share one footer treatment and accessible link colors. */
+.site-footer {
+  --footer-ink: var(--brand-ink);
+  --footer-muted: var(--brand-muted);
+  --footer-accent: var(--brand-teal);
+  position: relative;
+  width: var(--brand-width);
+  max-width: 1320px;
+  border: 1px solid var(--brand-line);
+  background: var(--brand-glass);
+  box-shadow: var(--brand-shadow);
+}
+.resource-main + .site-footer { max-width: 1320px; }
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 24px auto;
+  height: 2px;
+  background: var(--brand-route);
+}
+.site-footer h2 { font-size: .75rem; }
+.site-footer-column > a, .site-footer-email { font-size: .875rem; }
+.site-footer-brand p, .site-footer-bottom p, .site-footer-bottom > a { font-size: .8125rem; }
+.site-footer-socials a { background: #fcfefd; border-color: #b8d5d2; }

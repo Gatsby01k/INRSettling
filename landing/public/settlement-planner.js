@@ -46,6 +46,8 @@ export function planBrief(plan) {
     'INRSETTLE — CORRIDOR DISCOVERY BRIEF',
     'Cross-border settlement infrastructure for India', '',
     `Direction: ${plan.directionLabel}`, `Proposed currencies: ${plan.title}`,
+    `Funding: ${plan.funding} · ${plan.fundingLabel}`,
+    `Delivery: ${plan.delivery} · ${plan.deliveryLabel}`,
     `Business use: ${plan.purposeLabel}`, `Indicative volume: ${plan.volumeLabel}`, '',
     'POINTS TO REVIEW', ...plan.checks.map((check, i) => `${i + 1}. ${check.title}: ${check.text}`), '',
     plan.note, '', 'Contact: info@inrsettle.com'

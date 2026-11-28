@@ -31,7 +31,7 @@ landing/
     styles.css          tokens in :root, layout, motion
     app.js              navigation, role tabs, settlement walkthrough, dialogs
     market.js           business scenarios, corridor discovery and inquiry handoff
-    planner-picker.js   keyboard-operable selection grids with currency artwork
+    corridor-planner.css  route preview and responsive planner controls
     settlement-planner.js  validated discovery selections and downloadable briefs
     hero.css            connected settlement rail and responsive hero composition
     hero-flow.js        saturated energy pulses, lens highlights and pointer depth

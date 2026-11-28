@@ -1,0 +1,93 @@
+.workspace-page {
+  --ink: var(--brand-ink);
+  --muted: var(--brand-muted);
+  --teal: #08796e;
+  --deep-teal: var(--brand-teal);
+  --line: var(--brand-line);
+  --glass: var(--brand-glass);
+  min-width: 0;
+  background: radial-gradient(ellipse at 92% 2%, #e4f3f2, transparent 48%), #f2f7fb;
+}
+
+.workspace-page .sidebar {
+  border-color: #c9dbe4;
+  background: linear-gradient(160deg, #fbfdff, #e8f4f5);
+}
+.workspace-page .sidebar-brand { max-width: 100%; }
+.workspace-page .sidebar-art { opacity: .6; }
+.workspace-page .nav-link {
+  min-height: 44px;
+  color: #3d5768;
+  font-weight: 550;
+}
+.workspace-page .nav-link.active {
+  color: #154c49;
+  border-color: #b8d5d1;
+  background: linear-gradient(100deg, #e4f3ef, #e7f5f5);
+  box-shadow: inset 3px 0 #4c978b;
+}
+.workspace-page .nav-link.active .icon { color: #1c6d64; }
+.workspace-page .nav-link:hover { background: #fff; }
+.workspace-page .help-card { background: #ffffffd9; border-color: var(--brand-line); }
+.workspace-page .topbar { z-index: 5; }
+.workspace-page .global-search,
+.workspace-page .account-button,
+.workspace-page .notification-button { border-color: #cfdee5; background: #fcfefe; }
+.workspace-page .global-search,
+.workspace-page .global-search kbd { color: #4e6475; }
+
+.workspace-page .header-art { opacity: .46; }
+.workspace-page .page-heading { border-bottom: 1px solid var(--brand-line); margin-bottom: 18px; }
+.workspace-page .page-heading h1 { letter-spacing: -.043em; }
+.workspace-page .page-heading .subtitle,
+.workspace-page .metric-label,
+.workspace-page .metric-context small,
+.workspace-page .data-table .row-secondary { color: var(--brand-muted); }
+.workspace-page .panel,
+.workspace-page .metric { border-color: var(--brand-line); background: var(--brand-glass); box-shadow: var(--brand-shadow); }
+.workspace-page .metric-icon { color: #237b71; border-color: #d1e4e4; background: #f0f8f5; }
+.workspace-page .metric-change { color: #176e64; }
+.workspace-page .metric-change.negative { color: #a44458; }
+.workspace-page .panel-head h2 { font-size: .9375rem; }
+.workspace-page :is(.btn.primary, .quick-action.primary) {
+  color: #fff;
+  background: var(--brand-primary);
+  border-color: #398176;
+  box-shadow: inset 0 1px #cff9ed80, 0 8px 17px -14px #1e655cac;
+}
+.workspace-page :is(.btn.primary, .quick-action.primary):hover { background: #185e57; }
+.workspace-page .quick-action.primary small { color: #e1fbf3; }
+.workspace-page .data-table th { color: #435c6e; background: #eaf3f6; font-size: .8125rem; font-weight: 650; }
+.workspace-page .data-table td { border-color: #dae6eb; }
+.workspace-page .data-table :is(td, .row-link) { font-size: .8125rem; }
+.workspace-page .data-table tbody tr:hover { background: #eaf6f4; }
+.workspace-page .status { font-weight: 650; }
+.workspace-page .status:is(.settled, .ready, .verified) { color: #166950; }
+.workspace-page .status:is(.action-required, .needs-review) { color: #805118; }
+.workspace-page .status.example { color: #375569; border-color: #c5dce8; background: #e8f3f9; }
+
+.workspace-page .dialog,
+.workspace-page .settlement-drawer {
+  border-color: var(--brand-line);
+  background: #f8fcfe;
+}
+.workspace-page .dialog::backdrop { background: #162b458a; }
+.workspace-page :is(.transfer-composer, .transfer-summary, .sd-transfer) {
+  background: linear-gradient(115deg, #fff8ec, #f8fbfd 50%, #e8f6f4);
+}
+.workspace-page :is(.field input, .field textarea, .choice-trigger) { border-color: #b9d1db; }
+.workspace-page .app-footer { border-color: var(--brand-line); background: #eef6f7; }
+
+@media (max-width: 560px) {
+  .workspace-page .sidebar { overflow-y: auto; }
+  .workspace-page .page-heading { margin-bottom: 14px; padding-bottom: 14px; }
+  .workspace-page .metric-label { font-size: .8125rem; }
+}
+@media (max-width: 370px) {
+  .workspace-page .main-column { padding-inline: 10px; }
+  .workspace-page .topbar,
+  .workspace-page .topbar-account { gap: 5px; }
+  .workspace-page .preview-access-badge { padding-inline: 6px; }
+  .workspace-page .metric { gap: 6px; padding-inline: 9px; }
+  .workspace-page .metric-value { font-size: 1.2rem; }
+}

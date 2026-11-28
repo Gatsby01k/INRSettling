@@ -1,0 +1,27 @@
+/* Shared palette and materials for INRSettle's glass-and-light visual system. */
+:root {
+  --brand-ink: #10233a;
+  --brand-muted: #475e70;
+  --brand-teal: #1d6e68;
+  --brand-amber: #a65e1c;
+  --brand-paper: #f5f9fc;
+  --brand-mist: #eaf5f5;
+  --brand-line: #c9dce4;
+  --brand-glass: linear-gradient(145deg, #fff, #f3f9fc 68%, #eaf6f6);
+  --brand-route: linear-gradient(90deg, #cf8c43, #b4aa71 48%, #3e9b90);
+  --brand-primary: linear-gradient(128deg, #347e76, #1e645f 68%, #2b746e);
+  --brand-shadow: 0 16px 44px -30px #315f7780, inset 0 1px #fff;
+  --brand-radius: 20px;
+  --brand-width: min(1320px, calc(100% - 2 * clamp(16px, 5.3vw, 84px)));
+  --brand-space: clamp(48px, 6.3vw, 96px);
+}
+
+:where(.public-home, .resource-page, .access-page, .workspace-page) {
+  accent-color: var(--brand-teal);
+}
+
+:where(.public-home, .resource-page, .access-page, .workspace-page)
+  :where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 3px solid #08776e;
+  outline-offset: 3px;
+}

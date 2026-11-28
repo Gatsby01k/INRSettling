@@ -49,7 +49,8 @@ export function renderAccessPage({
   <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/sora-latin-variable.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/instrument-sans-latin-variable.woff2" crossorigin>
   <link rel="stylesheet" href="/typography.css?v=20261003">
-  <link rel="stylesheet" href="/access.css?v=20261008">
+  <link rel="stylesheet" href="/brand.css">
+  <link rel="stylesheet" href="/access.css?v=20261128">
   <script src="/access.js?v=20261008" defer></script>
 </head>
 <body class="access-page">
@@ -77,7 +78,7 @@ export function renderAccessPage({
       </section>
       <aside class="access-scene" aria-hidden="true">
         <div class="access-art-frame"><div class="access-illustration"><img class="access-artwork" src="/assets/hero-plate.webp" width="1659" height="948" alt=""><img class="access-emblem" src="/assets/brand-symbol.svg" width="833" height="676" alt=""></div></div>
-        <div class="access-scene-copy"><p>India. Connected.</p><h2>A clearer path to<br>every settlement.</h2><div class="access-corridor"><span>INR</span><span class="access-corridor-line"></span>${arrow}<span>Global corridors</span></div></div>
+        <div class="access-scene-copy"><div class="access-corridor"><span>INR</span><span class="access-corridor-line"></span>${arrow}<span>Global corridors</span></div></div>
       </aside>
     </div>
   </main>
